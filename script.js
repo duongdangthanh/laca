@@ -90,19 +90,71 @@ const cio = new IntersectionObserver(
 )
 counters.forEach(el => cio.observe(el))
 
-// --- Registration form (front-end demo) ---
+// --- Registration form submit ---
 const form = document.getElementById('regForm')
 const msg = document.getElementById('regMsg')
-form.addEventListener('submit', e => {
+const submitBtn = form.querySelector('button[type="submit"]')
+
+form.addEventListener('submit', async e => {
   e.preventDefault()
   const data = new FormData(form)
-  if (!data.get('player1') || !data.get('player2') || !data.get('email')) {
+
+  const player1 = String(data.get('player1') || '').trim()
+  const player2 = String(data.get('player2') || '').trim()
+  const team = String(data.get('team') || '').trim()
+  const phone = String(data.get('phone') || '').trim()
+  const endpoint = (form.dataset.endpoint || '').trim()
+
+  if (!player1 || !player2 || !phone) {
     msg.style.color = 'var(--pink-soft)'
-    msg.textContent = 'Vui lòng điền tên cả 2 VĐV và email liên hệ.'
+    msg.textContent = 'Vui lòng điền tên cả 2 VĐV và số điện thoại liên hệ.'
     return
   }
-  msg.style.color = 'var(--pink-bright)'
-  msg.textContent =
-    '🎉 Ghi danh thành công! BTC sẽ liên hệ xác nhận suất thi đấu.'
-  form.reset()
+
+  if (!endpoint) {
+    msg.style.color = 'var(--pink-soft)'
+    msg.textContent =
+      'Chưa cấu hình nơi lưu đăng ký. BTC hãy dán URL Web App vào data-endpoint của form.'
+    return
+  }
+
+  const payload = {
+    player1,
+    player2,
+    team,
+    phone,
+    submittedAt: new Date().toISOString()
+  }
+
+  submitBtn.disabled = true
+  msg.style.color = 'var(--text-soft)'
+  msg.textContent = 'Đang gửi đăng ký...'
+
+  try {
+    const isGoogleScriptEndpoint =
+      endpoint.includes('script.google.com') ||
+      endpoint.includes('script.googleusercontent.com')
+
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      mode: isGoogleScriptEndpoint ? 'no-cors' : 'cors',
+      body: JSON.stringify(payload)
+    })
+
+    if (!isGoogleScriptEndpoint && !res.ok) {
+      throw new Error('submit_failed')
+    }
+
+    msg.style.color = 'var(--pink-bright)'
+    msg.textContent =
+      '🎉 Ghi danh thành công! Dữ liệu đã được lưu, BTC sẽ liên hệ xác nhận.'
+    form.reset()
+  } catch (_error) {
+    msg.style.color = 'var(--pink-soft)'
+    msg.textContent =
+      'Gửi chưa thành công. Vui lòng thử lại hoặc liên hệ BTC để hỗ trợ.'
+  } finally {
+    submitBtn.disabled = false
+  }
 })

@@ -1053,11 +1053,22 @@ em {
   border-color: var(--pink);
   background: rgba(236, 30, 121, 0.06);
 }
+.reg-help {
+  font-size: 12px;
+  color: var(--text-faint);
+  text-align: left;
+  line-height: 1.5;
+}
 .reg-msg {
   font-size: 14px;
   min-height: 20px;
   color: var(--pink-soft);
   font-weight: 600;
+}
+.reg-form .btn[disabled] {
+  opacity: 0.72;
+  cursor: not-allowed;
+  transform: none;
 }
 
 /* ---------- Footer ---------- */
