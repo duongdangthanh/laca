@@ -61,13 +61,7 @@ function getOrCreateSheet_() {
 function ensureHeader_(sheet) {
   if (sheet.getLastRow() > 0) return
 
-  sheet.appendRow([
-    'submittedAt',
-    'player1',
-    'player2',
-    'team',
-    'phone'
-  ])
+  sheet.appendRow(['submittedAt', 'player1', 'player2', 'team', 'phone'])
 }
 
 function param_(e, key) {
@@ -80,7 +74,7 @@ function clean_(v) {
 }
 
 function jsonOutput(obj) {
-  return ContentService
-    .createTextOutput(JSON.stringify(obj))
-    .setMimeType(ContentService.MimeType.JSON)
+  return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(
+    ContentService.MimeType.JSON
+  )
 }
