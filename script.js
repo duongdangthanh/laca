@@ -20,8 +20,8 @@ navLinks.querySelectorAll('a').forEach(a =>
   })
 )
 
-// --- Countdown to match day: Sat 18 Jul 2026, 07:00 (local) ---
-const target = new Date('2026-07-11T07:00:00').getTime()
+// --- Countdown to match day: Sun 12 Jul 2026, 07:00 (local) ---
+const target = new Date('2026-07-12T07:00:00').getTime()
 const pad = n => String(n).padStart(2, '0')
 const els = {
   d: document.getElementById('cdD'),
