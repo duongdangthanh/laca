@@ -5,13 +5,13 @@ const ROSTER_LIMIT = 16
 
 const DEFAULT_ROSTER = {
   male: [
-    'Dương Đăng Thanh',
+    'Thanh Thật Thà',
     'Nguyễn Quốc Ân',
-    'Lê Văn Thuận',
+    'Thuận Sovo',
     'Mr Shadow',
-    'Tran Huu Khanh',
+    'Quang Khánh',
     'Dinh Thanh',
-    'Trường Nguyễn',
+    'Khầy Trường',
     'Minh Dương',
     'Phương Nam Trần',
     'Tomm',
