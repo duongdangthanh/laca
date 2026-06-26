@@ -8,7 +8,7 @@
     </title>
     <meta
       name="description"
-      content="Giải Pickleball đôi nam-nữ nội bộ của LacaTeam. 12 cặp vận động viên, một ngày tranh tài duy nhất — Chủ nhật 12.07.2026 tại Kingkong Pickleball Stadium. Are you in?"
+      content="Giải Pickleball đôi nam-nữ nội bộ của LacaTeam. 16 nam + 16 nữ đăng ký cá nhân, BTC ghép cặp ngẫu nhiên — Chủ nhật 12.07.2026 tại Kingkong Pickleball Stadium. Are you in?"
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -35,6 +35,7 @@
         <a href="#about">Giới thiệu</a>
         <a href="#format">Thể thức</a>
         <a href="#teams">Danh sách</a>
+        <a href="#draw">Bốc thăm</a>
         <a href="#schedule">Lịch trình</a>
         <a href="#prizes">Giải thưởng</a>
         <a href="#venue">Địa điểm</a>
@@ -69,8 +70,8 @@
           <strong>Season 2</strong>
         </p>
         <p class="hero__tag">
-          Giải Pickleball đôi nam–nữ nội bộ của LacaTeam · 12 cặp vận động viên
-          · 1 ngày tranh tài duy nhất
+          Giải Pickleball đôi nam–nữ nội bộ của LacaTeam · 16 nam + 16 nữ đăng
+          ký cá nhân · BTC ghép cặp ngẫu nhiên · 1 ngày tranh tài duy nhất
         </p>
 
         <!-- Countdown -->
@@ -115,15 +116,15 @@
     <!-- STATS -->
     <section class="stats">
       <div class="stat">
-        <span class="stat__num" data-count="12">12</span>
+        <span class="stat__num" data-count="16">16</span>
         <span class="stat__lbl">Cặp đôi</span>
       </div>
       <div class="stat">
-        <span class="stat__num" data-count="24">24</span>
+        <span class="stat__num" data-count="32">32</span>
         <span class="stat__lbl">Vận động viên</span>
       </div>
       <div class="stat">
-        <span class="stat__num" data-count="6">6</span>
+        <span class="stat__num" id="statRegistered" data-count="25">25</span>
         <span class="stat__lbl">Đã đăng ký</span>
       </div>
       <div class="stat">
@@ -184,42 +185,72 @@
     <section class="section section--alt" id="format">
       <div class="sec-head">
         <span class="kicker">02 · Thể thức thi đấu</span>
-        <h2>Đôi nam–nữ · Vòng bảng + Loại trực tiếp</h2>
+        <h2>Đăng ký cá nhân · Ghép cặp ngẫu nhiên · Vòng bảng + Loại trực tiếp</h2>
         <p>
-          Thể thức được thiết kế để 12 cặp đấu trọn vẹn, công bằng và kịch tính
-          trong buổi sáng
+          <strong>16 VĐV nam</strong>
+          và
+          <strong>16 VĐV nữ</strong>
+          đăng ký cá nhân. BTC bốc thăm ghép cặp ngẫu nhiên thành
+          <strong>16 cặp đôi nam–nữ</strong>
+          , chia
+          <strong>4 bảng</strong>
+          đánh vòng tròn 1 lượt, sau đó loại trực tiếp trong buổi sáng
           <strong>09:00 – 13:00</strong>
-          — ai cũng được đánh nhiều trận, nhà vô địch xứng đáng nhất sẽ lộ diện.
+          .
         </p>
       </div>
 
-      <div class="format-grid">
+      <div class="format-grid format-grid--3">
         <div class="fcard">
-          <span class="fcard__step">Vòng 1</span>
-          <h3>Vòng bảng (Round Robin)</h3>
+          <span class="fcard__step">Bước 1</span>
+          <h3>Đăng ký &amp; Ghép cặp</h3>
           <ul>
             <li>
-              <strong>12 cặp</strong>
-              tranh tài vòng bảng rồi loại trực tiếp
+              <strong>16 nam + 16 nữ</strong>
+              đăng ký cá nhân (tối đa mỗi giới)
             </li>
             <li>
-              Chi tiết
-              <strong>chia bảng</strong>
-              sẽ được BTC công bố trước ngày thi đấu
+              BTC
+              <strong>bốc thăm ghép cặp ngẫu nhiên</strong>
+              tạo 16 cặp đôi nam–nữ
             </li>
             <li>
-              Mỗi trận 1 ván tính điểm rally
-              <strong>đến 11</strong>
-              (không cần cách biệt 2 điểm)
-            </li>
-            <li>
-              Top các cặp xuất sắc nhất đi tiếp vào vòng loại trực tiếp
+              Mỗi cặp được đặt tên đội sau khi ghép (hoặc dùng tên 2 VĐV)
             </li>
           </ul>
         </div>
         <div class="fcard">
-          <span class="fcard__step">Vòng 2</span>
-          <h3>Loại trực tiếp (Knock-out)</h3>
+          <span class="fcard__step">Vòng bảng</span>
+          <h3>4 bảng · Vòng tròn 1 lượt</h3>
+          <ul>
+            <li>
+              <strong>16 cặp</strong>
+              chia đều
+              <strong>4 bảng</strong>
+              , mỗi bảng 4 đội
+            </li>
+            <li>
+              Đánh
+              <strong>vòng tròn 1 lượt</strong>
+              trong từng bảng (6 trận/bảng)
+            </li>
+            <li>
+              Mỗi trận 1 ván rally
+              <strong>chạm 11</strong>
+              , không cần cách biệt 2 điểm
+            </li>
+            <li>
+              <strong>Đổi sân ở 6 điểm</strong>
+            </li>
+            <li>
+              <strong>Top 2</strong>
+              mỗi bảng (8 đội) đi tiếp vòng loại trực tiếp
+            </li>
+          </ul>
+        </div>
+        <div class="fcard">
+          <span class="fcard__step">Loại trực tiếp</span>
+          <h3>Tứ kết → Bán kết → Chung kết</h3>
           <ul>
             <li>
               <strong>Tứ kết</strong>
@@ -233,18 +264,20 @@
               trước chung kết
             </li>
             <li>
-              Tứ kết & Bán kết: 1 ván rally
-              <strong>đến 13</strong>
-              (chênh 2)
+              Tứ kết &amp; Bán kết: rally
+              <strong>chạm 13</strong>
+              , không cần cách biệt 2 điểm
             </li>
             <li>
-              Chung kết: 1 ván rally
-              <strong>đến 15</strong>
-              (chênh 2)
+              <strong>Đổi sân ở 7 điểm</strong>
             </li>
             <li>
-              <strong>Đổi sân ở điểm giữa</strong>
-              trong mọi trận đấu
+              Chung kết: rally
+              <strong>chạm 15</strong>
+              , không cần cách biệt 2 điểm
+            </li>
+            <li>
+              <strong>Đổi sân ở 8 điểm</strong>
             </li>
           </ul>
         </div>
@@ -253,9 +286,8 @@
       <div class="rules-note">
         <strong>Luật chung:</strong>
         Áp dụng luật Pickleball tiêu chuẩn (giao bóng dưới hông, double-bounce,
-        không lấn vạch kitchen). Mỗi cặp được 1 timeout/ván và
-        <strong>đổi sân tại điểm giữa của mỗi trận</strong>
-        . Trọng tài điều hành mọi trận đấu loại trực tiếp.
+        không lấn vạch kitchen). Mỗi cặp được 1 timeout/ván. Trọng tài điều hành
+        mọi trận đấu loại trực tiếp.
       </div>
     </section>
 
@@ -263,63 +295,138 @@
     <section class="section" id="teams">
       <div class="sec-head">
         <span class="kicker">03 · Danh sách đăng ký</span>
-        <h2>12 cặp đôi nam–nữ</h2>
+        <h2>16 nam · 16 nữ · Đăng ký cá nhân</h2>
         <p>
-          Danh sách cập nhật theo thứ tự đăng ký —
-          <strong>6/12 suất</strong>
-          đã có tên. Chi tiết chia bảng sẽ được BTC công bố trước ngày thi đấu.
+          BTC quản lý danh sách trực tiếp trên giao diện — thêm hoặc xóa VĐV
+          từng giới. Khi đủ
+          <strong id="rosterSummary">25/32 suất</strong>
+          , sẵn sàng bốc thăm ghép cặp.
         </p>
       </div>
-      <ol class="reg-list">
-        <li>
-          <span class="pair__no">01</span>
-          <span class="pair__name">Quang Khánh &amp; Hoa Vũ</span>
-        </li>
-        <li>
-          <span class="pair__no">02</span>
-          <span class="pair__name">Khầy Trường &amp; Thảo Hiếu</span>
-        </li>
-        <li>
-          <span class="pair__no">03</span>
-          <span class="pair__name">Minh Dương &amp; Minh Thảo</span>
-        </li>
-        <li>
-          <span class="pair__no">04</span>
-          <span class="pair__name">Lukita &amp; Vân Nguyễn</span>
-        </li>
-        <li>
-          <span class="pair__no">05</span>
-          <span class="pair__name">Thanh Thật Thà &amp; Nana Phan</span>
-        </li>
-        <li>
-          <span class="pair__no">06</span>
-          <span class="pair__name">Quốc Ân &amp; Ánh Lê</span>
-        </li>
-        <li>
-          <span class="pair__no">07</span>
-          <span class="pair__name pair__name--tbd">TBC</span>
-        </li>
-        <li>
-          <span class="pair__no">08</span>
-          <span class="pair__name pair__name--tbd">TBC</span>
-        </li>
-        <li>
-          <span class="pair__no">09</span>
-          <span class="pair__name pair__name--tbd">TBC</span>
-        </li>
-        <li>
-          <span class="pair__no">10</span>
-          <span class="pair__name pair__name--tbd">TBC</span>
-        </li>
-        <li>
-          <span class="pair__no">11</span>
-          <span class="pair__name pair__name--tbd">TBC</span>
-        </li>
-        <li>
-          <span class="pair__no">12</span>
-          <span class="pair__name pair__name--tbd">TBC</span>
-        </li>
-      </ol>
+
+      <div class="roster-board">
+        <div class="roster-col roster-col--male">
+          <div class="roster-col__head">
+            <h3>
+              <span class="roster-col__icon" aria-hidden="true">♂</span>
+              VĐV Nam
+            </h3>
+            <span class="roster-col__count" id="maleCount">0/16</span>
+          </div>
+          <ol class="roster-list" id="maleList" aria-label="Danh sách VĐV nam"></ol>
+          <div class="roster-add">
+            <input
+              type="text"
+              id="maleInput"
+              placeholder="Thêm tên VĐV nam..."
+              maxlength="40"
+              autocomplete="off"
+            />
+            <button type="button" class="btn btn--ghost" id="maleAddBtn">
+              Thêm
+            </button>
+          </div>
+        </div>
+
+        <div class="roster-col roster-col--female">
+          <div class="roster-col__head">
+            <h3>
+              <span class="roster-col__icon" aria-hidden="true">♀</span>
+              VĐV Nữ
+            </h3>
+            <span class="roster-col__count" id="femaleCount">0/16</span>
+          </div>
+          <ol class="roster-list" id="femaleList" aria-label="Danh sách VĐV nữ"></ol>
+          <div class="roster-add">
+            <input
+              type="text"
+              id="femaleInput"
+              placeholder="Thêm tên VĐV nữ..."
+              maxlength="40"
+              autocomplete="off"
+            />
+            <button type="button" class="btn btn--ghost" id="femaleAddBtn">
+              Thêm
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DRAW / RANDOM -->
+    <section class="section section--alt" id="draw">
+      <div class="sec-head">
+        <span class="kicker">04 · Bốc thăm &amp; Xếp bảng</span>
+        <h2>Ghép cặp · Chia bảng · Lịch vòng bảng</h2>
+        <p>
+          Một nút duy nhất — hệ thống tự động bổ sung chỗ trống (Nam/Nữ xx),
+          ghép cặp ngẫu nhiên, chia 4 bảng và xếp thứ tự thi đấu vòng bảng.
+        </p>
+      </div>
+
+      <div class="draw-controls">
+        <button type="button" class="btn btn--primary btn--draw" id="drawBtn">
+          <span class="draw-btn__label">Bắt đầu bốc thăm</span>
+        </button>
+        <p class="draw-status" id="drawStatus" role="status" aria-live="polite">
+          Sẵn sàng bốc thăm — thiếu suất sẽ tự thêm Nam/Nữ xx.
+        </p>
+      </div>
+
+      <div class="draw-progress" id="drawProgress" hidden>
+        <div class="draw-progress__step" data-step="pairing">
+          <span class="draw-progress__dot"></span>
+          Ghép cặp
+        </div>
+        <div class="draw-progress__line"></div>
+        <div class="draw-progress__step" data-step="grouping">
+          <span class="draw-progress__dot"></span>
+          Chia bảng
+        </div>
+        <div class="draw-progress__line"></div>
+        <div class="draw-progress__step" data-step="scheduling">
+          <span class="draw-progress__dot"></span>
+          Xếp lịch
+        </div>
+      </div>
+
+      <div class="draw-shuffle" id="drawShuffle" hidden aria-hidden="true">
+        <div class="draw-shuffle__col">
+          <span class="draw-shuffle__label">Nam</span>
+          <span class="draw-shuffle__name" id="shuffleMale">—</span>
+        </div>
+        <span class="draw-shuffle__plus">+</span>
+        <div class="draw-shuffle__col">
+          <span class="draw-shuffle__label">Nữ</span>
+          <span class="draw-shuffle__name" id="shuffleFemale">—</span>
+        </div>
+      </div>
+
+      <div class="draw-results">
+        <div class="draw-phase" id="phasePairs">
+          <h3 class="draw-phase__title">
+            <span class="draw-phase__num">1</span>
+            Cặp đôi sau bốc thăm
+          </h3>
+          <div class="pairs-grid" id="pairsGrid"></div>
+        </div>
+
+        <div class="draw-phase" id="phaseGroups">
+          <h3 class="draw-phase__title">
+            <span class="draw-phase__num">2</span>
+            Chia 4 bảng
+          </h3>
+          <div class="groups draw-groups" id="groupsGrid"></div>
+        </div>
+
+        <div class="draw-phase" id="phaseSchedule">
+          <h3 class="draw-phase__title">
+            <span class="draw-phase__num">3</span>
+            Thứ tự thi đấu vòng bảng
+          </h3>
+          <div class="schedule-board" id="scheduleGrid"></div>
+        </div>
+      </div>
     </section>
 
     <!-- GALLERY -->
@@ -363,7 +470,7 @@
     <!-- SCHEDULE -->
     <section class="section section--alt" id="schedule">
       <div class="sec-head">
-        <span class="kicker">04 · Lịch trình trong ngày</span>
+        <span class="kicker">05 · Lịch trình trong ngày</span>
         <h2>Chủ nhật, 12.07.2026 · 09:00 – 13:00</h2>
         <p>
           Lịch thi đấu gọn trong buổi sáng, kết thúc lúc
@@ -375,8 +482,8 @@
         <li>
           <span class="tl__time">09:00 – 09:20</span>
           <div class="tl__body">
-            <h4>Check-in &amp; Xác nhận cặp đấu</h4>
-            <p>Nhận áo đấu, số báo danh và xác nhận thông tin cặp đấu.</p>
+            <h4>Check-in &amp; Bốc thăm ghép cặp</h4>
+            <p>Xác nhận danh sách và bốc thăm ghép cặp ngẫu nhiên.</p>
           </div>
         </li>
         <li>
@@ -427,7 +534,7 @@
     <!-- PRIZES -->
     <section class="section" id="prizes">
       <div class="sec-head">
-        <span class="kicker">05 · Giải thưởng</span>
+        <span class="kicker">06 · Giải thưởng</span>
         <h2>Vinh quang trên mặt sân</h2>
         <p>
           Cúp vô địch và huy chương dành cho ba cặp đôi xuất sắc nhất.
@@ -455,7 +562,7 @@
     <!-- VENUE -->
     <section class="section section--alt" id="venue">
       <div class="sec-head">
-        <span class="kicker">06 · Địa điểm</span>
+        <span class="kicker">07 · Địa điểm</span>
         <h2>Kingkong Pickleball Stadium</h2>
         <p>
           Hệ thống sân tiêu chuẩn thi đấu, mái che, ánh sáng tốt — sẵn sàng cho
@@ -511,23 +618,22 @@
     <!-- REGISTER / CTA -->
     <section class="register" id="register">
       <div class="register__inner">
-        <p class="hero__eyebrow">Chỉ 12 suất · Đăng ký theo cặp nam–nữ</p>
+        <p class="hero__eyebrow">32 suất · Đăng ký cá nhân (16 nam + 16 nữ)</p>
         <h2>Bạn sẽ tham gia chứ?</h2>
         <p class="register__sub">
-          Rủ ngay người đồng đội ăn ý nhất và ghi danh vào LACA ZOMBIE Season 2.
-          Một ngày — để trở thành huyền thoại của LacaTeam.
+          Ghi danh cá nhân — BTC sẽ bốc thăm ghép cặp ngẫu nhiên vào ngày thi
+          đấu. Một ngày — để trở thành huyền thoại của LacaTeam.
         </p>
         <form class="reg-form" id="regForm" data-endpoint="https://script.google.com/macros/s/AKfycbzPKMDnlgmWZ_jpCl7GnqIYnEI1h71YRXz1racCvWa4VPk6be1LKm0Ixjf1-ZyFma1I/exec" novalidate>
           <div class="reg-row">
-            <input type="text" name="player1" placeholder="VĐV Nam (VD: Tuấn Anh)" required />
-            <input type="text" name="player2" placeholder="VĐV Nữ (VD: Quỳnh Anh)" required />
+            <input type="text" name="name" placeholder="Họ và tên VĐV" required />
+            <select name="gender" required aria-label="Giới tính">
+              <option value="" disabled selected>Chọn giới tính</option>
+              <option value="male">Nam</option>
+              <option value="female">Nữ</option>
+            </select>
           </div>
-          <div class="reg-row">
-            <input
-              type="text"
-              name="team"
-              placeholder="Tên cặp đôi"
-            />
+          <div class="reg-row reg-row--single">
             <input
               type="tel"
               name="phone"
@@ -553,7 +659,7 @@
         <p>LACA ZOMBIE · Team Championship Season 2</p>
       </div>
       <div class="footer__meta">
-        <span>Mixed Doubles · 12 cặp</span>
+        <span>Mixed Doubles · 16 cặp · 32 VĐV</span>
         <span>12.07.2026 · Kingkong Pickleball Stadium</span>
         <span>© 2026 LacaTeam. Made for the team.</span>
       </div>
