@@ -541,7 +541,7 @@ em {
 /* Bracket */
 .bracket {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 14px;
   align-items: start;
   padding: 26px;
@@ -693,10 +693,38 @@ em {
   color: var(--pink-soft);
 }
 
-/* ---------- Groups / 16 pairs ---------- */
+/* ---------- Registration list ---------- */
+.reg-list {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  counter-reset: reg;
+}
+.reg-list li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 18px;
+  border-radius: var(--radius);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  backdrop-filter: var(--glass-blur);
+  transition:
+    transform 0.25s,
+    border-color 0.25s,
+    background 0.25s;
+}
+.reg-list li:hover {
+  transform: translateY(-4px);
+  border-color: var(--border-pink);
+  background: var(--panel-strong);
+}
+
+/* ---------- Groups (legacy) ---------- */
 .groups {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 16px;
 }
 .group {
@@ -781,6 +809,11 @@ em {
   font-size: 12.5px;
   color: var(--text-faint);
   margin-top: 2px;
+}
+.pair__name--tbd {
+  color: var(--text-faint);
+  font-weight: 500;
+  font-style: italic;
 }
 
 /* ---------- Timeline ---------- */
@@ -1151,6 +1184,9 @@ em {
   .groups {
     grid-template-columns: repeat(2, 1fr);
   }
+  .reg-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
   .gallery {
     grid-template-columns: repeat(2, 1fr);
     grid-auto-rows: 140px;
@@ -1185,6 +1221,9 @@ em {
     grid-template-columns: 1fr;
   }
   .groups {
+    grid-template-columns: 1fr;
+  }
+  .reg-list {
     grid-template-columns: 1fr;
   }
   .gallery__item--wide {
