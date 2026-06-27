@@ -37,7 +37,8 @@ const DEFAULT_ROSTER = {
     'Nana Phan',
     'Bubu Pham',
     'Tuyết Mei',
-    'Mai Ngọc'
+    'Mai Ngọc',
+    'Khánh Diệp'
   ]
 }
 
