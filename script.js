@@ -1,6 +1,6 @@
 // ===== LACA ZOMBIE Championship — landing interactions =====
 
-const ROSTER_KEY = 'laca_roster_v6'
+const ROSTER_KEY = 'laca_roster_v7'
 const ROSTER_LIMIT = 16
 
 const DEFAULT_ROSTER = {
@@ -25,7 +25,7 @@ const DEFAULT_ROSTER = {
   female: [
     'Mai Thu',
     'Tiên',
-    'Mai',
+    'Mai Nguyễn',
     'Em Trâm',
     'Thảo Hiếu',
     'Toại Thủy',
@@ -35,8 +35,8 @@ const DEFAULT_ROSTER = {
     'Minh Thao',
     'Phạm Thoa',
     'Nana Phan',
-    'Bubu Pham',
     'Tuyết Mei',
+    'Minh Anh',
     'Diệu',
     'Khánh Diệp'
   ]
