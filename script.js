@@ -1,6 +1,6 @@
 // ===== LACA ZOMBIE Championship — landing interactions =====
 
-const ROSTER_KEY = 'laca_roster_v3'
+const ROSTER_KEY = 'laca_roster_v4'
 const ROSTER_LIMIT = 16
 
 const DEFAULT_ROSTER = {
