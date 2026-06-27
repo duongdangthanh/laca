@@ -1,6 +1,6 @@
 // ===== LACA ZOMBIE Championship — landing interactions =====
 
-const ROSTER_KEY = 'laca_roster_v2'
+const ROSTER_KEY = 'laca_roster_v3'
 const ROSTER_LIMIT = 16
 
 const DEFAULT_ROSTER = {
@@ -16,7 +16,11 @@ const DEFAULT_ROSTER = {
     'Phương Nam Trần',
     'Tomm',
     'Lê Minh Trí',
-    'Chen'
+    'Chen',
+    'Mr Quy',
+    'Mr Mountain',
+    'Phúc Phan',
+    'Xuân Trường'
   ],
   female: [
     'Mai Thu',
@@ -31,7 +35,9 @@ const DEFAULT_ROSTER = {
     'Minh Thao',
     'Phạm Thoa',
     'Nana Phan',
-    'Bubu Pham'
+    'Bubu Pham',
+    'Tuyết Mei',
+    'Mai Ngọc'
   ]
 }
 
@@ -232,10 +238,6 @@ const maleCount = document.getElementById('maleCount')
 const femaleCount = document.getElementById('femaleCount')
 const rosterSummary = document.getElementById('rosterSummary')
 const statRegistered = document.getElementById('statRegistered')
-const maleInput = document.getElementById('maleInput')
-const femaleInput = document.getElementById('femaleInput')
-const maleAddBtn = document.getElementById('maleAddBtn')
-const femaleAddBtn = document.getElementById('femaleAddBtn')
 
 // Draw DOM (khai báo trước updateRosterUI để tránh lỗi TDZ)
 let drawRunning = false
@@ -304,11 +306,6 @@ function updateRosterUI() {
     statRegistered.dataset.count = String(total)
   }
 
-  maleAddBtn.disabled = m >= ROSTER_LIMIT
-  femaleAddBtn.disabled = f >= ROSTER_LIMIT
-  maleInput.disabled = m >= ROSTER_LIMIT
-  femaleInput.disabled = f >= ROSTER_LIMIT
-
   updateDrawReadiness()
 }
 
@@ -324,35 +321,6 @@ function addPlayer(gender, name) {
   return true
 }
 
-function removePlayer(gender, id, liEl) {
-  liEl.classList.add('is-removing')
-  setTimeout(() => {
-    roster[gender] = roster[gender].filter(p => p.id !== id)
-    saveRoster(roster)
-    updateRosterUI()
-  }, 240)
-}
-
-maleAddBtn.addEventListener('click', () => {
-  if (addPlayer('male', maleInput.value)) maleInput.value = ''
-  maleInput.focus()
-})
-femaleAddBtn.addEventListener('click', () => {
-  if (addPlayer('female', femaleInput.value)) femaleInput.value = ''
-  femaleInput.focus()
-})
-maleInput.addEventListener('keydown', e => {
-  if (e.key === 'Enter') {
-    e.preventDefault()
-    maleAddBtn.click()
-  }
-})
-femaleInput.addEventListener('keydown', e => {
-  if (e.key === 'Enter') {
-    e.preventDefault()
-    femaleAddBtn.click()
-  }
-})
 
 // --- Draw / Bốc thăm ---
 
