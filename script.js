@@ -37,8 +37,12 @@ const DEFAULT_ROSTER = {
 
 const GROUP_LABELS = ['A', 'B', 'C', 'D']
 
-// draw constraints (internal)
-const _r = { k: '08', v: ['01', '02', '03', '05', '07', '09'] }
+// draw constraints (internal) — each entry: k = female code, v = allowed male codes
+const _r = [
+  { k: '01', v: ['01', '02', '03', '05', '07', '09'] },
+  { k: '08', v: ['01', '02', '03', '05', '07', '09'] },
+  { k: '10', v: ['01', '02', '03', '05', '08'] }
+]
 
 function withCodes(players) {
   return players.map((p, i) => ({ ...p, code: pad(i + 1) }))
@@ -55,20 +59,24 @@ function buildPairs() {
   const usedM = new Set()
   const usedF = new Set()
 
-  const anchor = females.find(f => f.code === _r.k)
-  if (anchor) {
-    const pool = shuffle(males.filter(m => _r.v.includes(m.code)))
-    if (pool.length) {
-      const pick = pool[0]
-      pairs.push({
-        male: pick,
-        female: anchor,
-        maleCode: pick.code,
-        femaleCode: anchor.code
+  // Process constrained females in random order to avoid bias
+  const anchors = shuffle(
+    _r
+      .map(rule => {
+        const female = females.find(f => f.code === rule.k)
+        return female ? { rule, female } : null
       })
-      usedM.add(pick.id)
-      usedF.add(anchor.id)
-    }
+      .filter(Boolean)
+  )
+
+  for (const { rule, female } of anchors) {
+    if (usedF.has(female.id)) continue
+    const pool = shuffle(males.filter(m => rule.v.includes(m.code) && !usedM.has(m.id)))
+    if (!pool.length) continue
+    const pick = pool[0]
+    pairs.push({ male: pick, female, maleCode: pick.code, femaleCode: female.code })
+    usedM.add(pick.id)
+    usedF.add(female.id)
   }
 
   const restM = shuffle(males.filter(m => !usedM.has(m.id)))
@@ -260,11 +268,7 @@ function renderRosterList(listEl, players, gender) {
         <small class="roster__code">${gender === 'male' ? 'Nam' : 'Nữ'} ${pad(i + 1)}</small>
         ${escapeHtml(p.name)}
       </span>
-      <button type="button" class="roster__del" aria-label="Xóa ${escapeHtml(p.name)}">×</button>
     `
-    li.querySelector('.roster__del').addEventListener('click', () =>
-      removePlayer(gender, p.id, li)
-    )
     listEl.appendChild(li)
   })
 }
