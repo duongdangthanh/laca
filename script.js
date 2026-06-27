@@ -37,7 +37,6 @@ const DEFAULT_ROSTER = {
 
 const GROUP_LABELS = ['A', 'B', 'C', 'D']
 
-// draw constraints — k = female code, v = allowed male codes, x = excluded male codes
 const _r = [
   { k: '01', v: ['01', '02', '03', '05', '07', '09'] },
   { k: '06', x: ['01'] },
