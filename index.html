@@ -39,7 +39,6 @@
         <a href="#schedule">Lịch trình</a>
         <a href="#prizes">Giải thưởng</a>
         <a href="#venue">Địa điểm</a>
-        <a href="#register" class="nav__cta">Đăng ký</a>
       </nav>
       <button class="nav__burger" id="burger" aria-label="Mở menu">
         <span></span>
@@ -105,9 +104,6 @@
         </div>
 
         <div class="hero__actions">
-          <a href="#register" class="btn btn--primary">
-            Bạn sẽ tham gia chứ?
-          </a>
           <a href="#format" class="btn btn--ghost">Xem thể thức</a>
         </div>
       </div>
@@ -587,40 +583,6 @@
             <span class="court__ball"></span>
           </div>
         </div>
-      </div>
-    </section>
-
-    <!-- REGISTER / CTA -->
-    <section class="register" id="register">
-      <div class="register__inner">
-        <p class="hero__eyebrow">32 suất · Đăng ký cá nhân (16 nam + 16 nữ)</p>
-        <h2>Bạn sẽ tham gia chứ?</h2>
-        <p class="register__sub">
-          Ghi danh cá nhân — BTC sẽ bốc thăm ghép cặp ngẫu nhiên vào ngày thi
-          đấu. Một ngày — để trở thành huyền thoại của LacaTeam.
-        </p>
-        <form class="reg-form" id="regForm" data-endpoint="https://script.google.com/macros/s/AKfycbzPKMDnlgmWZ_jpCl7GnqIYnEI1h71YRXz1racCvWa4VPk6be1LKm0Ixjf1-ZyFma1I/exec" novalidate>
-          <div class="reg-row">
-            <input type="text" name="name" placeholder="Họ và tên VĐV" required />
-            <select name="gender" required aria-label="Giới tính">
-              <option value="" disabled selected>Chọn giới tính</option>
-              <option value="male">Nam</option>
-              <option value="female">Nữ</option>
-            </select>
-          </div>
-          <div class="reg-row reg-row--single">
-            <input
-              type="tel"
-              name="phone"
-              placeholder="Số điện thoại liên hệ"
-              required
-            />
-          </div>
-          <button type="submit" class="btn btn--primary btn--block">
-            Ghi danh ngay 🧟‍♂️🧟‍♀️
-          </button>
-          <p class="reg-msg" id="regMsg" role="status"></p>
-        </form>
       </div>
     </section>
 

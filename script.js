@@ -310,17 +310,6 @@ function updateRosterUI() {
   updateDrawReadiness()
 }
 
-function addPlayer(gender, name) {
-  const trimmed = name.trim()
-  if (!trimmed) return false
-  const list = roster[gender]
-  if (list.length >= ROSTER_LIMIT) return false
-  if (list.some(p => p.name.toLowerCase() === trimmed.toLowerCase())) return false
-  list.push({ id: uid(), name: trimmed })
-  saveRoster(roster)
-  updateRosterUI()
-  return true
-}
 
 
 // --- Draw / Bốc thăm ---
@@ -590,73 +579,3 @@ if (drawBtn) drawBtn.addEventListener('click', runDraw)
 
 updateRosterUI()
 
-// --- Registration form submit ---
-const form = document.getElementById('regForm')
-const msg = document.getElementById('regMsg')
-const submitBtn = form.querySelector('button[type="submit"]')
-
-form.addEventListener('submit', async e => {
-  e.preventDefault()
-  const data = new FormData(form)
-
-  const name = String(data.get('name') || '').trim()
-  const gender = String(data.get('gender') || '').trim()
-  const phone = String(data.get('phone') || '').trim()
-  const endpoint = (form.dataset.endpoint || '').trim()
-
-  if (!name || !gender || !phone) {
-    msg.style.color = 'var(--pink-soft)'
-    msg.textContent = 'Vui lòng điền đầy đủ họ tên, giới tính và số điện thoại.'
-    return
-  }
-
-  if (!endpoint) {
-    msg.style.color = 'var(--pink-soft)'
-    msg.textContent =
-      'Chưa cấu hình nơi lưu đăng ký. BTC hãy dán URL Web App vào data-endpoint của form.'
-    return
-  }
-
-  const genderLabel = gender === 'male' ? 'Nam' : 'Nữ'
-  const payload = {
-    player1: name,
-    player2: genderLabel,
-    team: '',
-    phone,
-    submittedAt: new Date().toISOString()
-  }
-
-  submitBtn.disabled = true
-  msg.style.color = 'var(--text-soft)'
-  msg.textContent = 'Đang gửi đăng ký...'
-
-  try {
-    const isGoogleScriptEndpoint =
-      endpoint.includes('script.google.com') ||
-      endpoint.includes('script.googleusercontent.com')
-
-    const res = await fetch(endpoint, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      mode: isGoogleScriptEndpoint ? 'no-cors' : 'cors',
-      body: JSON.stringify(payload)
-    })
-
-    if (!isGoogleScriptEndpoint && !res.ok) {
-      throw new Error('submit_failed')
-    }
-
-    const added = addPlayer(gender, name)
-    msg.style.color = 'var(--pink-bright)'
-    msg.textContent = added
-      ? '🎉 Ghi danh thành công! Tên của bạn đã được thêm vào danh sách.'
-      : '🎉 Ghi danh thành công! (Tên đã có trong danh sách hoặc đã đủ suất.)'
-    form.reset()
-  } catch (_error) {
-    msg.style.color = 'var(--pink-soft)'
-    msg.textContent =
-      'Gửi chưa thành công. Vui lòng thử lại hoặc liên hệ BTC để hỗ trợ.'
-  } finally {
-    submitBtn.disabled = false
-  }
-})
