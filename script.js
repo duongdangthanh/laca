@@ -37,11 +37,13 @@ const DEFAULT_ROSTER = {
 
 const GROUP_LABELS = ['A', 'B', 'C', 'D']
 
-// draw constraints (internal) — each entry: k = female code, v = allowed male codes
+// draw constraints — k = female code, v = allowed male codes, x = excluded male codes
 const _r = [
   { k: '01', v: ['01', '02', '03', '05', '07', '09'] },
+  { k: '06', x: ['01'] },
   { k: '08', v: ['01', '02', '03', '05', '07', '09'] },
-  { k: '10', v: ['01', '02', '03', '05', '08'] }
+  { k: '10', v: ['01', '02', '03', '05', '08'] },
+  { k: '13', x: ['01'] }
 ]
 
 function withCodes(players) {
@@ -71,7 +73,10 @@ function buildPairs() {
 
   for (const { rule, female } of anchors) {
     if (usedF.has(female.id)) continue
-    const pool = shuffle(males.filter(m => rule.v.includes(m.code) && !usedM.has(m.id)))
+    const pool = shuffle(males.filter(m => {
+      if (usedM.has(m.id)) return false
+      return rule.v ? rule.v.includes(m.code) : !rule.x.includes(m.code)
+    }))
     if (!pool.length) continue
     const pick = pool[0]
     pairs.push({ male: pick, female, maleCode: pick.code, femaleCode: female.code })
