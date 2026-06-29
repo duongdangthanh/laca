@@ -12,9 +12,9 @@ const DEFAULT_ROSTER = {
     'Mr Shadow',
     'Quang Khánh',
     'Dinh Thanh',
-    'Khầy Trường',
+    'Trường Trong Trắng',
     'Minh Dương',
-    'Phương Nam Trần',
+    'Phương Nam',
     'Tomm',
     'Lê Minh Trí',
     'Chen',
@@ -39,7 +39,7 @@ const DEFAULT_ROSTER = {
     'Tuyết Mei',
     'Minh Anh',
     'Diệu',
-    'Khánh Diệp'
+    'Diệp Ann'
   ]
 }
 
@@ -55,7 +55,8 @@ const _r = [
 
 const _mr = [
   { k: '01', v: ['01', '02', '03', '05', '08', '10', '12'] },
-  { k: '08', x: ['12'] }
+  { k: '08', x: ['12'] },
+  { k: '16', x: ['12'] }
 ]
 
 function withCodes(players) {
@@ -543,6 +544,55 @@ function showSavedDraw(result) {
   setProgressStep('done')
 }
 
+function teamKey(team) {
+  return String(team.id || team.code || team.name || '')
+}
+
+function matchTeamKeys(match) {
+  return [teamKey(match.a), teamKey(match.b)]
+}
+
+function isThreeConsecutiveTeam(m1, m2, m3) {
+  const s1 = new Set(matchTeamKeys(m1))
+  const s2 = new Set(matchTeamKeys(m2))
+  const s3 = new Set(matchTeamKeys(m3))
+  for (const key of s1) {
+    if (s2.has(key) && s3.has(key)) return true
+  }
+  return false
+}
+
+function schedulePenalty(schedule) {
+  let penalty = 0
+  const indicesByTeam = new Map()
+
+  for (let i = 0; i < schedule.length; i++) {
+    const match = schedule[i]
+
+    if (i > 0) {
+      const prev = new Set(matchTeamKeys(schedule[i - 1]))
+      const cur = matchTeamKeys(match)
+      if (prev.has(cur[0])) penalty += 12
+      if (prev.has(cur[1])) penalty += 12
+    }
+
+    for (const key of matchTeamKeys(match)) {
+      if (!indicesByTeam.has(key)) indicesByTeam.set(key, [])
+      indicesByTeam.get(key).push(i)
+    }
+  }
+
+  for (const positions of indicesByTeam.values()) {
+    for (let i = 1; i < positions.length; i++) {
+      const gap = positions[i] - positions[i - 1]
+      if (gap === 1) penalty += 6
+      else if (gap === 2) penalty += 1
+    }
+  }
+
+  return penalty
+}
+
 function buildRoundRobin(teams) {
   const matches = []
   for (let i = 0; i < teams.length; i++) {
@@ -550,7 +600,47 @@ function buildRoundRobin(teams) {
       matches.push({ a: teams[i], b: teams[j] })
     }
   }
-  return shuffle(matches)
+
+  if (matches.length <= 1) return matches
+
+  const used = new Array(matches.length).fill(false)
+  let bestSchedule = null
+  let bestPenalty = Infinity
+
+  function backtrack(current) {
+    if (current.length === matches.length) {
+      const penalty = schedulePenalty(current)
+      if (penalty < bestPenalty) {
+        bestPenalty = penalty
+        bestSchedule = [...current]
+      }
+      return
+    }
+
+    const order = shuffle(
+      matches.map((_, idx) => idx).filter(idx => !used[idx])
+    )
+
+    for (const idx of order) {
+      const next = matches[idx]
+      const len = current.length
+      if (
+        len >= 2 &&
+        isThreeConsecutiveTeam(current[len - 2], current[len - 1], next)
+      ) {
+        continue
+      }
+
+      used[idx] = true
+      current.push(next)
+      backtrack(current)
+      current.pop()
+      used[idx] = false
+    }
+  }
+
+  backtrack([])
+  return bestSchedule || shuffle(matches)
 }
 
 async function runShufflePreview(males, females, cycles = 28) {
