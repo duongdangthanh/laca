@@ -1,7 +1,6 @@
 // ===== LACA ZOMBIE Championship — landing interactions =====
 
 const ROSTER_KEY = 'laca_roster_v7'
-const DRAW_RESULT_KEY = 'laca_confirmed_draw_v1'
 const ROSTER_LIMIT = 16
 
 const DEFAULT_ROSTER = {
@@ -44,83 +43,6 @@ const DEFAULT_ROSTER = {
 }
 
 const GROUP_LABELS = ['A', 'B', 'C', 'D']
-
-const _r = [
-  { k: '01', v: ['01', '02', '03', '05', '07', '09'] },
-  { k: '06', x: ['01'] },
-  { k: '08', v: ['01', '02', '03', '05', '07', '09'] },
-  { k: '10', v: ['01', '02', '03', '05', '08'] },
-  { k: '13', x: ['01'] }
-]
-
-const _mr = [
-  { k: '01', v: ['01', '02', '03', '05', '08', '10', '12'] },
-  { k: '08', x: ['12'] },
-  { k: '16', x: ['12'] }
-]
-
-function withCodes(players) {
-  return players.map((p, i) => ({ ...p, code: pad(i + 1) }))
-}
-
-function teamLabel(pair) {
-  return `${pair.male.name} & ${pair.female.name}`
-}
-
-function isAllowedByRule(sourceCode, targetCode, rules) {
-  const rule = rules.find(item => item.k === sourceCode)
-  if (!rule) return true
-  if (rule.v) return rule.v.includes(targetCode)
-  if (rule.x) return !rule.x.includes(targetCode)
-  return true
-}
-
-function canPair(maleCode, femaleCode) {
-  return (
-    isAllowedByRule(femaleCode, maleCode, _r) &&
-    isAllowedByRule(maleCode, femaleCode, _mr)
-  )
-}
-
-function buildPairs() {
-  const males = withCodes(roster.male)
-  const females = withCodes(roster.female)
-  const orderedFemales = shuffle(females)
-    .map(female => ({
-      female,
-      options: males.filter(male => canPair(male.code, female.code)).length
-    }))
-    .sort((a, b) => a.options - b.options)
-    .map(item => item.female)
-
-  const usedMaleCodes = new Set()
-
-  function assign(index, pairs) {
-    if (index === orderedFemales.length) return pairs
-
-    const female = orderedFemales[index]
-    const candidates = shuffle(
-      males.filter(
-        male => !usedMaleCodes.has(male.code) && canPair(male.code, female.code)
-      )
-    )
-
-    for (const male of candidates) {
-      usedMaleCodes.add(male.code)
-      const result = assign(index + 1, [
-        ...pairs,
-        { male, female, maleCode: male.code, femaleCode: female.code }
-      ])
-      if (result) return result
-      usedMaleCodes.delete(male.code)
-    }
-
-    return null
-  }
-
-  const pairs = assign(0, [])
-  return pairs ? shuffle(pairs) : []
-}
 
 // --- Sticky nav background on scroll ---
 const nav = document.getElementById('nav')
@@ -173,7 +95,7 @@ const timer = setInterval(tick, 1000)
 
 // --- Scroll reveal ---
 const revealTargets = document.querySelectorAll(
-  '.sec-head, .about__media, .pillar, .fcard, .bracket, .rules-note, .group, .gallery__item, .timeline li, .prize, .prizes--mini, .venue__info, .venue__map, .stat, .roster-col, .draw-controls, .draw-phase'
+  '.sec-head, .about__media, .pillar, .fcard, .bracket, .rules-note, .group, .gallery__item, .timeline li, .prize, .prizes--mini, .venue__info, .venue__map, .stat, .roster-col, .draw-phase'
 )
 revealTargets.forEach(el => el.classList.add('reveal'))
 const io = new IntersectionObserver(
@@ -213,19 +135,20 @@ const cio = new IntersectionObserver(
 counters.forEach(el => cio.observe(el))
 
 // --- Utilities ---
-const sleep = ms => new Promise(r => setTimeout(r, ms))
-
-function shuffle(arr) {
-  const a = [...arr]
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
-    ;[a[i], a[j]] = [a[j], a[i]]
-  }
-  return a
-}
-
 function uid() {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+}
+
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+}
+
+function teamLabel(pair) {
+  return `${pair.male.name} & ${pair.female.name}`
 }
 
 // --- Roster state ---
@@ -236,48 +159,14 @@ function loadRoster() {
       const data = JSON.parse(raw)
       if (Array.isArray(data.male) && Array.isArray(data.female)) return data
     }
-  } catch (_e) {
-    /* use default */
-  }
+  } catch (_e) { /* use default */ }
   return {
     male: DEFAULT_ROSTER.male.map(name => ({ id: uid(), name })),
     female: DEFAULT_ROSTER.female.map(name => ({ id: uid(), name }))
   }
 }
 
-function loadConfirmedDraw() {
-  try {
-    const raw = localStorage.getItem(DRAW_RESULT_KEY)
-    if (!raw) return null
-    const data = JSON.parse(raw)
-    if (
-      data &&
-      data.locked === true &&
-      data.roster &&
-      Array.isArray(data.roster.male) &&
-      Array.isArray(data.roster.female) &&
-      Array.isArray(data.pairs) &&
-      Array.isArray(data.groups) &&
-      Array.isArray(data.groupSchedules)
-    ) {
-      return data
-    }
-  } catch (_e) {
-    /* ignore invalid saved draw */
-  }
-  return null
-}
-
-function saveConfirmedDraw(result) {
-  localStorage.setItem(DRAW_RESULT_KEY, JSON.stringify(result))
-}
-
-function saveRoster(roster) {
-  localStorage.setItem(ROSTER_KEY, JSON.stringify(roster))
-}
-
-let confirmedDraw = loadConfirmedDraw()
-let roster = confirmedDraw?.roster || loadRoster()
+let roster = loadRoster()
 
 const maleList = document.getElementById('maleList')
 const femaleList = document.getElementById('femaleList')
@@ -286,49 +175,19 @@ const femaleCount = document.getElementById('femaleCount')
 const rosterSummary = document.getElementById('rosterSummary')
 const statRegistered = document.getElementById('statRegistered')
 
-// Draw DOM (khai báo trước updateRosterUI để tránh lỗi TDZ)
-let drawRunning = false
-let currentDrawResult = confirmedDraw
-const drawBtn = document.getElementById('drawBtn')
-const confirmDrawBtn = document.getElementById('confirmDrawBtn')
-const drawStatus = document.getElementById('drawStatus')
-const drawProgress = document.getElementById('drawProgress')
-const drawShuffle = document.getElementById('drawShuffle')
-const shuffleMale = document.getElementById('shuffleMale')
-const shuffleFemale = document.getElementById('shuffleFemale')
 const pairsGrid = document.getElementById('pairsGrid')
 const groupsGrid = document.getElementById('groupsGrid')
 const scheduleGrid = document.getElementById('scheduleGrid')
 const phasePairs = document.getElementById('phasePairs')
 const phaseGroups = document.getElementById('phaseGroups')
 const phaseSchedule = document.getElementById('phaseSchedule')
-const drawBtnLabel = drawBtn?.querySelector('.draw-btn__label')
-
-function cloneData(value) {
-  return JSON.parse(JSON.stringify(value))
-}
-
-function setConfirmButtonVisible(visible) {
-  if (!confirmDrawBtn) return
-  confirmDrawBtn.hidden = !visible
-}
-
-function applyLockedDrawState() {
-  if (drawBtn) {
-    drawBtn.disabled = true
-    drawBtn.classList.remove('is-running')
-  }
-  if (drawBtnLabel) drawBtnLabel.textContent = 'Kết quả đã xác nhận'
-  setConfirmButtonVisible(false)
-}
 
 function renderRosterList(listEl, players, gender) {
   listEl.innerHTML = ''
   if (!players.length) {
     const empty = document.createElement('li')
     empty.className = 'roster-list__empty'
-    empty.textContent =
-      gender === 'male' ? 'Chưa có VĐV nam.' : 'Chưa có VĐV nữ.'
+    empty.textContent = gender === 'male' ? 'Chưa có VĐV nam.' : 'Chưa có VĐV nữ.'
     listEl.appendChild(empty)
     return
   }
@@ -344,14 +203,6 @@ function renderRosterList(listEl, players, gender) {
     `
     listEl.appendChild(li)
   })
-}
-
-function escapeHtml(str) {
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
 }
 
 function updateRosterUI() {
@@ -372,99 +223,16 @@ function updateRosterUI() {
     statRegistered.textContent = total
     statRegistered.dataset.count = String(total)
   }
-
-  updateDrawReadiness()
 }
 
-// --- Draw / Bốc thăm ---
+// --- Draw render ---
 
-function fillRosterToLimit() {
-  const added = { male: 0, female: 0 }
-
-  while (roster.male.length < ROSTER_LIMIT) {
-    const no = roster.male.length + 1
-    roster.male.push({ id: uid(), name: `Nam ${pad(no)}`, placeholder: true })
-    added.male++
-  }
-  while (roster.female.length < ROSTER_LIMIT) {
-    const no = roster.female.length + 1
-    roster.female.push({ id: uid(), name: `Nữ ${pad(no)}`, placeholder: true })
-    added.female++
-  }
-
-  if (added.male || added.female) {
-    saveRoster(roster)
-    updateRosterUI()
-  }
-  return added
-}
-
-function updateDrawReadiness() {
-  if (drawRunning || !drawStatus) return
-  if (confirmedDraw?.locked) {
-    drawStatus.className = 'draw-status is-success'
-    drawStatus.textContent =
-      'Kết quả bốc thăm đã được xác nhận và khóa. Không thể bốc thăm lại.'
-    applyLockedDrawState()
-    return
-  }
-  const needM = Math.max(0, ROSTER_LIMIT - roster.male.length)
-  const needF = Math.max(0, ROSTER_LIMIT - roster.female.length)
-  drawStatus.className = 'draw-status'
-  if (!needM && !needF) {
-    drawStatus.textContent = 'Đủ 16 nam + 16 nữ — sẵn sàng bốc thăm!'
-    drawStatus.classList.add('is-success')
-  } else {
-    const parts = []
-    if (needM) parts.push(`còn thiếu ${needM} nam`)
-    if (needF) parts.push(`còn thiếu ${needF} nữ`)
-    drawStatus.textContent = `Chưa đủ 16 mỗi giới (${parts.join(', ')}). Bấm bốc thăm sẽ tự thêm Nam/Nữ xx cho đủ chỗ.`
-  }
-}
-
-function setProgressStep(step) {
-  drawProgress.hidden = false
-  drawProgress.querySelectorAll('.draw-progress__step').forEach(el => {
-    const s = el.dataset.step
-    el.classList.remove('is-active', 'is-done')
-    if (s === step) el.classList.add('is-active')
-    else if (
-      (step === 'grouping' && s === 'pairing') ||
-      (step === 'scheduling' && (s === 'pairing' || s === 'grouping')) ||
-      (step === 'done' && s !== step)
-    ) {
-      el.classList.add('is-done')
-    }
-  })
-  if (step === 'done') {
-    drawProgress
-      .querySelectorAll('.draw-progress__step')
-      .forEach(el => el.classList.add('is-done'))
-  }
-}
-
-function resetDrawUI() {
+function renderPairs(pairs) {
+  phasePairs.classList.add('is-active', 'is-done')
   pairsGrid.innerHTML = ''
-  groupsGrid.innerHTML = ''
-  scheduleGrid.innerHTML = ''
-  drawShuffle.hidden = true
-  ;[phasePairs, phaseGroups, phaseSchedule].forEach(el => {
-    el.classList.remove('is-active', 'is-done')
-  })
-  drawProgress.hidden = true
-  drawProgress
-    .querySelectorAll('.draw-progress__step')
-    .forEach(el => el.classList.remove('is-active', 'is-done'))
-}
-
-function renderPairs(pairs, animated = true) {
-  phasePairs.classList.add('is-active')
-  pairsGrid.innerHTML = ''
-
   pairs.forEach((pair, i) => {
     const card = document.createElement('div')
-    card.className = 'draw-pair'
-    if (!animated) card.classList.add('is-visible', 'is-locked')
+    card.className = 'draw-pair is-visible is-locked'
     card.innerHTML = `
       <span class="draw-pair__no">Cặp ${pad(i + 1)}</span>
       <div class="draw-pair__names">
@@ -475,18 +243,14 @@ function renderPairs(pairs, animated = true) {
     `
     pairsGrid.appendChild(card)
   })
-
-  phasePairs.classList.add('is-done')
 }
 
-function renderGroups(groups, animated = true) {
-  phaseGroups.classList.add('is-active')
+function renderGroups(groups) {
+  phaseGroups.classList.add('is-active', 'is-done')
   groupsGrid.innerHTML = ''
-
   groups.forEach((teams, gi) => {
     const block = document.createElement('div')
-    block.className = 'draw-group'
-    if (!animated) block.classList.add('is-visible')
+    block.className = 'draw-group is-visible'
     block.innerHTML = `
       <div class="draw-group__head">
         <span class="draw-group__badge">${GROUP_LABELS[gi]}</span>
@@ -497,315 +261,92 @@ function renderGroups(groups, animated = true) {
     const ul = block.querySelector('.draw-group__teams')
     teams.forEach(pair => {
       const li = document.createElement('li')
-      if (!animated) li.classList.add('is-visible')
+      li.className = 'is-visible'
       li.textContent = teamLabel(pair)
       ul.appendChild(li)
     })
     groupsGrid.appendChild(block)
   })
-
-  phaseGroups.classList.add('is-done')
 }
 
-function renderSchedule(groupSchedules, animated = true) {
-  phaseSchedule.classList.add('is-active')
+function renderSchedule(groupSchedules) {
+  phaseSchedule.classList.add('is-active', 'is-done')
   scheduleGrid.innerHTML = ''
-
   groupSchedules.forEach((matches, gi) => {
     const block = document.createElement('div')
-    block.className = 'schedule-group'
-    if (!animated) block.classList.add('is-visible')
+    block.className = 'schedule-group is-visible'
     block.innerHTML = `<h4>Bảng ${GROUP_LABELS[gi]}</h4><ol></ol>`
     const ol = block.querySelector('ol')
-    matches.forEach((m, mi) => {
+    matches.forEach((match, mi) => {
       const li = document.createElement('li')
-      if (!animated) li.classList.add('is-visible')
+      li.className = 'is-visible'
       li.innerHTML = `
         <span class="schedule-group__no">${pad(mi + 1)}</span>
         <span class="schedule-group__match">
-          <strong>${escapeHtml(teamLabel(m.a))}</strong>
+          <strong>${escapeHtml(teamLabel(match.a))}</strong>
           vs
-          <strong>${escapeHtml(teamLabel(m.b))}</strong>
+          <strong>${escapeHtml(teamLabel(match.b))}</strong>
         </span>
       `
       ol.appendChild(li)
     })
     scheduleGrid.appendChild(block)
   })
-
-  phaseSchedule.classList.add('is-done')
 }
 
-function showSavedDraw(result) {
-  resetDrawUI()
-  renderPairs(result.pairs, false)
-  renderGroups(result.groups, false)
-  renderSchedule(result.groupSchedules, false)
-  setProgressStep('done')
-}
+// === Kết quả chính thức ===
+;(function () {
+  const mk = (m, f) => ({ male: { name: m }, female: { name: f } })
+  const pairs = [
+    mk('Nguyễn Quốc Ân',    'Minh Thao'),
+    mk('Phúc Phan',          'Ánh Lê'),
+    mk('Xuân Trường',        'Em Trâm'),
+    mk('Trường Trong Trắng', 'Hoa Vũ'),
+    mk('Thanh Thật Thà',     'Mai Nguyễn'),
+    mk('Minh Dương',         'Tuyết Mei'),
+    mk('Chen',               'Diệu'),
+    mk('Mr Shadow',          'Minh Anh'),
+    mk('Quang Khánh',        'Mai Thu'),
+    mk('Dinh Thanh',         'Toại Thủy'),
+    mk('Phương Nam',         'Thảo Hiếu'),
+    mk('Thuận Sovo',         'Nana Phan'),
+    mk('Tomm',               'Vân Nguyễn'),
+    mk('Mr Mountain',        'Phạm Thoa'),
+    mk('Mr Quy',             'Tiên'),
+    mk('Lê Minh Trí',        'Diệp Ann'),
+  ].map((p, i) => ({ ...p, id: i + 1 }))
 
-function teamKey(team) {
-  return String(team.id || team.code || team.name || '')
-}
+  const G = (...ids) => ids.map(i => pairs[i - 1])
+  const groups = [
+    G(1, 11, 14, 12),  // Bảng A
+    G(7,  4,  8, 13),  // Bảng B
+    G(2,  6, 15,  9),  // Bảng C
+    G(10, 3, 16,  5),  // Bảng D
+  ]
 
-function matchTeamKeys(match) {
-  return [teamKey(match.a), teamKey(match.b)]
-}
+  const v = (a, b) => ({ a, b })
+  const groupSchedules = [
+    // Bảng A
+    [v(groups[0][2], groups[0][3]), v(groups[0][0], groups[0][1]),
+     v(groups[0][0], groups[0][3]), v(groups[0][1], groups[0][2]),
+     v(groups[0][1], groups[0][3]), v(groups[0][0], groups[0][2])],
+    // Bảng B
+    [v(groups[1][0], groups[1][3]), v(groups[1][1], groups[1][2]),
+     v(groups[1][1], groups[1][3]), v(groups[1][0], groups[1][2]),
+     v(groups[1][2], groups[1][3]), v(groups[1][0], groups[1][1])],
+    // Bảng C
+    [v(groups[2][1], groups[2][2]), v(groups[2][0], groups[2][3]),
+     v(groups[2][0], groups[2][2]), v(groups[2][1], groups[2][3]),
+     v(groups[2][0], groups[2][1]), v(groups[2][2], groups[2][3])],
+    // Bảng D
+    [v(groups[3][0], groups[3][3]), v(groups[3][1], groups[3][2]),
+     v(groups[3][1], groups[3][3]), v(groups[3][0], groups[3][2]),
+     v(groups[3][0], groups[3][1]), v(groups[3][2], groups[3][3])],
+  ]
 
-function isThreeConsecutiveTeam(m1, m2, m3) {
-  const s1 = new Set(matchTeamKeys(m1))
-  const s2 = new Set(matchTeamKeys(m2))
-  const s3 = new Set(matchTeamKeys(m3))
-  for (const key of s1) {
-    if (s2.has(key) && s3.has(key)) return true
-  }
-  return false
-}
-
-function schedulePenalty(schedule) {
-  let penalty = 0
-  const indicesByTeam = new Map()
-
-  for (let i = 0; i < schedule.length; i++) {
-    const match = schedule[i]
-
-    if (i > 0) {
-      const prev = new Set(matchTeamKeys(schedule[i - 1]))
-      const cur = matchTeamKeys(match)
-      if (prev.has(cur[0])) penalty += 12
-      if (prev.has(cur[1])) penalty += 12
-    }
-
-    for (const key of matchTeamKeys(match)) {
-      if (!indicesByTeam.has(key)) indicesByTeam.set(key, [])
-      indicesByTeam.get(key).push(i)
-    }
-  }
-
-  for (const positions of indicesByTeam.values()) {
-    for (let i = 1; i < positions.length; i++) {
-      const gap = positions[i] - positions[i - 1]
-      if (gap === 1) penalty += 6
-      else if (gap === 2) penalty += 1
-    }
-  }
-
-  return penalty
-}
-
-function buildRoundRobin(teams) {
-  const matches = []
-  for (let i = 0; i < teams.length; i++) {
-    for (let j = i + 1; j < teams.length; j++) {
-      matches.push({ a: teams[i], b: teams[j] })
-    }
-  }
-
-  if (matches.length <= 1) return matches
-
-  const used = new Array(matches.length).fill(false)
-  let bestSchedule = null
-  let bestPenalty = Infinity
-
-  function backtrack(current) {
-    if (current.length === matches.length) {
-      const penalty = schedulePenalty(current)
-      if (penalty < bestPenalty) {
-        bestPenalty = penalty
-        bestSchedule = [...current]
-      }
-      return
-    }
-
-    const order = shuffle(
-      matches.map((_, idx) => idx).filter(idx => !used[idx])
-    )
-
-    for (const idx of order) {
-      const next = matches[idx]
-      const len = current.length
-      if (
-        len >= 2 &&
-        isThreeConsecutiveTeam(current[len - 2], current[len - 1], next)
-      ) {
-        continue
-      }
-
-      used[idx] = true
-      current.push(next)
-      backtrack(current)
-      current.pop()
-      used[idx] = false
-    }
-  }
-
-  backtrack([])
-  return bestSchedule || shuffle(matches)
-}
-
-async function runShufflePreview(males, females, cycles = 28) {
-  drawShuffle.hidden = false
-  for (let i = 0; i < cycles; i++) {
-    shuffleMale.textContent =
-      males[Math.floor(Math.random() * males.length)].name
-    shuffleFemale.textContent =
-      females[Math.floor(Math.random() * females.length)].name
-    await sleep(55 + i * 2)
-  }
-}
-
-async function revealPairs(pairs) {
   renderPairs(pairs)
-
-  for (let i = 0; i < pairs.length; i++) {
-    shuffleMale.textContent = pairs[i].male.name
-    shuffleFemale.textContent = pairs[i].female.name
-    const card = pairsGrid.children[i]
-    card.classList.add('is-visible')
-    await sleep(320)
-    card.classList.add('is-locked')
-    await sleep(180)
-  }
-
-  drawShuffle.hidden = true
-}
-
-async function revealGroups(groups) {
   renderGroups(groups)
-
-  for (let gi = 0; gi < groups.length; gi++) {
-    const block = groupsGrid.children[gi]
-    block.classList.add('is-visible', 'is-active')
-    const items = block.querySelectorAll('li')
-    for (const li of items) {
-      await sleep(200)
-      li.classList.add('is-visible')
-    }
-    block.classList.remove('is-active')
-    await sleep(280)
-  }
-}
-
-async function revealSchedule(groupSchedules) {
   renderSchedule(groupSchedules)
-
-  for (const block of scheduleGrid.children) {
-    block.classList.add('is-visible')
-    await sleep(200)
-    for (const li of block.querySelectorAll('li')) {
-      await sleep(120)
-      li.classList.add('is-visible')
-    }
-    await sleep(200)
-  }
-}
-
-async function runDraw() {
-  if (drawRunning || !drawBtn || confirmedDraw?.locked) return
-
-  drawRunning = true
-  currentDrawResult = null
-  setConfirmButtonVisible(false)
-  drawBtn.disabled = true
-  drawBtn.classList.add('is-running')
-  if (drawBtnLabel) drawBtnLabel.textContent = 'Đang bốc thăm...'
-
-  try {
-    const added = fillRosterToLimit()
-    resetDrawUI()
-
-    if (added.male || added.female) {
-      const parts = []
-      if (added.male) parts.push(`${added.male} nam`)
-      if (added.female) parts.push(`${added.female} nữ`)
-      drawStatus.className = 'draw-status'
-      drawStatus.textContent = `Đã tự động thêm ${parts.join(' và ')} placeholder (Nam/Nữ xx)...`
-      await sleep(900)
-    }
-
-    drawStatus.className = 'draw-status'
-    drawStatus.textContent = 'Đang xáo trộn danh sách...'
-
-    const males = withCodes(roster.male)
-    const females = withCodes(roster.female)
-    const pairs = buildPairs().map((p, i) => ({ ...p, id: i + 1 }))
-
-    setProgressStep('pairing')
-    await runShufflePreview(males, females)
-    drawStatus.textContent = 'Đang ghép cặp ngẫu nhiên...'
-    await revealPairs(pairs)
-
-    setProgressStep('grouping')
-    drawStatus.textContent = 'Đang chia 4 bảng...'
-    const shuffledPairs = shuffle(pairs)
-    const groups = GROUP_LABELS.map((_, i) =>
-      shuffledPairs.slice(i * 4, i * 4 + 4)
-    )
-    await revealGroups(groups)
-
-    setProgressStep('scheduling')
-    drawStatus.textContent = 'Đang xếp thứ tự thi đấu vòng bảng...'
-    const groupSchedules = groups.map(teams => buildRoundRobin(teams))
-    await revealSchedule(groupSchedules)
-
-    currentDrawResult = {
-      locked: false,
-      roster: cloneData(roster),
-      pairs: cloneData(pairs),
-      groups: cloneData(groups),
-      groupSchedules: cloneData(groupSchedules)
-    }
-
-    setProgressStep('done')
-    drawStatus.className = 'draw-status is-success'
-    drawStatus.textContent =
-      'Hoàn tất! Có thể bốc thăm lại hoặc bấm "Xác nhận kết quả" để khóa kết quả này.'
-    if (drawBtnLabel) drawBtnLabel.textContent = 'Bốc thăm lại'
-    setConfirmButtonVisible(true)
-  } catch (err) {
-    console.error(err)
-    currentDrawResult = null
-    setConfirmButtonVisible(false)
-    drawStatus.className = 'draw-status is-error'
-    drawStatus.textContent = 'Có lỗi khi bốc thăm. Vui lòng thử lại.'
-    if (drawBtnLabel) drawBtnLabel.textContent = 'Bắt đầu bốc thăm'
-  } finally {
-    drawRunning = false
-    drawBtn.disabled = false
-    drawBtn.classList.remove('is-running')
-  }
-}
-
-if (drawBtn) drawBtn.addEventListener('click', runDraw)
-
-function confirmDrawResult() {
-  if (!currentDrawResult || confirmedDraw?.locked) return
-  const code = window.prompt('Nhập mã xác nhận để khóa kết quả bốc thăm:')
-  if (code === null) return
-  if (code.trim() !== '1207') {
-    drawStatus.className = 'draw-status is-error'
-    drawStatus.textContent = 'Mã xác nhận không đúng. Kết quả chưa được lưu.'
-    return
-  }
-
-  confirmedDraw = {
-    ...cloneData(currentDrawResult),
-    locked: true,
-    confirmedAt: Date.now()
-  }
-  roster = cloneData(confirmedDraw.roster)
-  currentDrawResult = confirmedDraw
-  saveRoster(roster)
-  saveConfirmedDraw(confirmedDraw)
-  updateRosterUI()
-  showSavedDraw(confirmedDraw)
-}
-
-if (confirmDrawBtn) confirmDrawBtn.addEventListener('click', confirmDrawResult)
-
-if (confirmedDraw?.locked) {
-  saveRoster(roster)
-  showSavedDraw(confirmedDraw)
-}
+})()
 
 updateRosterUI()

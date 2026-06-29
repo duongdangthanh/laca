@@ -405,58 +405,11 @@
     <!-- DRAW / RANDOM -->
     <section class="section section--alt" id="draw">
       <div class="sec-head">
-        <span class="kicker">04 · Bốc thăm &amp; Xếp bảng</span>
+        <span class="kicker">04 · Xếp bảng chính thức</span>
         <h2>Ghép cặp · Chia bảng · Lịch vòng bảng</h2>
         <p>
-          Một nút duy nhất — hệ thống tự động bổ sung chỗ trống (Nam/Nữ xx),
-          ghép cặp ngẫu nhiên, chia 4 bảng và xếp thứ tự thi đấu vòng bảng.
+          Kết quả bốc thăm chính thức — 16 cặp đôi chia thành 4 bảng đấu.
         </p>
-      </div>
-
-      <div class="draw-controls">
-        <button type="button" class="btn btn--primary btn--draw" id="drawBtn">
-          <span class="draw-btn__label">Bắt đầu bốc thăm</span>
-        </button>
-        <button
-          type="button"
-          class="btn btn--ghost btn--confirm-draw"
-          id="confirmDrawBtn"
-          hidden
-        >
-          Xác nhận kết quả
-        </button>
-        <p class="draw-status" id="drawStatus" role="status" aria-live="polite">
-          Sẵn sàng bốc thăm — thiếu suất sẽ tự thêm Nam/Nữ xx.
-        </p>
-      </div>
-
-      <div class="draw-progress" id="drawProgress" hidden>
-        <div class="draw-progress__step" data-step="pairing">
-          <span class="draw-progress__dot"></span>
-          Ghép cặp
-        </div>
-        <div class="draw-progress__line"></div>
-        <div class="draw-progress__step" data-step="grouping">
-          <span class="draw-progress__dot"></span>
-          Chia bảng
-        </div>
-        <div class="draw-progress__line"></div>
-        <div class="draw-progress__step" data-step="scheduling">
-          <span class="draw-progress__dot"></span>
-          Xếp lịch
-        </div>
-      </div>
-
-      <div class="draw-shuffle" id="drawShuffle" hidden aria-hidden="true">
-        <div class="draw-shuffle__col">
-          <span class="draw-shuffle__label">Nam</span>
-          <span class="draw-shuffle__name" id="shuffleMale">—</span>
-        </div>
-        <span class="draw-shuffle__plus">+</span>
-        <div class="draw-shuffle__col">
-          <span class="draw-shuffle__label">Nữ</span>
-          <span class="draw-shuffle__name" id="shuffleFemale">—</span>
-        </div>
       </div>
 
       <div class="draw-results">
