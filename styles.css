@@ -544,21 +544,24 @@ em {
 /* Bracket */
 .bracket {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 14px;
-  align-items: start;
+  grid-template-columns: minmax(0, 1.25fr) minmax(220px, 1fr) minmax(220px, 1fr);
+  gap: 22px;
+  align-items: stretch;
   padding: 26px;
   border-radius: var(--radius);
   background: var(--panel);
   border: 1px solid var(--border);
   backdrop-filter: var(--glass-blur);
   margin-bottom: 28px;
+  overflow-x: auto;
 }
-.bracket__col {
+.bracket__round {
+  min-width: 0;
+}
+.bracket__lane {
+  min-height: 390px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  justify-content: center;
 }
 .bracket__head {
   font-size: 11px;
@@ -566,24 +569,71 @@ em {
   letter-spacing: 2px;
   color: var(--text-faint);
   text-align: center;
-  margin-bottom: 4px;
+  margin-bottom: 14px;
   font-weight: 600;
 }
-.grp,
 .match {
-  padding: 12px 10px;
-  border-radius: 10px;
-  text-align: center;
+  padding: 14px 14px 13px;
+  border-radius: 14px;
+  text-align: left;
   font-size: 14px;
   font-weight: 600;
   border: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.03);
-}
-.grp {
-  border-left: 3px solid var(--pink);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.05),
+    rgba(255, 255, 255, 0.02)
+  );
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  position: relative;
 }
 .match {
   color: var(--text-soft);
+}
+.bracket__round--quarters .bracket__lane {
+  justify-content: space-between;
+  gap: 28px;
+}
+.bracket__cluster {
+  display: grid;
+  gap: 16px;
+}
+.bracket__round--semis .bracket__lane {
+  justify-content: space-around;
+  gap: 90px;
+  padding: 54px 0;
+}
+.bracket__round--finals .bracket__lane {
+  justify-content: center;
+  gap: 24px;
+  padding: 96px 0 54px;
+}
+.match__code,
+.match__team,
+.match__vs {
+  display: block;
+}
+.match__code {
+  margin-bottom: 6px;
+  font-size: 11px;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.match__team {
+  color: var(--text);
+  line-height: 1.45;
+}
+.match__team + .match__team {
+  margin-top: 6px;
+}
+.match__vs {
+  margin: 6px 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--pink-soft);
 }
 .match--final {
   background: linear-gradient(135deg, var(--pink), var(--pink-bright));
@@ -591,8 +641,18 @@ em {
   border: 0;
   box-shadow: 0 6px 22px var(--pink-glow);
 }
+.match--final .match__code,
+.match--final .match__team,
+.match--final .match__vs {
+  color: #fff;
+}
 .match--bronze {
   border-color: var(--border-pink);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 138, 92, 0.12),
+    rgba(255, 255, 255, 0.03)
+  );
 }
 
 /* ---------- About media ---------- */
@@ -1001,10 +1061,16 @@ em {
   text-align: center;
   margin-bottom: 32px;
 }
+.draw-controls .btn + .btn {
+  margin-left: 12px;
+}
 .btn--draw {
   min-width: 240px;
   position: relative;
   overflow: hidden;
+}
+.btn--confirm-draw {
+  min-width: 220px;
 }
 .btn--draw.is-running {
   pointer-events: none;
@@ -1805,6 +1871,22 @@ em {
     grid-template-columns: 1fr 1fr;
     gap: 18px;
   }
+  .bracket__round--finals {
+    grid-column: 1 / -1;
+  }
+  .bracket__round--finals .bracket__lane {
+    min-height: auto;
+    padding-top: 0;
+    flex-direction: row;
+    align-items: stretch;
+  }
+  .match--final::before,
+  .match--semi::before,
+  .match--semi::after,
+  .bracket__cluster::before,
+  .bracket__cluster::after {
+    display: none;
+  }
   .prizes {
     grid-template-columns: 1fr;
     max-width: 380px;
@@ -1847,6 +1929,24 @@ em {
   }
   .bracket {
     grid-template-columns: 1fr;
+  }
+  .bracket__lane {
+    min-height: auto;
+  }
+  .bracket__round--semis .bracket__lane,
+  .bracket__round--finals .bracket__lane {
+    padding: 0;
+    gap: 16px;
+  }
+  .bracket__round--finals .bracket__lane {
+    flex-direction: column;
+  }
+  .bracket__cluster {
+    padding-right: 0;
+  }
+  .bracket__cluster::before,
+  .bracket__cluster::after {
+    display: none;
   }
   .reg-row {
     grid-template-columns: 1fr;

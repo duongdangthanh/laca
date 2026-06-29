@@ -1,6 +1,7 @@
 // ===== LACA ZOMBIE Championship — landing interactions =====
 
 const ROSTER_KEY = 'laca_roster_v7'
+const DRAW_RESULT_KEY = 'laca_confirmed_draw_v1'
 const ROSTER_LIMIT = 16
 
 const DEFAULT_ROSTER = {
@@ -52,6 +53,11 @@ const _r = [
   { k: '13', x: ['01'] }
 ]
 
+const _mr = [
+  { k: '01', v: ['01', '02', '03', '05', '08', '10', '12'] },
+  { k: '08', x: ['12'] }
+]
+
 function withCodes(players) {
   return players.map((p, i) => ({ ...p, code: pad(i + 1) }))
 }
@@ -60,48 +66,59 @@ function teamLabel(pair) {
   return `${pair.male.name} & ${pair.female.name}`
 }
 
+function isAllowedByRule(sourceCode, targetCode, rules) {
+  const rule = rules.find(item => item.k === sourceCode)
+  if (!rule) return true
+  if (rule.v) return rule.v.includes(targetCode)
+  if (rule.x) return !rule.x.includes(targetCode)
+  return true
+}
+
+function canPair(maleCode, femaleCode) {
+  return (
+    isAllowedByRule(femaleCode, maleCode, _r) &&
+    isAllowedByRule(maleCode, femaleCode, _mr)
+  )
+}
+
 function buildPairs() {
   const males = withCodes(roster.male)
   const females = withCodes(roster.female)
-  const pairs = []
-  const usedM = new Set()
-  const usedF = new Set()
-
-  // Process constrained females in random order to avoid bias
-  const anchors = shuffle(
-    _r
-      .map(rule => {
-        const female = females.find(f => f.code === rule.k)
-        return female ? { rule, female } : null
-      })
-      .filter(Boolean)
-  )
-
-  for (const { rule, female } of anchors) {
-    if (usedF.has(female.id)) continue
-    const pool = shuffle(males.filter(m => {
-      if (usedM.has(m.id)) return false
-      return rule.v ? rule.v.includes(m.code) : !rule.x.includes(m.code)
+  const orderedFemales = shuffle(females)
+    .map(female => ({
+      female,
+      options: males.filter(male => canPair(male.code, female.code)).length
     }))
-    if (!pool.length) continue
-    const pick = pool[0]
-    pairs.push({ male: pick, female, maleCode: pick.code, femaleCode: female.code })
-    usedM.add(pick.id)
-    usedF.add(female.id)
+    .sort((a, b) => a.options - b.options)
+    .map(item => item.female)
+
+  const usedMaleCodes = new Set()
+
+  function assign(index, pairs) {
+    if (index === orderedFemales.length) return pairs
+
+    const female = orderedFemales[index]
+    const candidates = shuffle(
+      males.filter(
+        male => !usedMaleCodes.has(male.code) && canPair(male.code, female.code)
+      )
+    )
+
+    for (const male of candidates) {
+      usedMaleCodes.add(male.code)
+      const result = assign(index + 1, [
+        ...pairs,
+        { male, female, maleCode: male.code, femaleCode: female.code }
+      ])
+      if (result) return result
+      usedMaleCodes.delete(male.code)
+    }
+
+    return null
   }
 
-  const restM = shuffle(males.filter(m => !usedM.has(m.id)))
-  const restF = shuffle(females.filter(f => !usedF.has(f.id)))
-  for (let i = 0; i < restM.length; i++) {
-    pairs.push({
-      male: restM[i],
-      female: restF[i],
-      maleCode: restM[i].code,
-      femaleCode: restF[i].code
-    })
-  }
-
-  return shuffle(pairs)
+  const pairs = assign(0, [])
+  return pairs ? shuffle(pairs) : []
 }
 
 // --- Sticky nav background on scroll ---
@@ -227,11 +244,39 @@ function loadRoster() {
   }
 }
 
+function loadConfirmedDraw() {
+  try {
+    const raw = localStorage.getItem(DRAW_RESULT_KEY)
+    if (!raw) return null
+    const data = JSON.parse(raw)
+    if (
+      data &&
+      data.locked === true &&
+      data.roster &&
+      Array.isArray(data.roster.male) &&
+      Array.isArray(data.roster.female) &&
+      Array.isArray(data.pairs) &&
+      Array.isArray(data.groups) &&
+      Array.isArray(data.groupSchedules)
+    ) {
+      return data
+    }
+  } catch (_e) {
+    /* ignore invalid saved draw */
+  }
+  return null
+}
+
+function saveConfirmedDraw(result) {
+  localStorage.setItem(DRAW_RESULT_KEY, JSON.stringify(result))
+}
+
 function saveRoster(roster) {
   localStorage.setItem(ROSTER_KEY, JSON.stringify(roster))
 }
 
-let roster = loadRoster()
+let confirmedDraw = loadConfirmedDraw()
+let roster = confirmedDraw?.roster || loadRoster()
 
 const maleList = document.getElementById('maleList')
 const femaleList = document.getElementById('femaleList')
@@ -242,7 +287,9 @@ const statRegistered = document.getElementById('statRegistered')
 
 // Draw DOM (khai báo trước updateRosterUI để tránh lỗi TDZ)
 let drawRunning = false
+let currentDrawResult = confirmedDraw
 const drawBtn = document.getElementById('drawBtn')
+const confirmDrawBtn = document.getElementById('confirmDrawBtn')
 const drawStatus = document.getElementById('drawStatus')
 const drawProgress = document.getElementById('drawProgress')
 const drawShuffle = document.getElementById('drawShuffle')
@@ -255,6 +302,24 @@ const phasePairs = document.getElementById('phasePairs')
 const phaseGroups = document.getElementById('phaseGroups')
 const phaseSchedule = document.getElementById('phaseSchedule')
 const drawBtnLabel = drawBtn?.querySelector('.draw-btn__label')
+
+function cloneData(value) {
+  return JSON.parse(JSON.stringify(value))
+}
+
+function setConfirmButtonVisible(visible) {
+  if (!confirmDrawBtn) return
+  confirmDrawBtn.hidden = !visible
+}
+
+function applyLockedDrawState() {
+  if (drawBtn) {
+    drawBtn.disabled = true
+    drawBtn.classList.remove('is-running')
+  }
+  if (drawBtnLabel) drawBtnLabel.textContent = 'Kết quả đã xác nhận'
+  setConfirmButtonVisible(false)
+}
 
 function renderRosterList(listEl, players, gender) {
   listEl.innerHTML = ''
@@ -310,8 +375,6 @@ function updateRosterUI() {
   updateDrawReadiness()
 }
 
-
-
 // --- Draw / Bốc thăm ---
 
 function fillRosterToLimit() {
@@ -337,6 +400,13 @@ function fillRosterToLimit() {
 
 function updateDrawReadiness() {
   if (drawRunning || !drawStatus) return
+  if (confirmedDraw?.locked) {
+    drawStatus.className = 'draw-status is-success'
+    drawStatus.textContent =
+      'Kết quả bốc thăm đã được xác nhận và khóa. Không thể bốc thăm lại.'
+    applyLockedDrawState()
+    return
+  }
   const needM = Math.max(0, ROSTER_LIMIT - roster.male.length)
   const needF = Math.max(0, ROSTER_LIMIT - roster.female.length)
   drawStatus.className = 'draw-status'
@@ -366,9 +436,9 @@ function setProgressStep(step) {
     }
   })
   if (step === 'done') {
-    drawProgress.querySelectorAll('.draw-progress__step').forEach(el =>
-      el.classList.add('is-done')
-    )
+    drawProgress
+      .querySelectorAll('.draw-progress__step')
+      .forEach(el => el.classList.add('is-done'))
   }
 }
 
@@ -381,9 +451,96 @@ function resetDrawUI() {
     el.classList.remove('is-active', 'is-done')
   })
   drawProgress.hidden = true
-  drawProgress.querySelectorAll('.draw-progress__step').forEach(el =>
-    el.classList.remove('is-active', 'is-done')
-  )
+  drawProgress
+    .querySelectorAll('.draw-progress__step')
+    .forEach(el => el.classList.remove('is-active', 'is-done'))
+}
+
+function renderPairs(pairs, animated = true) {
+  phasePairs.classList.add('is-active')
+  pairsGrid.innerHTML = ''
+
+  pairs.forEach((pair, i) => {
+    const card = document.createElement('div')
+    card.className = 'draw-pair'
+    if (!animated) card.classList.add('is-visible', 'is-locked')
+    card.innerHTML = `
+      <span class="draw-pair__no">Cặp ${pad(i + 1)}</span>
+      <div class="draw-pair__names">
+        ${escapeHtml(pair.male.name)}
+        <span>+</span>
+        ${escapeHtml(pair.female.name)}
+      </div>
+    `
+    pairsGrid.appendChild(card)
+  })
+
+  phasePairs.classList.add('is-done')
+}
+
+function renderGroups(groups, animated = true) {
+  phaseGroups.classList.add('is-active')
+  groupsGrid.innerHTML = ''
+
+  groups.forEach((teams, gi) => {
+    const block = document.createElement('div')
+    block.className = 'draw-group'
+    if (!animated) block.classList.add('is-visible')
+    block.innerHTML = `
+      <div class="draw-group__head">
+        <span class="draw-group__badge">${GROUP_LABELS[gi]}</span>
+        <h4>Bảng ${GROUP_LABELS[gi]}</h4>
+      </div>
+      <ul class="draw-group__teams"></ul>
+    `
+    const ul = block.querySelector('.draw-group__teams')
+    teams.forEach(pair => {
+      const li = document.createElement('li')
+      if (!animated) li.classList.add('is-visible')
+      li.textContent = teamLabel(pair)
+      ul.appendChild(li)
+    })
+    groupsGrid.appendChild(block)
+  })
+
+  phaseGroups.classList.add('is-done')
+}
+
+function renderSchedule(groupSchedules, animated = true) {
+  phaseSchedule.classList.add('is-active')
+  scheduleGrid.innerHTML = ''
+
+  groupSchedules.forEach((matches, gi) => {
+    const block = document.createElement('div')
+    block.className = 'schedule-group'
+    if (!animated) block.classList.add('is-visible')
+    block.innerHTML = `<h4>Bảng ${GROUP_LABELS[gi]}</h4><ol></ol>`
+    const ol = block.querySelector('ol')
+    matches.forEach((m, mi) => {
+      const li = document.createElement('li')
+      if (!animated) li.classList.add('is-visible')
+      li.innerHTML = `
+        <span class="schedule-group__no">${pad(mi + 1)}</span>
+        <span class="schedule-group__match">
+          <strong>${escapeHtml(teamLabel(m.a))}</strong>
+          vs
+          <strong>${escapeHtml(teamLabel(m.b))}</strong>
+        </span>
+      `
+      ol.appendChild(li)
+    })
+    scheduleGrid.appendChild(block)
+  })
+
+  phaseSchedule.classList.add('is-done')
+}
+
+function showSavedDraw(result) {
+  resetDrawUI()
+  renderPairs(result.pairs, false)
+  renderGroups(result.groups, false)
+  renderSchedule(result.groupSchedules, false)
+  setProgressStep('done')
 }
 
 function buildRoundRobin(teams) {
@@ -399,29 +556,16 @@ function buildRoundRobin(teams) {
 async function runShufflePreview(males, females, cycles = 28) {
   drawShuffle.hidden = false
   for (let i = 0; i < cycles; i++) {
-    shuffleMale.textContent = males[Math.floor(Math.random() * males.length)].name
-    shuffleFemale.textContent = females[Math.floor(Math.random() * females.length)].name
+    shuffleMale.textContent =
+      males[Math.floor(Math.random() * males.length)].name
+    shuffleFemale.textContent =
+      females[Math.floor(Math.random() * females.length)].name
     await sleep(55 + i * 2)
   }
 }
 
 async function revealPairs(pairs) {
-  phasePairs.classList.add('is-active')
-  pairsGrid.innerHTML = ''
-
-  pairs.forEach((pair, i) => {
-    const card = document.createElement('div')
-    card.className = 'draw-pair'
-    card.innerHTML = `
-      <span class="draw-pair__no">Cặp ${pad(i + 1)}</span>
-      <div class="draw-pair__names">
-        ${escapeHtml(pair.male.name)}
-        <span>+</span>
-        ${escapeHtml(pair.female.name)}
-      </div>
-    `
-    pairsGrid.appendChild(card)
-  })
+  renderPairs(pairs)
 
   for (let i = 0; i < pairs.length; i++) {
     shuffleMale.textContent = pairs[i].male.name
@@ -434,31 +578,10 @@ async function revealPairs(pairs) {
   }
 
   drawShuffle.hidden = true
-  phasePairs.classList.add('is-done')
 }
 
 async function revealGroups(groups) {
-  phaseGroups.classList.add('is-active')
-  groupsGrid.innerHTML = ''
-
-  groups.forEach((teams, gi) => {
-    const block = document.createElement('div')
-    block.className = 'draw-group'
-    block.innerHTML = `
-      <div class="draw-group__head">
-        <span class="draw-group__badge">${GROUP_LABELS[gi]}</span>
-        <h4>Bảng ${GROUP_LABELS[gi]}</h4>
-      </div>
-      <ul class="draw-group__teams"></ul>
-    `
-    const ul = block.querySelector('.draw-group__teams')
-    teams.forEach(pair => {
-      const li = document.createElement('li')
-      li.textContent = teamLabel(pair)
-      ul.appendChild(li)
-    })
-    groupsGrid.appendChild(block)
-  })
+  renderGroups(groups)
 
   for (let gi = 0; gi < groups.length; gi++) {
     const block = groupsGrid.children[gi]
@@ -471,33 +594,10 @@ async function revealGroups(groups) {
     block.classList.remove('is-active')
     await sleep(280)
   }
-
-  phaseGroups.classList.add('is-done')
 }
 
 async function revealSchedule(groupSchedules) {
-  phaseSchedule.classList.add('is-active')
-  scheduleGrid.innerHTML = ''
-
-  groupSchedules.forEach((matches, gi) => {
-    const block = document.createElement('div')
-    block.className = 'schedule-group'
-    block.innerHTML = `<h4>Bảng ${GROUP_LABELS[gi]}</h4><ol></ol>`
-    const ol = block.querySelector('ol')
-    matches.forEach((m, mi) => {
-      const li = document.createElement('li')
-      li.innerHTML = `
-        <span class="schedule-group__no">${pad(mi + 1)}</span>
-        <span class="schedule-group__match">
-          <strong>${escapeHtml(teamLabel(m.a))}</strong>
-          vs
-          <strong>${escapeHtml(teamLabel(m.b))}</strong>
-        </span>
-      `
-      ol.appendChild(li)
-    })
-    scheduleGrid.appendChild(block)
-  })
+  renderSchedule(groupSchedules)
 
   for (const block of scheduleGrid.children) {
     block.classList.add('is-visible')
@@ -508,14 +608,14 @@ async function revealSchedule(groupSchedules) {
     }
     await sleep(200)
   }
-
-  phaseSchedule.classList.add('is-done')
 }
 
 async function runDraw() {
-  if (drawRunning || !drawBtn) return
+  if (drawRunning || !drawBtn || confirmedDraw?.locked) return
 
   drawRunning = true
+  currentDrawResult = null
+  setConfirmButtonVisible(false)
   drawBtn.disabled = true
   drawBtn.classList.add('is-running')
   if (drawBtnLabel) drawBtnLabel.textContent = 'Đang bốc thăm...'
@@ -558,13 +658,24 @@ async function runDraw() {
     const groupSchedules = groups.map(teams => buildRoundRobin(teams))
     await revealSchedule(groupSchedules)
 
+    currentDrawResult = {
+      locked: false,
+      roster: cloneData(roster),
+      pairs: cloneData(pairs),
+      groups: cloneData(groups),
+      groupSchedules: cloneData(groupSchedules)
+    }
+
     setProgressStep('done')
     drawStatus.className = 'draw-status is-success'
     drawStatus.textContent =
-      'Hoàn tất! Bấm nút bên dưới để bốc thăm lại từ đầu.'
+      'Hoàn tất! Có thể bốc thăm lại hoặc bấm "Xác nhận kết quả" để khóa kết quả này.'
     if (drawBtnLabel) drawBtnLabel.textContent = 'Bốc thăm lại'
+    setConfirmButtonVisible(true)
   } catch (err) {
     console.error(err)
+    currentDrawResult = null
+    setConfirmButtonVisible(false)
     drawStatus.className = 'draw-status is-error'
     drawStatus.textContent = 'Có lỗi khi bốc thăm. Vui lòng thử lại.'
     if (drawBtnLabel) drawBtnLabel.textContent = 'Bắt đầu bốc thăm'
@@ -577,5 +688,34 @@ async function runDraw() {
 
 if (drawBtn) drawBtn.addEventListener('click', runDraw)
 
-updateRosterUI()
+function confirmDrawResult() {
+  if (!currentDrawResult || confirmedDraw?.locked) return
+  const code = window.prompt('Nhập mã xác nhận để khóa kết quả bốc thăm:')
+  if (code === null) return
+  if (code.trim() !== '1207') {
+    drawStatus.className = 'draw-status is-error'
+    drawStatus.textContent = 'Mã xác nhận không đúng. Kết quả chưa được lưu.'
+    return
+  }
 
+  confirmedDraw = {
+    ...cloneData(currentDrawResult),
+    locked: true,
+    confirmedAt: Date.now()
+  }
+  roster = cloneData(confirmedDraw.roster)
+  currentDrawResult = confirmedDraw
+  saveRoster(roster)
+  saveConfirmedDraw(confirmedDraw)
+  updateRosterUI()
+  showSavedDraw(confirmedDraw)
+}
+
+if (confirmDrawBtn) confirmDrawBtn.addEventListener('click', confirmDrawResult)
+
+if (confirmedDraw?.locked) {
+  saveRoster(roster)
+  showSavedDraw(confirmedDraw)
+}
+
+updateRosterUI()
