@@ -1,6 +1,10 @@
 // ===== LACA ZOMBIE Championship — landing interactions =====
 
 const ROSTER_KEY = 'laca_roster_v7'
+const SCORE_STATE_KEY = 'laca_group_score_state_v1'
+const KNOCKOUT_SCORE_STATE_KEY = 'laca_knockout_score_state_v1'
+const REMOTE_STATE_URL =
+  'https://script.google.com/macros/s/AKfycbxbMjRvwc3gKKVm4xxS6vlS1aAhca9CKpLH4uRu17PQULAKR5u52LtTDcH3FIT9PHNERw/exec'
 const ROSTER_LIMIT = 16
 
 const DEFAULT_ROSTER = {
@@ -166,7 +170,40 @@ function loadRoster() {
   }
 }
 
+function loadScoreState() {
+  try {
+    const raw = localStorage.getItem(SCORE_STATE_KEY)
+    if (!raw) return {}
+    const data = JSON.parse(raw)
+    return data && typeof data === 'object' ? data : {}
+  } catch (_e) {
+    return {}
+  }
+}
+
+function saveScoreState() {
+  localStorage.setItem(SCORE_STATE_KEY, JSON.stringify(scoreState))
+}
+
+function loadKnockoutScoreState() {
+  try {
+    const raw = localStorage.getItem(KNOCKOUT_SCORE_STATE_KEY)
+    if (!raw) return {}
+    const data = JSON.parse(raw)
+    return data && typeof data === 'object' ? data : {}
+  } catch (_e) {
+    return {}
+  }
+}
+
+function saveKnockoutScoreState() {
+  localStorage.setItem(KNOCKOUT_SCORE_STATE_KEY, JSON.stringify(knockoutScoreState))
+}
+
 let roster = loadRoster()
+let scoreState = loadScoreState()
+let knockoutScoreState = loadKnockoutScoreState()
+let remoteSaveTimer = null
 
 const maleList = document.getElementById('maleList')
 const femaleList = document.getElementById('femaleList')
@@ -181,6 +218,76 @@ const scheduleGrid = document.getElementById('scheduleGrid')
 const phasePairs = document.getElementById('phasePairs')
 const phaseGroups = document.getElementById('phaseGroups')
 const phaseSchedule = document.getElementById('phaseSchedule')
+const bracketEl = document.querySelector('.bracket')
+const drawStatus = document.getElementById('drawStatus')
+
+let currentPairs = []
+let currentGroups = []
+let currentGroupSchedules = []
+let qualifierSignature = ''
+
+function getDefaultRemoteState() {
+  return {
+    pairs: currentPairs,
+    groups: currentGroups,
+    groupSchedules: currentGroupSchedules,
+    scoreState,
+    knockoutScoreState,
+    updatedAt: Date.now()
+  }
+}
+
+async function fetchRemoteState() {
+  const url = `${REMOTE_STATE_URL}?action=getState`
+  const response = await fetch(url, { method: 'GET' })
+  if (!response.ok) throw new Error(`getState_failed_${response.status}`)
+  const data = await response.json()
+  if (!data || data.ok !== true) throw new Error('getState_invalid_payload')
+  return data.state || null
+}
+
+async function saveRemoteState(state) {
+  const response = await fetch(REMOTE_STATE_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'saveState', state })
+  })
+  if (!response.ok) throw new Error(`saveState_failed_${response.status}`)
+  const data = await response.json()
+  if (!data || data.ok !== true) throw new Error('saveState_invalid_payload')
+}
+
+function scheduleRemoteSave() {
+  if (remoteSaveTimer) clearTimeout(remoteSaveTimer)
+  remoteSaveTimer = setTimeout(async () => {
+    try {
+      await saveRemoteState(getDefaultRemoteState())
+      if (drawStatus) {
+        drawStatus.classList.remove('is-error')
+      }
+    } catch (_e) {
+      if (drawStatus) {
+        drawStatus.classList.add('is-error')
+        drawStatus.textContent = 'Lưu online thất bại, dữ liệu vẫn được giữ local.'
+      }
+    }
+  }, 500)
+}
+
+function applyRemoteState(remoteState) {
+  if (!remoteState || typeof remoteState !== 'object') return
+  if (remoteState.scoreState && typeof remoteState.scoreState === 'object') {
+    scoreState = remoteState.scoreState
+    saveScoreState()
+  }
+  if (
+    remoteState.knockoutScoreState &&
+    typeof remoteState.knockoutScoreState === 'object'
+  ) {
+    knockoutScoreState = remoteState.knockoutScoreState
+    saveKnockoutScoreState()
+  }
+}
 
 function renderRosterList(listEl, players, gender) {
   listEl.innerHTML = ''
@@ -275,24 +382,314 @@ function renderSchedule(groupSchedules) {
   groupSchedules.forEach((matches, gi) => {
     const block = document.createElement('div')
     block.className = 'schedule-group is-visible'
-    block.innerHTML = `<h4>Bảng ${GROUP_LABELS[gi]}</h4><ol></ol>`
+    block.innerHTML = `
+      <h4>Bảng ${GROUP_LABELS[gi]}</h4>
+      <ol></ol>
+      <div class="group-standings">
+        <h5>Bảng xếp hạng</h5>
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Đội</th>
+              <th>Tr</th>
+              <th>T</th>
+              <th>B</th>
+              <th>HS</th>
+              <th>Điểm</th>
+            </tr>
+          </thead>
+          <tbody data-standings-body="${gi}"></tbody>
+        </table>
+      </div>
+    `
     const ol = block.querySelector('ol')
     matches.forEach((match, mi) => {
+      const matchId = `G${gi + 1}-M${mi + 1}`
+      const saved = scoreState[matchId] || {}
+      const scoreA = Number.isInteger(saved.a) ? saved.a : ''
+      const scoreB = Number.isInteger(saved.b) ? saved.b : ''
       const li = document.createElement('li')
       li.className = 'is-visible'
       li.innerHTML = `
         <span class="schedule-group__no">${pad(mi + 1)}</span>
         <span class="schedule-group__match">
           <strong>${escapeHtml(teamLabel(match.a))}</strong>
-          vs
+          <span class="schedule-group__score-inputs">
+            <input type="number" min="0" step="1" inputmode="numeric" data-match-id="${matchId}" data-side="a" value="${scoreA}" />
+            <span>-</span>
+            <input type="number" min="0" step="1" inputmode="numeric" data-match-id="${matchId}" data-side="b" value="${scoreB}" />
+          </span>
           <strong>${escapeHtml(teamLabel(match.b))}</strong>
         </span>
       `
       ol.appendChild(li)
     })
     scheduleGrid.appendChild(block)
+    renderStandingsForGroup(gi)
+  })
+  applyKnockoutBracket(false)
+}
+
+function getTeamStatsMap(groupIndex) {
+  const teams = currentGroups[groupIndex] || []
+  const schedules = currentGroupSchedules[groupIndex] || []
+  const stats = new Map()
+
+  teams.forEach(team => {
+    stats.set(team.id, {
+      id: team.id,
+      name: teamLabel(team),
+      played: 0,
+      wins: 0,
+      losses: 0,
+      scored: 0,
+      conceded: 0,
+      diff: 0,
+      points: 0
+    })
+  })
+
+  schedules.forEach((match, matchIndex) => {
+    const matchId = `G${groupIndex + 1}-M${matchIndex + 1}`
+    const saved = scoreState[matchId]
+    if (!saved || !Number.isInteger(saved.a) || !Number.isInteger(saved.b)) return
+
+    const a = stats.get(match.a.id)
+    const b = stats.get(match.b.id)
+    if (!a || !b) return
+
+    a.played += 1
+    b.played += 1
+    a.scored += saved.a
+    a.conceded += saved.b
+    b.scored += saved.b
+    b.conceded += saved.a
+
+    if (saved.a > saved.b) {
+      a.wins += 1
+      b.losses += 1
+      a.points += 3
+    } else if (saved.b > saved.a) {
+      b.wins += 1
+      a.losses += 1
+      b.points += 3
+    } else {
+      a.points += 1
+      b.points += 1
+    }
+  })
+
+  for (const row of stats.values()) {
+    row.diff = row.scored - row.conceded
+  }
+
+  return [...stats.values()].sort((x, y) => {
+    if (y.points !== x.points) return y.points - x.points
+    if (y.diff !== x.diff) return y.diff - x.diff
+    if (y.scored !== x.scored) return y.scored - x.scored
+    return x.name.localeCompare(y.name, 'vi')
   })
 }
+
+function renderStandingsForGroup(groupIndex) {
+  const tbody = scheduleGrid.querySelector(`[data-standings-body="${groupIndex}"]`)
+  if (!tbody) return
+  const rows = getTeamStatsMap(groupIndex)
+  tbody.innerHTML = ''
+
+  rows.forEach((row, i) => {
+    const tr = document.createElement('tr')
+    tr.innerHTML = `
+      <td>${i + 1}</td>
+      <td>${escapeHtml(row.name)}</td>
+      <td>${row.played}</td>
+      <td>${row.wins}</td>
+      <td>${row.losses}</td>
+      <td>${row.diff > 0 ? '+' : ''}${row.diff}</td>
+      <td>${row.points}</td>
+    `
+    tbody.appendChild(tr)
+  })
+}
+
+function findTeamById(groupIndex, teamId) {
+  const teams = currentGroups[groupIndex] || []
+  return teams.find(team => team.id === teamId) || null
+}
+
+function getRankedTeams(groupIndex) {
+  return getTeamStatsMap(groupIndex)
+    .map(row => findTeamById(groupIndex, row.id))
+    .filter(Boolean)
+}
+
+function setBracketSlot(slot, value) {
+  const el = document.querySelector(`[data-slot="${slot}"]`)
+  if (!el) return
+  el.textContent = value
+}
+
+function normalizeKnockoutScoreInput(code) {
+  const pair = knockoutScoreState[code] || {}
+  const a = Number.isInteger(pair.a) ? pair.a : null
+  const b = Number.isInteger(pair.b) ? pair.b : null
+  return { a, b }
+}
+
+function getKnockoutOutcome(code, sideA, sideB) {
+  const { a, b } = normalizeKnockoutScoreInput(code)
+  if (!sideA || !sideB || a === null || b === null || a === b) {
+    return { winner: null, loser: null }
+  }
+  return a > b ? { winner: sideA, loser: sideB } : { winner: sideB, loser: sideA }
+}
+
+function setKnockoutInputsFromState() {
+  if (!bracketEl) return
+  bracketEl.querySelectorAll('input[data-ko-match]').forEach(input => {
+    const code = input.dataset.koMatch
+    const side = input.dataset.side
+    if (!code || (side !== 'a' && side !== 'b')) return
+    const pair = knockoutScoreState[code] || {}
+    input.value = Number.isInteger(pair[side]) ? String(pair[side]) : ''
+  })
+}
+
+function applyKnockoutBracket(resetIfQualifierChanged) {
+  const rankedA = getRankedTeams(0)
+  const rankedB = getRankedTeams(1)
+  const rankedC = getRankedTeams(2)
+  const rankedD = getRankedTeams(3)
+
+  const qf = {
+    TK1A: rankedA[0] ? teamLabel(rankedA[0]) : 'Nhất A',
+    TK1B: rankedB[1] ? teamLabel(rankedB[1]) : 'Nhì B',
+    TK2A: rankedC[0] ? teamLabel(rankedC[0]) : 'Nhất C',
+    TK2B: rankedD[1] ? teamLabel(rankedD[1]) : 'Nhì D',
+    TK3A: rankedB[0] ? teamLabel(rankedB[0]) : 'Nhất B',
+    TK3B: rankedA[1] ? teamLabel(rankedA[1]) : 'Nhì A',
+    TK4A: rankedD[0] ? teamLabel(rankedD[0]) : 'Nhất D',
+    TK4B: rankedC[1] ? teamLabel(rankedC[1]) : 'Nhì C'
+  }
+
+  const nextSignature = [
+    qf.TK1A,
+    qf.TK1B,
+    qf.TK2A,
+    qf.TK2B,
+    qf.TK3A,
+    qf.TK3B,
+    qf.TK4A,
+    qf.TK4B
+  ].join('|')
+
+  if (resetIfQualifierChanged && qualifierSignature && qualifierSignature !== nextSignature) {
+    knockoutScoreState = {}
+    saveKnockoutScoreState()
+  }
+  qualifierSignature = nextSignature
+
+  setBracketSlot('TK1-A', qf.TK1A)
+  setBracketSlot('TK1-B', qf.TK1B)
+  setBracketSlot('TK2-A', qf.TK2A)
+  setBracketSlot('TK2-B', qf.TK2B)
+  setBracketSlot('TK3-A', qf.TK3A)
+  setBracketSlot('TK3-B', qf.TK3B)
+  setBracketSlot('TK4-A', qf.TK4A)
+  setBracketSlot('TK4-B', qf.TK4B)
+
+  const q1 = getKnockoutOutcome('TK1', qf.TK1A, qf.TK1B)
+  const q2 = getKnockoutOutcome('TK2', qf.TK2A, qf.TK2B)
+  const q3 = getKnockoutOutcome('TK3', qf.TK3A, qf.TK3B)
+  const q4 = getKnockoutOutcome('TK4', qf.TK4A, qf.TK4B)
+
+  const bk1a = q1.winner || 'Thắng TK1'
+  const bk1b = q2.winner || 'Thắng TK2'
+  const bk2a = q3.winner || 'Thắng TK3'
+  const bk2b = q4.winner || 'Thắng TK4'
+
+  setBracketSlot('BK1-A', bk1a)
+  setBracketSlot('BK1-B', bk1b)
+  setBracketSlot('BK2-A', bk2a)
+  setBracketSlot('BK2-B', bk2b)
+
+  const s1 = getKnockoutOutcome('BK1', bk1a, bk1b)
+  const s2 = getKnockoutOutcome('BK2', bk2a, bk2b)
+
+  setBracketSlot('CK-A', s1.winner || 'Thắng BK1')
+  setBracketSlot('CK-B', s2.winner || 'Thắng BK2')
+  setBracketSlot('BR-A', s1.loser || 'Thua BK1')
+  setBracketSlot('BR-B', s2.loser || 'Thua BK2')
+
+  setKnockoutInputsFromState()
+}
+
+function onScheduleScoreInput(event) {
+  const input = event.target
+  if (!(input instanceof HTMLInputElement)) return
+  const matchId = input.dataset.matchId
+  const side = input.dataset.side
+  if (!matchId || (side !== 'a' && side !== 'b')) return
+
+  const value = input.value.trim()
+  if (!scoreState[matchId]) scoreState[matchId] = {}
+
+  if (value === '') {
+    delete scoreState[matchId][side]
+  } else {
+    const parsed = Math.max(0, parseInt(value, 10) || 0)
+    scoreState[matchId][side] = parsed
+    if (String(parsed) !== value) input.value = String(parsed)
+  }
+
+  if (
+    !Number.isInteger(scoreState[matchId].a) &&
+    !Number.isInteger(scoreState[matchId].b)
+  ) {
+    delete scoreState[matchId]
+  }
+
+  saveScoreState()
+  const groupIndex = parseInt(matchId.slice(1, matchId.indexOf('-')), 10) - 1
+  renderStandingsForGroup(groupIndex)
+  applyKnockoutBracket(true)
+  scheduleRemoteSave()
+}
+
+scheduleGrid.addEventListener('input', onScheduleScoreInput)
+
+function onKnockoutScoreInput(event) {
+  const input = event.target
+  if (!(input instanceof HTMLInputElement)) return
+  const code = input.dataset.koMatch
+  const side = input.dataset.side
+  if (!code || (side !== 'a' && side !== 'b')) return
+
+  const value = input.value.trim()
+  if (!knockoutScoreState[code]) knockoutScoreState[code] = {}
+
+  if (value === '') {
+    delete knockoutScoreState[code][side]
+  } else {
+    const parsed = Math.max(0, parseInt(value, 10) || 0)
+    knockoutScoreState[code][side] = parsed
+    if (String(parsed) !== value) input.value = String(parsed)
+  }
+
+  if (
+    !Number.isInteger(knockoutScoreState[code].a) &&
+    !Number.isInteger(knockoutScoreState[code].b)
+  ) {
+    delete knockoutScoreState[code]
+  }
+
+  saveKnockoutScoreState()
+  applyKnockoutBracket(false)
+  scheduleRemoteSave()
+}
+
+if (bracketEl) bracketEl.addEventListener('input', onKnockoutScoreInput)
 
 // === Kết quả chính thức ===
 ;(function () {
@@ -344,9 +741,32 @@ function renderSchedule(groupSchedules) {
      v(groups[3][0], groups[3][1]), v(groups[3][2], groups[3][3])],
   ]
 
+  currentPairs = pairs
+  currentGroups = groups
+  currentGroupSchedules = groupSchedules
+
   renderPairs(pairs)
   renderGroups(groups)
   renderSchedule(groupSchedules)
+  applyKnockoutBracket(false)
+})()
+
+;(async function syncFromRemote() {
+  try {
+    const remoteState = await fetchRemoteState()
+    if (remoteState) {
+      applyRemoteState(remoteState)
+      renderSchedule(currentGroupSchedules)
+      applyKnockoutBracket(false)
+      if (drawStatus) {
+        drawStatus.classList.remove('is-error')
+      }
+    } else {
+      await saveRemoteState(getDefaultRemoteState())
+    }
+  } catch (_e) {
+    // Fallback to local-only when remote is unavailable.
+  }
 })()
 
 updateRosterUI()

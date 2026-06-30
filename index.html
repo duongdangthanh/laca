@@ -286,29 +286,49 @@
             <div class="bracket__cluster">
               <div class="match match--quarter">
                 <span class="match__code">TK1</span>
-                <div class="match__team">Nhất A</div>
+                <div class="match__team" data-slot="TK1-A">Nhất A</div>
                 <div class="match__vs">gặp</div>
-                <div class="match__team">Nhì B</div>
+                <div class="match__team" data-slot="TK1-B">Nhì B</div>
+                <div class="match__score-inputs">
+                  <input type="number" min="0" step="1" inputmode="numeric" data-ko-match="TK1" data-side="a" />
+                  <span>-</span>
+                  <input type="number" min="0" step="1" inputmode="numeric" data-ko-match="TK1" data-side="b" />
+                </div>
               </div>
               <div class="match match--quarter">
                 <span class="match__code">TK2</span>
-                <div class="match__team">Nhất C</div>
+                <div class="match__team" data-slot="TK2-A">Nhất C</div>
                 <div class="match__vs">gặp</div>
-                <div class="match__team">Nhì D</div>
+                <div class="match__team" data-slot="TK2-B">Nhì D</div>
+                <div class="match__score-inputs">
+                  <input type="number" min="0" step="1" inputmode="numeric" data-ko-match="TK2" data-side="a" />
+                  <span>-</span>
+                  <input type="number" min="0" step="1" inputmode="numeric" data-ko-match="TK2" data-side="b" />
+                </div>
               </div>
             </div>
             <div class="bracket__cluster">
               <div class="match match--quarter">
                 <span class="match__code">TK3</span>
-                <div class="match__team">Nhất B</div>
+                <div class="match__team" data-slot="TK3-A">Nhất B</div>
                 <div class="match__vs">gặp</div>
-                <div class="match__team">Nhì A</div>
+                <div class="match__team" data-slot="TK3-B">Nhì A</div>
+                <div class="match__score-inputs">
+                  <input type="number" min="0" step="1" inputmode="numeric" data-ko-match="TK3" data-side="a" />
+                  <span>-</span>
+                  <input type="number" min="0" step="1" inputmode="numeric" data-ko-match="TK3" data-side="b" />
+                </div>
               </div>
               <div class="match match--quarter">
                 <span class="match__code">TK4</span>
-                <div class="match__team">Nhất D</div>
+                <div class="match__team" data-slot="TK4-A">Nhất D</div>
                 <div class="match__vs">gặp</div>
-                <div class="match__team">Nhì C</div>
+                <div class="match__team" data-slot="TK4-B">Nhì C</div>
+                <div class="match__score-inputs">
+                  <input type="number" min="0" step="1" inputmode="numeric" data-ko-match="TK4" data-side="a" />
+                  <span>-</span>
+                  <input type="number" min="0" step="1" inputmode="numeric" data-ko-match="TK4" data-side="b" />
+                </div>
               </div>
             </div>
           </div>
@@ -318,15 +338,25 @@
           <div class="bracket__lane">
             <div class="match match--semi">
               <span class="match__code">BK1</span>
-              <div class="match__team">Thắng TK1</div>
+              <div class="match__team" data-slot="BK1-A">Thắng TK1</div>
               <div class="match__vs">gặp</div>
-              <div class="match__team">Thắng TK2</div>
+              <div class="match__team" data-slot="BK1-B">Thắng TK2</div>
+              <div class="match__score-inputs">
+                <input type="number" min="0" step="1" inputmode="numeric" data-ko-match="BK1" data-side="a" />
+                <span>-</span>
+                <input type="number" min="0" step="1" inputmode="numeric" data-ko-match="BK1" data-side="b" />
+              </div>
             </div>
             <div class="match match--semi">
               <span class="match__code">BK2</span>
-              <div class="match__team">Thắng TK3</div>
+              <div class="match__team" data-slot="BK2-A">Thắng TK3</div>
               <div class="match__vs">gặp</div>
-              <div class="match__team">Thắng TK4</div>
+              <div class="match__team" data-slot="BK2-B">Thắng TK4</div>
+              <div class="match__score-inputs">
+                <input type="number" min="0" step="1" inputmode="numeric" data-ko-match="BK2" data-side="a" />
+                <span>-</span>
+                <input type="number" min="0" step="1" inputmode="numeric" data-ko-match="BK2" data-side="b" />
+              </div>
             </div>
           </div>
         </div>
@@ -335,15 +365,20 @@
           <div class="bracket__lane">
             <div class="match match--final">
               <span class="match__code">CK</span>
-              <div class="match__team">Thắng BK1</div>
+              <div class="match__team" data-slot="CK-A">Thắng BK1</div>
               <div class="match__vs">gặp</div>
-              <div class="match__team">Thắng BK2</div>
+              <div class="match__team" data-slot="CK-B">Thắng BK2</div>
+              <div class="match__score-inputs">
+                <input type="number" min="0" step="1" inputmode="numeric" data-ko-match="CK" data-side="a" />
+                <span>-</span>
+                <input type="number" min="0" step="1" inputmode="numeric" data-ko-match="CK" data-side="b" />
+              </div>
             </div>
             <div class="match match--bronze">
               <span class="match__code">Hạng 3</span>
-              <div class="match__team">Thua BK1</div>
+              <div class="match__team" data-slot="BR-A">Thua BK1</div>
               <div class="match__vs">gặp</div>
-              <div class="match__team">Thua BK2</div>
+              <div class="match__team" data-slot="BR-B">Thua BK2</div>
             </div>
           </div>
         </div>

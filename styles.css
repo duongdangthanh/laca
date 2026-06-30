@@ -635,6 +635,27 @@ em {
   text-transform: uppercase;
   color: var(--pink-soft);
 }
+.match__score-inputs {
+  margin-top: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.match__score-inputs input {
+  width: 42px;
+  padding: 5px 4px;
+  border-radius: 8px;
+  border: 1px solid var(--border-pink);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text);
+  text-align: center;
+  font-weight: 700;
+}
+.match__score-inputs input:focus {
+  outline: none;
+  border-color: var(--pink-bright);
+  box-shadow: 0 0 0 2px rgba(236, 30, 121, 0.2);
+}
 .match--final {
   background: linear-gradient(135deg, var(--pink), var(--pink-bright));
   color: #fff;
@@ -644,6 +665,11 @@ em {
 .match--final .match__code,
 .match--final .match__team,
 .match--final .match__vs {
+  color: #fff;
+}
+.match--final .match__score-inputs input {
+  border-color: rgba(255, 255, 255, 0.45);
+  background: rgba(255, 255, 255, 0.15);
   color: #fff;
 }
 .match--bronze {
@@ -1451,10 +1477,65 @@ em {
 .schedule-group__match {
   flex: 1;
   line-height: 1.35;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
 }
 .schedule-group__match strong {
   color: var(--text);
   font-weight: 600;
+}
+.schedule-group__match strong:last-child {
+  text-align: right;
+}
+.schedule-group__score-inputs {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.schedule-group__score-inputs input {
+  width: 50px;
+  padding: 6px 4px;
+  border-radius: 8px;
+  border: 1px solid var(--border-pink);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text);
+  font-weight: 700;
+  text-align: center;
+}
+.schedule-group__score-inputs input:focus {
+  outline: none;
+  border-color: var(--pink-bright);
+  box-shadow: 0 0 0 2px rgba(236, 30, 121, 0.18);
+}
+.group-standings {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+.group-standings h5 {
+  margin: 0 0 8px;
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.group-standings table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.group-standings th,
+.group-standings td {
+  padding: 6px 4px;
+  border-bottom: 1px solid var(--border);
+  text-align: center;
+}
+.group-standings th:nth-child(2),
+.group-standings td:nth-child(2) {
+  text-align: left;
 }
 
 /* ---------- Timeline ---------- */
@@ -1866,6 +1947,13 @@ em {
   }
   .schedule-board {
     grid-template-columns: 1fr;
+  }
+  .schedule-group__match {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+  .schedule-group__match strong:last-child {
+    text-align: left;
   }
   .bracket {
     grid-template-columns: 1fr 1fr;
