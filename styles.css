@@ -1443,6 +1443,7 @@ em {
 .schedule-group li {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 10px;
   padding: 10px 12px;
   border-radius: 8px;
@@ -1485,6 +1486,22 @@ em {
 .schedule-group__match strong {
   color: var(--text);
   font-weight: 600;
+}
+.schedule-group__status {
+  margin-left: 36px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  line-height: 1;
+}
+.schedule-group__status.is-pending {
+  color: #8f9aaa;
+}
+.schedule-group__status.is-live {
+  color: #f0c36d;
+}
+.schedule-group__status.is-complete {
+  color: #76d39b;
 }
 .schedule-group__match strong:last-child {
   text-align: right;
@@ -1951,6 +1968,9 @@ em {
   .schedule-group__match {
     grid-template-columns: 1fr;
     gap: 6px;
+  }
+  .schedule-group__status {
+    margin-left: 0;
   }
   .schedule-group__match strong:last-child {
     text-align: left;

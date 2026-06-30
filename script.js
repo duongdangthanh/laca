@@ -5,6 +5,7 @@ const SCORE_STATE_KEY = 'laca_group_score_state_v1'
 const KNOCKOUT_SCORE_STATE_KEY = 'laca_knockout_score_state_v1'
 const REMOTE_STATE_URL =
   'https://script.google.com/macros/s/AKfycbxbMjRvwc3gKKVm4xxS6vlS1aAhca9CKpLH4uRu17PQULAKR5u52LtTDcH3FIT9PHNERw/exec'
+const REMOTE_SYNC_INTERVAL_MS = 3000
 const ROSTER_LIMIT = 16
 
 const DEFAULT_ROSTER = {
@@ -36,7 +37,7 @@ const DEFAULT_ROSTER = {
     'Ánh Lê',
     'Hoa Vũ',
     'Vân Nguyễn',
-    'Minh Thao',
+    'Minh Thảo',
     'Phạm Thoa',
     'Nana Phan',
     'Tuyết Mei',
@@ -163,7 +164,9 @@ function loadRoster() {
       const data = JSON.parse(raw)
       if (Array.isArray(data.male) && Array.isArray(data.female)) return data
     }
-  } catch (_e) { /* use default */ }
+  } catch (_e) {
+    /* use default */
+  }
   return {
     male: DEFAULT_ROSTER.male.map(name => ({ id: uid(), name })),
     female: DEFAULT_ROSTER.female.map(name => ({ id: uid(), name }))
@@ -197,13 +200,17 @@ function loadKnockoutScoreState() {
 }
 
 function saveKnockoutScoreState() {
-  localStorage.setItem(KNOCKOUT_SCORE_STATE_KEY, JSON.stringify(knockoutScoreState))
+  localStorage.setItem(
+    KNOCKOUT_SCORE_STATE_KEY,
+    JSON.stringify(knockoutScoreState)
+  )
 }
 
 let roster = loadRoster()
 let scoreState = loadScoreState()
 let knockoutScoreState = loadKnockoutScoreState()
 let remoteSaveTimer = null
+let lastRemoteUpdatedAt = 0
 
 const maleList = document.getElementById('maleList')
 const femaleList = document.getElementById('femaleList')
@@ -238,8 +245,8 @@ function getDefaultRemoteState() {
 }
 
 async function fetchRemoteState() {
-  const url = `${REMOTE_STATE_URL}?action=getState`
-  const response = await fetch(url, { method: 'GET' })
+  const url = `${REMOTE_STATE_URL}?action=getState&t=${Date.now()}`
+  const response = await fetch(url, { method: 'GET', cache: 'no-store' })
   if (!response.ok) throw new Error(`getState_failed_${response.status}`)
   const data = await response.json()
   if (!data || data.ok !== true) throw new Error('getState_invalid_payload')
@@ -249,7 +256,8 @@ async function fetchRemoteState() {
 async function saveRemoteState(state) {
   const response = await fetch(REMOTE_STATE_URL, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    // Use text/plain to avoid CORS preflight issues with Apps Script Web Apps.
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
     body: JSON.stringify({ action: 'saveState', state })
   })
   if (!response.ok) throw new Error(`saveState_failed_${response.status}`)
@@ -261,14 +269,17 @@ function scheduleRemoteSave() {
   if (remoteSaveTimer) clearTimeout(remoteSaveTimer)
   remoteSaveTimer = setTimeout(async () => {
     try {
-      await saveRemoteState(getDefaultRemoteState())
+      const state = getDefaultRemoteState()
+      await saveRemoteState(state)
+      lastRemoteUpdatedAt = Number(state.updatedAt || 0)
       if (drawStatus) {
         drawStatus.classList.remove('is-error')
       }
     } catch (_e) {
       if (drawStatus) {
         drawStatus.classList.add('is-error')
-        drawStatus.textContent = 'Lưu online thất bại, dữ liệu vẫn được giữ local.'
+        drawStatus.textContent =
+          'Lưu online thất bại, dữ liệu vẫn được giữ local.'
       }
     }
   }, 500)
@@ -276,6 +287,9 @@ function scheduleRemoteSave() {
 
 function applyRemoteState(remoteState) {
   if (!remoteState || typeof remoteState !== 'object') return
+  lastRemoteUpdatedAt = Number(
+    remoteState.updatedAt || lastRemoteUpdatedAt || 0
+  )
   if (remoteState.scoreState && typeof remoteState.scoreState === 'object') {
     scoreState = remoteState.scoreState
     saveScoreState()
@@ -289,12 +303,28 @@ function applyRemoteState(remoteState) {
   }
 }
 
+async function pullRemoteStateIfNewer() {
+  try {
+    const remoteState = await fetchRemoteState()
+    if (!remoteState) return
+    const remoteUpdatedAt = Number(remoteState.updatedAt || 0)
+    if (remoteUpdatedAt > lastRemoteUpdatedAt) {
+      applyRemoteState(remoteState)
+      renderSchedule(currentGroupSchedules)
+      applyKnockoutBracket(false)
+    }
+  } catch (_e) {
+    // Keep UI functional with local state if remote is unavailable.
+  }
+}
+
 function renderRosterList(listEl, players, gender) {
   listEl.innerHTML = ''
   if (!players.length) {
     const empty = document.createElement('li')
     empty.className = 'roster-list__empty'
-    empty.textContent = gender === 'male' ? 'Chưa có VĐV nam.' : 'Chưa có VĐV nữ.'
+    empty.textContent =
+      gender === 'male' ? 'Chưa có VĐV nam.' : 'Chưa có VĐV nữ.'
     listEl.appendChild(empty)
     return
   }
@@ -409,6 +439,7 @@ function renderSchedule(groupSchedules) {
       const saved = scoreState[matchId] || {}
       const scoreA = Number.isInteger(saved.a) ? saved.a : ''
       const scoreB = Number.isInteger(saved.b) ? saved.b : ''
+      const status = getGroupMatchStatus(saved)
       const li = document.createElement('li')
       li.className = 'is-visible'
       li.innerHTML = `
@@ -422,6 +453,9 @@ function renderSchedule(groupSchedules) {
           </span>
           <strong>${escapeHtml(teamLabel(match.b))}</strong>
         </span>
+        <span class="schedule-group__status ${status.cls}" data-match-status="${matchId}" title="${status.title}" aria-label="${status.title}">
+          ${status.icon}
+        </span>
       `
       ol.appendChild(li)
     })
@@ -429,6 +463,23 @@ function renderSchedule(groupSchedules) {
     renderStandingsForGroup(gi)
   })
   applyKnockoutBracket(false)
+}
+
+function isCompletedGroupMatchScore(a, b) {
+  return Number.isInteger(a) && Number.isInteger(b) && (a >= 11 || b >= 11)
+}
+
+function getGroupMatchStatus(saved) {
+  const a = saved && Number.isInteger(saved.a) ? saved.a : null
+  const b = saved && Number.isInteger(saved.b) ? saved.b : null
+
+  if (isCompletedGroupMatchScore(a, b)) {
+    return { cls: 'is-complete', icon: '✓', title: 'Hoan thanh' }
+  }
+  if (a !== null || b !== null) {
+    return { cls: 'is-live', icon: '●', title: 'Dang thi dau' }
+  }
+  return { cls: 'is-pending', icon: '○', title: 'Chua thi dau' }
 }
 
 function getTeamStatsMap(groupIndex) {
@@ -453,7 +504,7 @@ function getTeamStatsMap(groupIndex) {
   schedules.forEach((match, matchIndex) => {
     const matchId = `G${groupIndex + 1}-M${matchIndex + 1}`
     const saved = scoreState[matchId]
-    if (!saved || !Number.isInteger(saved.a) || !Number.isInteger(saved.b)) return
+    if (!saved || !isCompletedGroupMatchScore(saved.a, saved.b)) return
 
     const a = stats.get(match.a.id)
     const b = stats.get(match.b.id)
@@ -492,8 +543,21 @@ function getTeamStatsMap(groupIndex) {
   })
 }
 
+function getCompletedGroupMatchCount(groupIndex) {
+  const schedules = currentGroupSchedules[groupIndex] || []
+  let count = 0
+  schedules.forEach((_, matchIndex) => {
+    const matchId = `G${groupIndex + 1}-M${matchIndex + 1}`
+    const saved = scoreState[matchId]
+    if (saved && isCompletedGroupMatchScore(saved.a, saved.b)) count += 1
+  })
+  return count
+}
+
 function renderStandingsForGroup(groupIndex) {
-  const tbody = scheduleGrid.querySelector(`[data-standings-body="${groupIndex}"]`)
+  const tbody = scheduleGrid.querySelector(
+    `[data-standings-body="${groupIndex}"]`
+  )
   if (!tbody) return
   const rows = getTeamStatsMap(groupIndex)
   tbody.innerHTML = ''
@@ -511,6 +575,21 @@ function renderStandingsForGroup(groupIndex) {
     `
     tbody.appendChild(tr)
   })
+}
+
+function updateGroupMatchStatus(matchId) {
+  const statusEl = scheduleGrid.querySelector(
+    `[data-match-status="${matchId}"]`
+  )
+  if (!statusEl) return
+  const saved = scoreState[matchId] || {}
+  const status = getGroupMatchStatus(saved)
+  statusEl.textContent = status.icon
+  statusEl.title = status.title
+  statusEl.setAttribute('aria-label', status.title)
+  statusEl.classList.toggle('is-complete', status.cls === 'is-complete')
+  statusEl.classList.toggle('is-live', status.cls === 'is-live')
+  statusEl.classList.toggle('is-pending', status.cls === 'is-pending')
 }
 
 function findTeamById(groupIndex, teamId) {
@@ -542,7 +621,9 @@ function getKnockoutOutcome(code, sideA, sideB) {
   if (!sideA || !sideB || a === null || b === null || a === b) {
     return { winner: null, loser: null }
   }
-  return a > b ? { winner: sideA, loser: sideB } : { winner: sideB, loser: sideA }
+  return a > b
+    ? { winner: sideA, loser: sideB }
+    : { winner: sideB, loser: sideA }
 }
 
 function setKnockoutInputsFromState() {
@@ -557,10 +638,15 @@ function setKnockoutInputsFromState() {
 }
 
 function applyKnockoutBracket(resetIfQualifierChanged) {
-  const rankedA = getRankedTeams(0)
-  const rankedB = getRankedTeams(1)
-  const rankedC = getRankedTeams(2)
-  const rankedD = getRankedTeams(3)
+  const readyA = getCompletedGroupMatchCount(0) > 0
+  const readyB = getCompletedGroupMatchCount(1) > 0
+  const readyC = getCompletedGroupMatchCount(2) > 0
+  const readyD = getCompletedGroupMatchCount(3) > 0
+
+  const rankedA = readyA ? getRankedTeams(0) : []
+  const rankedB = readyB ? getRankedTeams(1) : []
+  const rankedC = readyC ? getRankedTeams(2) : []
+  const rankedD = readyD ? getRankedTeams(3) : []
 
   const qf = {
     TK1A: rankedA[0] ? teamLabel(rankedA[0]) : 'Nhất A',
@@ -584,7 +670,11 @@ function applyKnockoutBracket(resetIfQualifierChanged) {
     qf.TK4B
   ].join('|')
 
-  if (resetIfQualifierChanged && qualifierSignature && qualifierSignature !== nextSignature) {
+  if (
+    resetIfQualifierChanged &&
+    qualifierSignature &&
+    qualifierSignature !== nextSignature
+  ) {
     knockoutScoreState = {}
     saveKnockoutScoreState()
   }
@@ -651,6 +741,7 @@ function onScheduleScoreInput(event) {
   }
 
   saveScoreState()
+  updateGroupMatchStatus(matchId)
   const groupIndex = parseInt(matchId.slice(1, matchId.indexOf('-')), 10) - 1
   renderStandingsForGroup(groupIndex)
   applyKnockoutBracket(true)
@@ -689,56 +780,77 @@ function onKnockoutScoreInput(event) {
   scheduleRemoteSave()
 }
 
-if (bracketEl) bracketEl.addEventListener('input', onKnockoutScoreInput)
+if (bracketEl)
+  bracketEl.addEventListener('input', onKnockoutScoreInput)
 
-// === Kết quả chính thức ===
+  // === Kết quả chính thức ===
 ;(function () {
   const mk = (m, f) => ({ male: { name: m }, female: { name: f } })
   const pairs = [
-    mk('Nguyễn Quốc Ân',    'Minh Thao'),
-    mk('Phúc Phan',          'Ánh Lê'),
-    mk('Xuân Trường',        'Em Trâm'),
+    mk('Nguyễn Quốc Ân', 'Minh Thao'),
+    mk('Phúc Phan', 'Ánh Lê'),
+    mk('Xuân Trường', 'Em Trâm'),
     mk('Trường Trong Trắng', 'Hoa Vũ'),
-    mk('Thanh Thật Thà',     'Mai Nguyễn'),
-    mk('Minh Dương',         'Tuyết Mei'),
-    mk('Chen',               'Diệu'),
-    mk('Mr Shadow',          'Minh Anh'),
-    mk('Quang Khánh',        'Mai Thu'),
-    mk('Dinh Thanh',         'Toại Thủy'),
-    mk('Phương Nam',         'Thảo Hiếu'),
-    mk('Thuận Sovo',         'Nana Phan'),
-    mk('Tomm',               'Vân Nguyễn'),
-    mk('Mr Mountain',        'Phạm Thoa'),
-    mk('Mr Quy',             'Tiên'),
-    mk('Lê Minh Trí',        'Diệp Ann'),
+    mk('Thanh Thật Thà', 'Mai Nguyễn'),
+    mk('Minh Dương', 'Tuyết Mei'),
+    mk('Chen', 'Diệu'),
+    mk('Mr Shadow', 'Minh Anh'),
+    mk('Quang Khánh', 'Mai Thu'),
+    mk('Dinh Thanh', 'Toại Thủy'),
+    mk('Phương Nam', 'Thảo Hiếu'),
+    mk('Thuận Sovo', 'Nana Phan'),
+    mk('Tomm', 'Vân Nguyễn'),
+    mk('Mr Mountain', 'Phạm Thoa'),
+    mk('Mr Quy', 'Tiên'),
+    mk('Lê Minh Trí', 'Diệp Ann')
   ].map((p, i) => ({ ...p, id: i + 1 }))
 
   const G = (...ids) => ids.map(i => pairs[i - 1])
   const groups = [
-    G(1, 11, 14, 12),  // Bảng A
-    G(7,  4,  8, 13),  // Bảng B
-    G(2,  6, 15,  9),  // Bảng C
-    G(10, 3, 16,  5),  // Bảng D
+    G(1, 11, 14, 12), // Bảng A
+    G(7, 4, 8, 13), // Bảng B
+    G(2, 6, 15, 9), // Bảng C
+    G(10, 3, 16, 5) // Bảng D
   ]
 
   const v = (a, b) => ({ a, b })
   const groupSchedules = [
     // Bảng A
-    [v(groups[0][2], groups[0][3]), v(groups[0][0], groups[0][1]),
-     v(groups[0][0], groups[0][3]), v(groups[0][1], groups[0][2]),
-     v(groups[0][1], groups[0][3]), v(groups[0][0], groups[0][2])],
+    [
+      v(groups[0][2], groups[0][3]),
+      v(groups[0][0], groups[0][1]),
+      v(groups[0][0], groups[0][3]),
+      v(groups[0][1], groups[0][2]),
+      v(groups[0][1], groups[0][3]),
+      v(groups[0][0], groups[0][2])
+    ],
     // Bảng B
-    [v(groups[1][0], groups[1][3]), v(groups[1][1], groups[1][2]),
-     v(groups[1][1], groups[1][3]), v(groups[1][0], groups[1][2]),
-     v(groups[1][2], groups[1][3]), v(groups[1][0], groups[1][1])],
+    [
+      v(groups[1][0], groups[1][3]),
+      v(groups[1][1], groups[1][2]),
+      v(groups[1][1], groups[1][3]),
+      v(groups[1][0], groups[1][2]),
+      v(groups[1][2], groups[1][3]),
+      v(groups[1][0], groups[1][1])
+    ],
     // Bảng C
-    [v(groups[2][1], groups[2][2]), v(groups[2][0], groups[2][3]),
-     v(groups[2][0], groups[2][2]), v(groups[2][1], groups[2][3]),
-     v(groups[2][0], groups[2][1]), v(groups[2][2], groups[2][3])],
+    [
+      v(groups[2][1], groups[2][2]),
+      v(groups[2][0], groups[2][3]),
+      v(groups[2][0], groups[2][2]),
+      v(groups[2][1], groups[2][3]),
+      v(groups[2][0], groups[2][1]),
+      v(groups[2][2], groups[2][3])
+    ],
     // Bảng D
-    [v(groups[3][0], groups[3][3]), v(groups[3][1], groups[3][2]),
-     v(groups[3][1], groups[3][3]), v(groups[3][0], groups[3][2]),
-     v(groups[3][0], groups[3][1]), v(groups[3][2], groups[3][3])],
+    [
+      v(groups[3][0], groups[3][3]),
+      v(groups[3][1], groups[3][2]),
+      v(groups[3][1], groups[3][3]),
+      v(groups[3][0], groups[3][2]),
+      v(groups[3][0], groups[3][1]),
+      v(groups[3][2], groups[3][3])
+    ]
   ]
 
   currentPairs = pairs
@@ -750,7 +862,6 @@ if (bracketEl) bracketEl.addEventListener('input', onKnockoutScoreInput)
   renderSchedule(groupSchedules)
   applyKnockoutBracket(false)
 })()
-
 ;(async function syncFromRemote() {
   try {
     const remoteState = await fetchRemoteState()
@@ -768,5 +879,7 @@ if (bracketEl) bracketEl.addEventListener('input', onKnockoutScoreInput)
     // Fallback to local-only when remote is unavailable.
   }
 })()
+
+setInterval(pullRemoteStateIfNewer, REMOTE_SYNC_INTERVAL_MS)
 
 updateRosterUI()
