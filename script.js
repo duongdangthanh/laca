@@ -819,37 +819,37 @@ if (bracketEl)
     [
       v(groups[0][2], groups[0][3]),
       v(groups[0][0], groups[0][1]),
-      v(groups[0][0], groups[0][3]),
+      v(groups[0][3], groups[0][0]),
       v(groups[0][1], groups[0][2]),
-      v(groups[0][1], groups[0][3]),
+      v(groups[0][3], groups[0][1]),
       v(groups[0][0], groups[0][2])
     ],
     // Bảng B
     [
-      v(groups[1][0], groups[1][3]),
-      v(groups[1][1], groups[1][2]),
-      v(groups[1][1], groups[1][3]),
       v(groups[1][0], groups[1][2]),
+      v(groups[1][3], groups[1][1]),
+      v(groups[1][0], groups[1][1]),
       v(groups[1][2], groups[1][3]),
-      v(groups[1][0], groups[1][1])
+      v(groups[1][1], groups[1][2]),
+      v(groups[1][0], groups[1][3])
     ],
     // Bảng C
     [
-      v(groups[2][1], groups[2][2]),
-      v(groups[2][0], groups[2][3]),
       v(groups[2][0], groups[2][2]),
-      v(groups[2][1], groups[2][3]),
-      v(groups[2][0], groups[2][1]),
-      v(groups[2][2], groups[2][3])
+      v(groups[2][2], groups[2][3]),
+      v(groups[2][3], groups[2][0]),
+      v(groups[2][1], groups[2][2]),
+      v(groups[2][1], groups[2][0]),
+      v(groups[2][1], groups[2][3])
     ],
     // Bảng D
     [
+      v(groups[3][2], groups[3][1]),
       v(groups[3][0], groups[3][3]),
-      v(groups[3][1], groups[3][2]),
+      v(groups[3][2], groups[3][0]),
       v(groups[3][1], groups[3][3]),
-      v(groups[3][0], groups[3][2]),
-      v(groups[3][0], groups[3][1]),
-      v(groups[3][2], groups[3][3])
+      v(groups[3][2], groups[3][3]),
+      v(groups[3][0], groups[3][1])
     ]
   ]
 
