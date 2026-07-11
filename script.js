@@ -232,6 +232,7 @@ let currentPairs = []
 let currentGroups = []
 let currentGroupSchedules = []
 let qualifierSignature = ''
+let knockoutMatchSides = {}
 
 function getDefaultRemoteState() {
   return {
@@ -609,6 +610,14 @@ function setBracketSlot(slot, value) {
   el.textContent = value
 }
 
+function isResolvedTeam(v) {
+  return !!(v && typeof v === 'object' && v.male && v.female)
+}
+
+function slotLabel(v) {
+  return isResolvedTeam(v) ? teamLabel(v) : v
+}
+
 function normalizeKnockoutScoreInput(code) {
   const pair = knockoutScoreState[code] || {}
   const a = Number.isInteger(pair.a) ? pair.a : null
@@ -616,9 +625,11 @@ function normalizeKnockoutScoreInput(code) {
   return { a, b }
 }
 
+// sideA/sideB are either a resolved pair object ({id, male, female}) or a
+// placeholder label string (e.g. 'Nhất A') while the qualifier isn't known yet.
 function getKnockoutOutcome(code, sideA, sideB) {
   const { a, b } = normalizeKnockoutScoreInput(code)
-  if (!sideA || !sideB || a === null || b === null || a === b) {
+  if (!isResolvedTeam(sideA) || !isResolvedTeam(sideB) || a === null || b === null || a === b) {
     return { winner: null, loser: null }
   }
   return a > b
@@ -649,14 +660,14 @@ function applyKnockoutBracket(resetIfQualifierChanged) {
   const rankedD = readyD ? getRankedTeams(3) : []
 
   const qf = {
-    TK1A: rankedA[0] ? teamLabel(rankedA[0]) : 'Nhất A',
-    TK1B: rankedB[1] ? teamLabel(rankedB[1]) : 'Nhì B',
-    TK2A: rankedC[0] ? teamLabel(rankedC[0]) : 'Nhất C',
-    TK2B: rankedD[1] ? teamLabel(rankedD[1]) : 'Nhì D',
-    TK3A: rankedB[0] ? teamLabel(rankedB[0]) : 'Nhất B',
-    TK3B: rankedA[1] ? teamLabel(rankedA[1]) : 'Nhì A',
-    TK4A: rankedD[0] ? teamLabel(rankedD[0]) : 'Nhất D',
-    TK4B: rankedC[1] ? teamLabel(rankedC[1]) : 'Nhì C'
+    TK1A: rankedA[0] || 'Nhất A',
+    TK1B: rankedB[1] || 'Nhì B',
+    TK2A: rankedC[0] || 'Nhất C',
+    TK2B: rankedD[1] || 'Nhì D',
+    TK3A: rankedB[0] || 'Nhất B',
+    TK3B: rankedA[1] || 'Nhì A',
+    TK4A: rankedD[0] || 'Nhất D',
+    TK4B: rankedC[1] || 'Nhì C'
   }
 
   const nextSignature = [
@@ -668,7 +679,9 @@ function applyKnockoutBracket(resetIfQualifierChanged) {
     qf.TK3B,
     qf.TK4A,
     qf.TK4B
-  ].join('|')
+  ]
+    .map(slotLabel)
+    .join('|')
 
   if (
     resetIfQualifierChanged &&
@@ -680,14 +693,14 @@ function applyKnockoutBracket(resetIfQualifierChanged) {
   }
   qualifierSignature = nextSignature
 
-  setBracketSlot('TK1-A', qf.TK1A)
-  setBracketSlot('TK1-B', qf.TK1B)
-  setBracketSlot('TK2-A', qf.TK2A)
-  setBracketSlot('TK2-B', qf.TK2B)
-  setBracketSlot('TK3-A', qf.TK3A)
-  setBracketSlot('TK3-B', qf.TK3B)
-  setBracketSlot('TK4-A', qf.TK4A)
-  setBracketSlot('TK4-B', qf.TK4B)
+  setBracketSlot('TK1-A', slotLabel(qf.TK1A))
+  setBracketSlot('TK1-B', slotLabel(qf.TK1B))
+  setBracketSlot('TK2-A', slotLabel(qf.TK2A))
+  setBracketSlot('TK2-B', slotLabel(qf.TK2B))
+  setBracketSlot('TK3-A', slotLabel(qf.TK3A))
+  setBracketSlot('TK3-B', slotLabel(qf.TK3B))
+  setBracketSlot('TK4-A', slotLabel(qf.TK4A))
+  setBracketSlot('TK4-B', slotLabel(qf.TK4B))
 
   const q1 = getKnockoutOutcome('TK1', qf.TK1A, qf.TK1B)
   const q2 = getKnockoutOutcome('TK2', qf.TK2A, qf.TK2B)
@@ -699,18 +712,34 @@ function applyKnockoutBracket(resetIfQualifierChanged) {
   const bk2a = q3.winner || 'Thắng TK3'
   const bk2b = q4.winner || 'Thắng TK4'
 
-  setBracketSlot('BK1-A', bk1a)
-  setBracketSlot('BK1-B', bk1b)
-  setBracketSlot('BK2-A', bk2a)
-  setBracketSlot('BK2-B', bk2b)
+  setBracketSlot('BK1-A', slotLabel(bk1a))
+  setBracketSlot('BK1-B', slotLabel(bk1b))
+  setBracketSlot('BK2-A', slotLabel(bk2a))
+  setBracketSlot('BK2-B', slotLabel(bk2b))
 
   const s1 = getKnockoutOutcome('BK1', bk1a, bk1b)
   const s2 = getKnockoutOutcome('BK2', bk2a, bk2b)
 
-  setBracketSlot('CK-A', s1.winner || 'Thắng BK1')
-  setBracketSlot('CK-B', s2.winner || 'Thắng BK2')
-  setBracketSlot('BR-A', s1.loser || 'Thua BK1')
-  setBracketSlot('BR-B', s2.loser || 'Thua BK2')
+  const cka = s1.winner || 'Thắng BK1'
+  const ckb = s2.winner || 'Thắng BK2'
+  const bra = s1.loser || 'Thua BK1'
+  const brb = s2.loser || 'Thua BK2'
+
+  setBracketSlot('CK-A', slotLabel(cka))
+  setBracketSlot('CK-B', slotLabel(ckb))
+  setBracketSlot('BR-A', slotLabel(bra))
+  setBracketSlot('BR-B', slotLabel(brb))
+
+  knockoutMatchSides = {
+    TK1: { a: qf.TK1A, b: qf.TK1B },
+    TK2: { a: qf.TK2A, b: qf.TK2B },
+    TK3: { a: qf.TK3A, b: qf.TK3B },
+    TK4: { a: qf.TK4A, b: qf.TK4B },
+    BK1: { a: bk1a, b: bk1b },
+    BK2: { a: bk2a, b: bk2b },
+    CK: { a: cka, b: ckb },
+    BR: { a: bra, b: brb }
+  }
 
   setKnockoutInputsFromState()
 }
@@ -883,3 +912,519 @@ if (bracketEl)
 setInterval(pullRemoteStateIfNewer, REMOTE_SYNC_INTERVAL_MS)
 
 updateRosterUI()
+
+// ===== Pickleball side-out scoring engine =====
+// A team's own two players always occupy complementary courts (right/even,
+// left/odd). Only the box of the CURRENT server is meaningful; it always
+// matches the parity of the serving team's own score.
+function otherPlayerKey(key) {
+  return key === 'male' ? 'female' : 'male'
+}
+
+function otherTeamKey(team) {
+  return team === 'a' ? 'b' : 'a'
+}
+
+function createInitialServeCourt(setup) {
+  const servingTeam = setup.servingTeam
+  const receivingTeam = otherTeamKey(servingTeam)
+  const court = {}
+  court[servingTeam] = {
+    right: setup.firstServer,
+    left: otherPlayerKey(setup.firstServer)
+  }
+  court[receivingTeam] = {
+    right: setup.firstReceiver,
+    left: otherPlayerKey(setup.firstReceiver)
+  }
+  return court
+}
+
+// Replays the full rally history from the initial setup so current state is
+// always derived, never stored redundantly — undo is just history.pop().
+function computeServeState(setup, history) {
+  const score = { a: 0, b: 0 }
+  let servingTeam = setup.servingTeam
+  // The very first serve of the whole match is conventionally called "2"
+  // (server #1's turn is skipped) so the score call reads e.g. "0-0-2".
+  let serverNum = 2
+  let firstServeActive = true
+  const court = createInitialServeCourt(setup)
+
+  for (const winner of history) {
+    if (winner === servingTeam) {
+      score[servingTeam] += 1
+      const c = court[servingTeam]
+      const swap = c.right
+      c.right = c.left
+      c.left = swap
+    } else if (firstServeActive) {
+      // First service of the match: only one server before the first side-out.
+      servingTeam = otherTeamKey(servingTeam)
+      serverNum = 1
+      firstServeActive = false
+    } else if (serverNum === 1) {
+      serverNum = 2
+    } else {
+      servingTeam = otherTeamKey(servingTeam)
+      serverNum = 1
+    }
+  }
+
+  const parity = score[servingTeam] % 2 === 0 ? 'right' : 'left'
+  return { score, servingTeam, serverNum, court, serverKey: court[servingTeam][parity] }
+}
+
+// ===== Referee Score Modal =====
+;(function () {
+  const refModal = document.getElementById('refModal')
+  const refClose = document.getElementById('refClose')
+  const refCodeEl = document.getElementById('refCode')
+  const refBody = document.getElementById('refBody')
+  const refStatusEl = document.getElementById('refStatus')
+
+  let refCtx = null // { type, id, code, teamA, teamB }
+  let refView = 'entry' // 'entry' | 'setup' | 'play' | 'manual'
+  let setupChoices = {}
+  let manualScore = { a: 0, b: 0 }
+  let refTrigger = null
+  let holdTimer = null
+  let holdInterval = null
+  let manualSaveTimer = null
+  let statusTimer = null
+
+  function getScoreStore() {
+    return refCtx.type === 'group' ? scoreState : knockoutScoreState
+  }
+
+  function getSavedMatch() {
+    return getScoreStore()[refCtx.id] || {}
+  }
+
+  function persistMatch(patch) {
+    const store = getScoreStore()
+    if (!store[refCtx.id]) store[refCtx.id] = {}
+    Object.assign(store[refCtx.id], patch)
+    if (refCtx.type === 'group') saveScoreState()
+    else saveKnockoutScoreState()
+  }
+
+  function clearServeState() {
+    const store = getScoreStore()
+    if (store[refCtx.id]) delete store[refCtx.id].serve
+    if (refCtx.type === 'group') saveScoreState()
+    else saveKnockoutScoreState()
+  }
+
+  function syncExternalAfterScoreChange() {
+    if (refCtx.type === 'group') {
+      const matchId = refCtx.id
+      const saved = scoreState[matchId] || {}
+      const inpA = scheduleGrid.querySelector(`input[data-match-id="${matchId}"][data-side="a"]`)
+      const inpB = scheduleGrid.querySelector(`input[data-match-id="${matchId}"][data-side="b"]`)
+      if (inpA) inpA.value = Number.isInteger(saved.a) ? String(saved.a) : ''
+      if (inpB) inpB.value = Number.isInteger(saved.b) ? String(saved.b) : ''
+      updateGroupMatchStatus(matchId)
+      const groupIndex = parseInt(matchId.slice(1, matchId.indexOf('-')), 10) - 1
+      renderStandingsForGroup(groupIndex)
+      applyKnockoutBracket(true)
+    } else {
+      setKnockoutInputsFromState()
+      applyKnockoutBracket(false)
+    }
+    scheduleRemoteSave()
+  }
+
+  function flashSaved() {
+    refStatusEl.textContent = '✓ Đã lưu'
+    refStatusEl.style.opacity = '1'
+    clearTimeout(statusTimer)
+    statusTimer = setTimeout(() => { refStatusEl.style.opacity = '0' }, 1800)
+  }
+
+  function render() {
+    if (refView === 'setup') renderSetup()
+    else if (refView === 'play') renderPlay()
+    else if (refView === 'manual') renderManual()
+    else renderEntry()
+  }
+
+  function renderEntry() {
+    const saved = getSavedMatch()
+    const hasServe = saved.serve && Array.isArray(saved.serve.history)
+    const hasLegacyScore = Number.isInteger(saved.a) || Number.isInteger(saved.b)
+
+    let html = `<div class="ref-modal__matchup">${escapeHtml(teamLabel(refCtx.teamA))} <span>vs</span> ${escapeHtml(teamLabel(refCtx.teamB))}</div>`
+
+    if (hasServe) {
+      const state = computeServeState(saved.serve.setup, saved.serve.history)
+      const done = isCompletedGroupMatchScore(state.score.a, state.score.b)
+      html += `<div class="ref-modal__note">Tỷ số hiện tại: ${state.score.a} - ${state.score.b}${done ? ' (đã kết thúc)' : ''}</div>
+        <div class="ref-modal__actions">
+          <button class="ref-modal__action-btn" data-action="continue">Tiếp tục trận đấu</button>
+          <button class="ref-modal__action-btn ref-modal__action-btn--ghost" data-action="restart">Bắt đầu lại trận đấu</button>
+        </div>`
+    } else if (hasLegacyScore) {
+      html += `<div class="ref-modal__note">Trận này đã có tỷ số nhập tay: ${Number.isInteger(saved.a) ? saved.a : 0} - ${Number.isInteger(saved.b) ? saved.b : 0}</div>
+        <div class="ref-modal__actions">
+          <button class="ref-modal__action-btn" data-action="start">Bắt đầu trận đấu tự động (reset 0-0)</button>
+        </div>`
+    } else {
+      html += `<div class="ref-modal__actions">
+          <button class="ref-modal__action-btn" data-action="start">Bắt đầu trận đấu</button>
+        </div>`
+    }
+
+    html += `<button class="ref-modal__link" data-action="manual">Sửa tỷ số thủ công</button>`
+    refBody.innerHTML = html
+  }
+
+  function renderSetup() {
+    const step = setupChoices.step || 1
+    let html = `<div class="ref-modal__matchup">${escapeHtml(teamLabel(refCtx.teamA))} <span>vs</span> ${escapeHtml(teamLabel(refCtx.teamB))}</div>`
+
+    if (step === 1) {
+      html += `<div class="ref-modal__step-label">Bước 1/3 · Chọn đội giao bóng</div>
+        <div class="ref-modal__choice-grid">
+          <button class="ref-modal__choice-btn" data-setup="team" data-value="a">${escapeHtml(teamLabel(refCtx.teamA))}</button>
+          <button class="ref-modal__choice-btn" data-setup="team" data-value="b">${escapeHtml(teamLabel(refCtx.teamB))}</button>
+        </div>`
+    } else if (step === 2) {
+      const servingPair = setupChoices.servingTeam === 'a' ? refCtx.teamA : refCtx.teamB
+      html += `<div class="ref-modal__step-label">Bước 2/3 · Chọn người giao bóng đầu tiên</div>
+        <div class="ref-modal__choice-grid">
+          <button class="ref-modal__choice-btn" data-setup="server" data-value="male">${escapeHtml(servingPair.male.name)}</button>
+          <button class="ref-modal__choice-btn" data-setup="server" data-value="female">${escapeHtml(servingPair.female.name)}</button>
+        </div>`
+    } else {
+      const receivingPair = setupChoices.servingTeam === 'a' ? refCtx.teamB : refCtx.teamA
+      html += `<div class="ref-modal__step-label">Bước 3/3 · Chọn người đỡ bóng đầu tiên</div>
+        <div class="ref-modal__choice-grid">
+          <button class="ref-modal__choice-btn" data-setup="receiver" data-value="male">${escapeHtml(receivingPair.male.name)}</button>
+          <button class="ref-modal__choice-btn" data-setup="receiver" data-value="female">${escapeHtml(receivingPair.female.name)}</button>
+        </div>`
+    }
+
+    html += `<button class="ref-modal__link" data-action="back-entry">Hủy</button>`
+    refBody.innerHTML = html
+  }
+
+  function renderPlay() {
+    const saved = getSavedMatch()
+    const state = computeServeState(saved.serve.setup, saved.serve.history)
+    const done = isCompletedGroupMatchScore(state.score.a, state.score.b)
+    const teamAName = teamLabel(refCtx.teamA)
+    const teamBName = teamLabel(refCtx.teamB)
+
+    let html = `<div class="ref-modal__board">
+        <div class="ref-modal__col">
+          <div class="ref-modal__name">${escapeHtml(teamAName)}</div>
+          <div class="ref-modal__score">${state.score.a}</div>
+        </div>
+        <div class="ref-modal__dash">–</div>
+        <div class="ref-modal__col">
+          <div class="ref-modal__name">${escapeHtml(teamBName)}</div>
+          <div class="ref-modal__score">${state.score.b}</div>
+        </div>
+      </div>`
+
+    if (done) {
+      const winnerName = state.score.a > state.score.b ? teamAName : teamBName
+      html += `<div class="ref-modal__final-banner">🏆 ${escapeHtml(winnerName)} thắng ${Math.max(state.score.a, state.score.b)}-${Math.min(state.score.a, state.score.b)}</div>`
+    } else {
+      const servingPair = state.servingTeam === 'a' ? refCtx.teamA : refCtx.teamB
+      const servingTeamName = state.servingTeam === 'a' ? teamAName : teamBName
+      const receivingScore = state.score[otherTeamKey(state.servingTeam)]
+      const callText = `${state.score[state.servingTeam]}-${receivingScore}-${state.serverNum}`
+      html += `<div class="ref-modal__score-call" title="Điểm đội giao - điểm đội đỡ - số giao">${callText}</div>
+        <div class="ref-modal__serve-info">Đang giao: <strong>${escapeHtml(servingPair[state.serverKey].name)}</strong> (Đội ${escapeHtml(servingTeamName)})<span class="ref-modal__serve-badge">#${state.serverNum}</span></div>`
+    }
+
+    html += `<div class="ref-modal__rally-grid">
+        <button class="ref-modal__rally-btn" data-rally="a" ${done ? 'disabled' : ''}>${escapeHtml(teamAName)} thắng pha</button>
+        <button class="ref-modal__rally-btn" data-rally="b" ${done ? 'disabled' : ''}>${escapeHtml(teamBName)} thắng pha</button>
+      </div>
+      <div class="ref-modal__footer-row">
+        <button class="ref-modal__action-btn ref-modal__action-btn--ghost" data-action="undo" ${saved.serve.history.length === 0 ? 'disabled' : ''}>↩ Hoàn tác</button>
+        <button class="ref-modal__action-btn ref-modal__action-btn--ghost" data-action="manual">Sửa tay</button>
+      </div>`
+
+    refBody.innerHTML = html
+  }
+
+  function renderManual() {
+    const teamAName = teamLabel(refCtx.teamA)
+    const teamBName = teamLabel(refCtx.teamB)
+    refBody.innerHTML = `
+      <div class="ref-modal__board">
+        <div class="ref-modal__col">
+          <div class="ref-modal__name">${escapeHtml(teamAName)}</div>
+          <button class="ref-modal__btn" data-manual-side="a" data-dir="up">▲</button>
+          <div class="ref-modal__score" id="refManualScoreA">${manualScore.a}</div>
+          <button class="ref-modal__btn" data-manual-side="a" data-dir="down">▼</button>
+        </div>
+        <div class="ref-modal__dash">–</div>
+        <div class="ref-modal__col">
+          <div class="ref-modal__name">${escapeHtml(teamBName)}</div>
+          <button class="ref-modal__btn" data-manual-side="b" data-dir="up">▲</button>
+          <div class="ref-modal__score" id="refManualScoreB">${manualScore.b}</div>
+          <button class="ref-modal__btn" data-manual-side="b" data-dir="down">▼</button>
+        </div>
+      </div>
+      <button class="ref-modal__link" data-action="back-entry">Quay lại</button>
+    `
+  }
+
+  function goEntry() {
+    refView = 'entry'
+    setupChoices = {}
+    render()
+  }
+
+  function startSetup() {
+    setupChoices = { step: 1 }
+    refView = 'setup'
+    render()
+  }
+
+  function finishSetup() {
+    persistMatch({
+      a: 0,
+      b: 0,
+      serve: {
+        setup: {
+          servingTeam: setupChoices.servingTeam,
+          firstServer: setupChoices.firstServer,
+          firstReceiver: setupChoices.firstReceiver
+        },
+        history: []
+      }
+    })
+    syncExternalAfterScoreChange()
+    flashSaved()
+    refView = 'play'
+    render()
+  }
+
+  function goManual() {
+    const saved = getSavedMatch()
+    if (saved.serve) {
+      if (!confirm('Chuyển sang sửa tay sẽ dừng chế độ tự động cho trận này. Tiếp tục?')) return
+      clearServeState()
+    }
+    const fresh = getSavedMatch()
+    manualScore = {
+      a: Number.isInteger(fresh.a) ? fresh.a : 0,
+      b: Number.isInteger(fresh.b) ? fresh.b : 0
+    }
+    refView = 'manual'
+    render()
+  }
+
+  function applyRally(side) {
+    const saved = getSavedMatch()
+    const state = computeServeState(saved.serve.setup, saved.serve.history)
+    if (isCompletedGroupMatchScore(state.score.a, state.score.b)) return
+    const history = saved.serve.history.slice()
+    history.push(side)
+    const next = computeServeState(saved.serve.setup, history)
+    persistMatch({ a: next.score.a, b: next.score.b, serve: { setup: saved.serve.setup, history } })
+    syncExternalAfterScoreChange()
+    flashSaved()
+    render()
+  }
+
+  function undoRally() {
+    const saved = getSavedMatch()
+    if (!saved.serve || saved.serve.history.length === 0) return
+    const history = saved.serve.history.slice(0, -1)
+    const next = computeServeState(saved.serve.setup, history)
+    persistMatch({ a: next.score.a, b: next.score.b, serve: { setup: saved.serve.setup, history } })
+    syncExternalAfterScoreChange()
+    flashSaved()
+    render()
+  }
+
+  function doManualSave() {
+    clearTimeout(manualSaveTimer)
+    manualSaveTimer = null
+    persistMatch({ a: manualScore.a, b: manualScore.b })
+    syncExternalAfterScoreChange()
+    flashSaved()
+  }
+
+  function debouncedManualSave() {
+    clearTimeout(manualSaveTimer)
+    refStatusEl.style.opacity = '0'
+    manualSaveTimer = setTimeout(doManualSave, 800)
+  }
+
+  function stepManualScore(side, dir) {
+    const delta = dir === 'up' ? 1 : -1
+    manualScore[side] = Math.max(0, manualScore[side] + delta)
+    const el = document.getElementById(side === 'a' ? 'refManualScoreA' : 'refManualScoreB')
+    if (el) el.textContent = String(manualScore[side])
+    debouncedManualSave()
+  }
+
+  function startHold(side, dir) {
+    stepManualScore(side, dir)
+    holdTimer = setTimeout(() => {
+      holdInterval = setInterval(() => stepManualScore(side, dir), 100)
+    }, 400)
+  }
+
+  function stopHold() {
+    clearTimeout(holdTimer)
+    clearInterval(holdInterval)
+    holdTimer = null
+    holdInterval = null
+  }
+
+  function openRefModal({ type, id, code, teamA, teamB }) {
+    refTrigger = document.activeElement
+    refCtx = { type, id, code, teamA, teamB }
+    refView = 'entry'
+    setupChoices = {}
+    refCodeEl.textContent = code
+    refStatusEl.style.opacity = '0'
+    render()
+    refModal.classList.add('is-open')
+    refModal.setAttribute('aria-hidden', 'false')
+    document.body.style.overflow = 'hidden'
+    setTimeout(() => refClose.focus(), 50)
+  }
+
+  function closeRefModal() {
+    if (manualSaveTimer) doManualSave()
+    refModal.classList.remove('is-open')
+    refModal.setAttribute('aria-hidden', 'true')
+    document.body.style.overflow = ''
+    stopHold()
+    refCtx = null
+    if (refTrigger) {
+      refTrigger.focus()
+      refTrigger = null
+    }
+  }
+
+  refBody.addEventListener('click', e => {
+    const setupBtn = e.target.closest('[data-setup]')
+    if (setupBtn) {
+      const { setup, value } = setupBtn.dataset
+      if (setup === 'team') {
+        setupChoices.servingTeam = value
+        setupChoices.step = 2
+      } else if (setup === 'server') {
+        setupChoices.firstServer = value
+        setupChoices.step = 3
+      } else if (setup === 'receiver') {
+        setupChoices.firstReceiver = value
+        finishSetup()
+        return
+      }
+      render()
+      return
+    }
+
+    const rallyBtn = e.target.closest('[data-rally]')
+    if (rallyBtn) {
+      applyRally(rallyBtn.dataset.rally)
+      return
+    }
+
+    const actionBtn = e.target.closest('[data-action]')
+    if (actionBtn) {
+      const action = actionBtn.dataset.action
+      if (action === 'start') {
+        const saved = getSavedMatch()
+        if (
+          (Number.isInteger(saved.a) || Number.isInteger(saved.b)) &&
+          !confirm('Bắt đầu chế độ tự động sẽ đưa tỷ số về 0-0. Tiếp tục?')
+        ) return
+        startSetup()
+      } else if (action === 'continue') {
+        refView = 'play'
+        render()
+      } else if (action === 'restart') {
+        if (!confirm('Bắt đầu lại sẽ xóa toàn bộ lịch sử trận đấu này. Tiếp tục?')) return
+        startSetup()
+      } else if (action === 'manual') {
+        goManual()
+      } else if (action === 'undo') {
+        undoRally()
+      } else if (action === 'back-entry') {
+        goEntry()
+      }
+    }
+  })
+
+  // Mouse hold-to-repeat (manual mode)
+  refBody.addEventListener('mousedown', e => {
+    const btn = e.target.closest('[data-manual-side]')
+    if (!btn) return
+    e.preventDefault()
+    startHold(btn.dataset.manualSide, btn.dataset.dir)
+  })
+  document.addEventListener('mouseup', stopHold)
+
+  // Touch hold-to-repeat (manual mode)
+  refBody.addEventListener('touchstart', e => {
+    const btn = e.target.closest('[data-manual-side]')
+    if (!btn) return
+    startHold(btn.dataset.manualSide, btn.dataset.dir)
+  }, { passive: true })
+  refBody.addEventListener('touchend', stopHold)
+  refBody.addEventListener('touchcancel', stopHold)
+
+  refClose.addEventListener('click', closeRefModal)
+  refModal.addEventListener('click', e => {
+    if (e.target === refModal) closeRefModal()
+  })
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && refModal.classList.contains('is-open')) closeRefModal()
+  })
+
+  // Open modal when clicking a group match row (not directly on an input)
+  scheduleGrid.addEventListener('click', e => {
+    if (e.target instanceof HTMLInputElement) return
+    const li = e.target.closest('.schedule-group li')
+    if (!li) return
+    const inpA = li.querySelector('input[data-match-id][data-side="a"]')
+    if (!inpA) return
+    const matchId = inpA.dataset.matchId
+    const groupIndex = parseInt(matchId.slice(1, matchId.indexOf('-')), 10) - 1
+    const matchIndex = parseInt(matchId.slice(matchId.indexOf('M') + 1), 10) - 1
+    const match = (currentGroupSchedules[groupIndex] || [])[matchIndex]
+    if (!match) return
+    openRefModal({
+      type: 'group',
+      id: matchId,
+      code: matchId,
+      teamA: match.a,
+      teamB: match.b
+    })
+  })
+
+  // Open modal when clicking a knockout bracket match (not directly on an input)
+  if (bracketEl) {
+    bracketEl.addEventListener('click', e => {
+      if (e.target instanceof HTMLInputElement) return
+      const matchEl = e.target.closest('.match')
+      if (!matchEl) return
+      const inp = matchEl.querySelector('input[data-ko-match]')
+      if (!inp) return
+      const code = inp.dataset.koMatch
+      const sides = knockoutMatchSides[code]
+      if (!sides || !isResolvedTeam(sides.a) || !isResolvedTeam(sides.b)) return
+      const codeLabel = matchEl.querySelector('.match__code')?.textContent?.trim() || code
+      openRefModal({
+        type: 'knockout',
+        id: code,
+        code: codeLabel,
+        teamA: sides.a,
+        teamB: sides.b
+      })
+    })
+  }
+})()
