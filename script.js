@@ -228,6 +228,19 @@ const phaseSchedule = document.getElementById('phaseSchedule')
 const bracketEl = document.querySelector('.bracket')
 const drawStatus = document.getElementById('drawStatus')
 
+const scoreModal = document.getElementById('scoreModal')
+const scoreModalBackdrop = document.getElementById('scoreModalBackdrop')
+const scoreModalLabel = document.getElementById('scoreModalLabel')
+const scoreModalNameA = document.getElementById('scoreModalNameA')
+const scoreModalNameB = document.getElementById('scoreModalNameB')
+const scoreModalNumA = document.getElementById('scoreModalNumA')
+const scoreModalNumB = document.getElementById('scoreModalNumB')
+const serveBtnA = document.getElementById('serveBtnA')
+const serveBtnB = document.getElementById('serveBtnB')
+
+let activeModal = null // { type: 'group'|'ko', id, groupIndex }
+const servingState = {} // matchId -> 'a' | 'b'
+
 let currentPairs = []
 let currentGroups = []
 let currentGroupSchedules = []
@@ -442,14 +455,15 @@ function renderSchedule(groupSchedules) {
       const status = getGroupMatchStatus(saved)
       const li = document.createElement('li')
       li.className = 'is-visible'
+      li.dataset.matchId = matchId
       li.innerHTML = `
         <span class="schedule-group__no">${pad(mi + 1)}</span>
         <span class="schedule-group__match">
           <strong>${escapeHtml(teamLabel(match.a))}</strong>
-          <span class="schedule-group__score-inputs">
-            <input type="number" min="0" step="1" inputmode="numeric" data-match-id="${matchId}" data-side="a" value="${scoreA}" />
-            <span>-</span>
-            <input type="number" min="0" step="1" inputmode="numeric" data-match-id="${matchId}" data-side="b" value="${scoreB}" />
+          <span class="schedule-group__score-display">
+            <span data-group-score="${matchId}-a">${scoreA !== '' ? scoreA : '—'}</span>
+            <span class="sep">:</span>
+            <span data-group-score="${matchId}-b">${scoreB !== '' ? scoreB : '—'}</span>
           </span>
           <strong>${escapeHtml(teamLabel(match.b))}</strong>
         </span>
@@ -628,12 +642,13 @@ function getKnockoutOutcome(code, sideA, sideB) {
 
 function setKnockoutInputsFromState() {
   if (!bracketEl) return
-  bracketEl.querySelectorAll('input[data-ko-match]').forEach(input => {
-    const code = input.dataset.koMatch
-    const side = input.dataset.side
-    if (!code || (side !== 'a' && side !== 'b')) return
+  const codes = ['TK1', 'TK2', 'TK3', 'TK4', 'BK1', 'BK2', 'CK', 'BR']
+  codes.forEach(code => {
     const pair = knockoutScoreState[code] || {}
-    input.value = Number.isInteger(pair[side]) ? String(pair[side]) : ''
+    const spanA = bracketEl.querySelector(`[data-ko-score="${code}-a"]`)
+    const spanB = bracketEl.querySelector(`[data-ko-score="${code}-b"]`)
+    if (spanA) spanA.textContent = Number.isInteger(pair.a) ? String(pair.a) : '—'
+    if (spanB) spanB.textContent = Number.isInteger(pair.b) ? String(pair.b) : '—'
   })
 }
 
@@ -715,73 +730,122 @@ function applyKnockoutBracket(resetIfQualifierChanged) {
   setKnockoutInputsFromState()
 }
 
-function onScheduleScoreInput(event) {
-  const input = event.target
-  if (!(input instanceof HTMLInputElement)) return
-  const matchId = input.dataset.matchId
-  const side = input.dataset.side
-  if (!matchId || (side !== 'a' && side !== 'b')) return
-
-  const value = input.value.trim()
-  if (!scoreState[matchId]) scoreState[matchId] = {}
-
-  if (value === '') {
-    delete scoreState[matchId][side]
-  } else {
-    const parsed = Math.max(0, parseInt(value, 10) || 0)
-    scoreState[matchId][side] = parsed
-    if (String(parsed) !== value) input.value = String(parsed)
-  }
-
-  if (
-    !Number.isInteger(scoreState[matchId].a) &&
-    !Number.isInteger(scoreState[matchId].b)
-  ) {
-    delete scoreState[matchId]
-  }
-
-  saveScoreState()
-  updateGroupMatchStatus(matchId)
-  const groupIndex = parseInt(matchId.slice(1, matchId.indexOf('-')), 10) - 1
-  renderStandingsForGroup(groupIndex)
-  applyKnockoutBracket(true)
-  scheduleRemoteSave()
+function updateGroupScoreDisplay(matchId) {
+  const saved = scoreState[matchId] || {}
+  const spanA = scheduleGrid.querySelector(`[data-group-score="${matchId}-a"]`)
+  const spanB = scheduleGrid.querySelector(`[data-group-score="${matchId}-b"]`)
+  if (spanA) spanA.textContent = Number.isInteger(saved.a) ? saved.a : '—'
+  if (spanB) spanB.textContent = Number.isInteger(saved.b) ? saved.b : '—'
 }
 
-scheduleGrid.addEventListener('input', onScheduleScoreInput)
-
-function onKnockoutScoreInput(event) {
-  const input = event.target
-  if (!(input instanceof HTMLInputElement)) return
-  const code = input.dataset.koMatch
-  const side = input.dataset.side
-  if (!code || (side !== 'a' && side !== 'b')) return
-
-  const value = input.value.trim()
-  if (!knockoutScoreState[code]) knockoutScoreState[code] = {}
-
-  if (value === '') {
-    delete knockoutScoreState[code][side]
-  } else {
-    const parsed = Math.max(0, parseInt(value, 10) || 0)
-    knockoutScoreState[code][side] = parsed
-    if (String(parsed) !== value) input.value = String(parsed)
-  }
-
-  if (
-    !Number.isInteger(knockoutScoreState[code].a) &&
-    !Number.isInteger(knockoutScoreState[code].b)
-  ) {
-    delete knockoutScoreState[code]
-  }
-
-  saveKnockoutScoreState()
-  applyKnockoutBracket(false)
-  scheduleRemoteSave()
+function updateServingDisplay(side) {
+  if (serveBtnA) serveBtnA.classList.toggle('is-serving', side === 'a')
+  if (serveBtnB) serveBtnB.classList.toggle('is-serving', side === 'b')
 }
 
-if (bracketEl)
-  bracketEl.addEventListener('input', onKnockoutScoreInput)
+function openScoreModal(type, id, nameA, nameB, label, groupIndex) {
+  scoreModalLabel.textContent = label
+  scoreModalNameA.textContent = nameA
+  scoreModalNameB.textContent = nameB
+  if (serveBtnA) serveBtnA.textContent = nameA
+  if (serveBtnB) serveBtnB.textContent = nameB
+
+  let scoreA, scoreB
+  if (type === 'group') {
+    const saved = scoreState[id] || {}
+    scoreA = Number.isInteger(saved.a) ? saved.a : 0
+    scoreB = Number.isInteger(saved.b) ? saved.b : 0
+  } else {
+    const saved = knockoutScoreState[id] || {}
+    scoreA = Number.isInteger(saved.a) ? saved.a : 0
+    scoreB = Number.isInteger(saved.b) ? saved.b : 0
+  }
+
+  scoreModalNumA.textContent = scoreA
+  scoreModalNumB.textContent = scoreB
+
+  const serving = servingState[id] || null
+  updateServingDisplay(serving)
+
+  activeModal = { type, id, groupIndex: groupIndex !== undefined ? groupIndex : -1 }
+  scoreModal.hidden = false
+  document.body.style.overflow = 'hidden'
+}
+
+function closeScoreModal() {
+  scoreModal.hidden = true
+  document.body.style.overflow = ''
+  activeModal = null
+}
+
+scoreModal.addEventListener('click', e => {
+  if (e.target === scoreModalBackdrop) { closeScoreModal(); return }
+  if (e.target.id === 'scoreModalClose' || e.target.closest('#scoreModalClose')) { closeScoreModal(); return }
+
+  const btn = e.target.closest('[data-delta]')
+  if (btn && activeModal) {
+    const side = btn.dataset.modalSide
+    const delta = parseInt(btn.dataset.delta, 10)
+    if (side !== 'a' && side !== 'b') return
+    const numEl = side === 'a' ? scoreModalNumA : scoreModalNumB
+    const newVal = Math.max(0, (parseInt(numEl.textContent, 10) || 0) + delta)
+    numEl.textContent = newVal
+
+    const { type, id, groupIndex } = activeModal
+    if (type === 'group') {
+      if (!scoreState[id]) scoreState[id] = {}
+      scoreState[id][side] = newVal
+      saveScoreState()
+      updateGroupMatchStatus(id)
+      updateGroupScoreDisplay(id)
+      if (groupIndex >= 0) renderStandingsForGroup(groupIndex)
+      applyKnockoutBracket(true)
+    } else {
+      if (!knockoutScoreState[id]) knockoutScoreState[id] = {}
+      knockoutScoreState[id][side] = newVal
+      saveKnockoutScoreState()
+      applyKnockoutBracket(false)
+    }
+    scheduleRemoteSave()
+    return
+  }
+
+  const serveBtn = e.target.closest('[data-serve-side]')
+  if (serveBtn && activeModal) {
+    const side = serveBtn.dataset.serveSide
+    servingState[activeModal.id] = side
+    updateServingDisplay(side)
+  }
+})
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && activeModal) closeScoreModal()
+})
+
+scheduleGrid.addEventListener('click', e => {
+  const li = e.target.closest('li[data-match-id]')
+  if (!li) return
+  const matchId = li.dataset.matchId
+  const parts = matchId.match(/^G(\d+)-M(\d+)$/)
+  if (!parts) return
+  const gi = parseInt(parts[1], 10) - 1
+  const mi = parseInt(parts[2], 10) - 1
+  const match = currentGroupSchedules[gi] && currentGroupSchedules[gi][mi]
+  if (!match) return
+  openScoreModal('group', matchId, teamLabel(match.a), teamLabel(match.b), `Bảng ${GROUP_LABELS[gi]} · Trận ${pad(mi + 1)}`, gi)
+})
+
+if (bracketEl) {
+  bracketEl.addEventListener('click', e => {
+    const matchEl = e.target.closest('.match[data-ko-match]')
+    if (!matchEl) return
+    const code = matchEl.dataset.koMatch
+    const nameA = matchEl.querySelector(`[data-slot="${code}-A"]`)?.textContent || 'Đội A'
+    const nameB = matchEl.querySelector(`[data-slot="${code}-B"]`)?.textContent || 'Đội B'
+    const labels = { TK1: 'Tứ kết 1', TK2: 'Tứ kết 2', TK3: 'Tứ kết 3', TK4: 'Tứ kết 4', BK1: 'Bán kết 1', BK2: 'Bán kết 2', CK: 'Chung kết', BR: 'Tranh hạng 3' }
+    openScoreModal('ko', code, nameA, nameB, labels[code] || code)
+  })
+}
 
   // === Kết quả chính thức ===
 ;(function () {
