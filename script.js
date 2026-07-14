@@ -3,9 +3,6 @@
 const ROSTER_KEY = 'laca_roster_v7'
 const SCORE_STATE_KEY = 'laca_group_score_state_v1'
 const KNOCKOUT_SCORE_STATE_KEY = 'laca_knockout_score_state_v1'
-const REMOTE_STATE_URL =
-  'https://script.google.com/macros/s/AKfycbxbMjRvwc3gKKVm4xxS6vlS1aAhca9CKpLH4uRu17PQULAKR5u52LtTDcH3FIT9PHNERw/exec'
-const REMOTE_SYNC_INTERVAL_MS = 3000
 const ROSTER_LIMIT = 16
 
 const DEFAULT_ROSTER = {
@@ -78,6 +75,7 @@ const els = {
   m: document.getElementById('cdM'),
   s: document.getElementById('cdS')
 }
+let timer = null
 function tick() {
   const diff = target - Date.now()
   if (diff <= 0) {
@@ -86,7 +84,7 @@ function tick() {
       els.m.textContent =
       els.s.textContent =
         '00'
-    clearInterval(timer)
+    if (timer) clearInterval(timer)
     return
   }
   const sec = Math.floor(diff / 1000)
@@ -96,7 +94,7 @@ function tick() {
   els.s.textContent = pad(sec % 60)
 }
 tick()
-const timer = setInterval(tick, 1000)
+timer = setInterval(tick, 1000)
 
 // --- Scroll reveal ---
 const revealTargets = document.querySelectorAll(
@@ -209,8 +207,6 @@ function saveKnockoutScoreState() {
 let roster = loadRoster()
 let scoreState = loadScoreState()
 let knockoutScoreState = loadKnockoutScoreState()
-let remoteSaveTimer = null
-let lastRemoteUpdatedAt = 0
 
 const maleList = document.getElementById('maleList')
 const femaleList = document.getElementById('femaleList')
@@ -226,98 +222,12 @@ const phasePairs = document.getElementById('phasePairs')
 const phaseGroups = document.getElementById('phaseGroups')
 const phaseSchedule = document.getElementById('phaseSchedule')
 const bracketEl = document.querySelector('.bracket')
-const drawStatus = document.getElementById('drawStatus')
 
 let currentPairs = []
 let currentGroups = []
 let currentGroupSchedules = []
 let qualifierSignature = ''
 let knockoutMatchSides = {}
-
-function getDefaultRemoteState() {
-  return {
-    pairs: currentPairs,
-    groups: currentGroups,
-    groupSchedules: currentGroupSchedules,
-    scoreState,
-    knockoutScoreState,
-    updatedAt: Date.now()
-  }
-}
-
-async function fetchRemoteState() {
-  const url = `${REMOTE_STATE_URL}?action=getState&t=${Date.now()}`
-  const response = await fetch(url, { method: 'GET', cache: 'no-store' })
-  if (!response.ok) throw new Error(`getState_failed_${response.status}`)
-  const data = await response.json()
-  if (!data || data.ok !== true) throw new Error('getState_invalid_payload')
-  return data.state || null
-}
-
-async function saveRemoteState(state) {
-  const response = await fetch(REMOTE_STATE_URL, {
-    method: 'POST',
-    // Use text/plain to avoid CORS preflight issues with Apps Script Web Apps.
-    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body: JSON.stringify({ action: 'saveState', state })
-  })
-  if (!response.ok) throw new Error(`saveState_failed_${response.status}`)
-  const data = await response.json()
-  if (!data || data.ok !== true) throw new Error('saveState_invalid_payload')
-}
-
-function scheduleRemoteSave() {
-  if (remoteSaveTimer) clearTimeout(remoteSaveTimer)
-  remoteSaveTimer = setTimeout(async () => {
-    try {
-      const state = getDefaultRemoteState()
-      await saveRemoteState(state)
-      lastRemoteUpdatedAt = Number(state.updatedAt || 0)
-      if (drawStatus) {
-        drawStatus.classList.remove('is-error')
-      }
-    } catch (_e) {
-      if (drawStatus) {
-        drawStatus.classList.add('is-error')
-        drawStatus.textContent =
-          'Lưu online thất bại, dữ liệu vẫn được giữ local.'
-      }
-    }
-  }, 500)
-}
-
-function applyRemoteState(remoteState) {
-  if (!remoteState || typeof remoteState !== 'object') return
-  lastRemoteUpdatedAt = Number(
-    remoteState.updatedAt || lastRemoteUpdatedAt || 0
-  )
-  if (remoteState.scoreState && typeof remoteState.scoreState === 'object') {
-    scoreState = remoteState.scoreState
-    saveScoreState()
-  }
-  if (
-    remoteState.knockoutScoreState &&
-    typeof remoteState.knockoutScoreState === 'object'
-  ) {
-    knockoutScoreState = remoteState.knockoutScoreState
-    saveKnockoutScoreState()
-  }
-}
-
-async function pullRemoteStateIfNewer() {
-  try {
-    const remoteState = await fetchRemoteState()
-    if (!remoteState) return
-    const remoteUpdatedAt = Number(remoteState.updatedAt || 0)
-    if (remoteUpdatedAt > lastRemoteUpdatedAt) {
-      applyRemoteState(remoteState)
-      renderSchedule(currentGroupSchedules)
-      applyKnockoutBracket(false)
-    }
-  } catch (_e) {
-    // Keep UI functional with local state if remote is unavailable.
-  }
-}
 
 function renderRosterList(listEl, players, gender) {
   listEl.innerHTML = ''
@@ -774,7 +684,6 @@ function onScheduleScoreInput(event) {
   const groupIndex = parseInt(matchId.slice(1, matchId.indexOf('-')), 10) - 1
   renderStandingsForGroup(groupIndex)
   applyKnockoutBracket(true)
-  scheduleRemoteSave()
 }
 
 scheduleGrid.addEventListener('input', onScheduleScoreInput)
@@ -806,7 +715,6 @@ function onKnockoutScoreInput(event) {
 
   saveKnockoutScoreState()
   applyKnockoutBracket(false)
-  scheduleRemoteSave()
 }
 
 if (bracketEl)
@@ -891,25 +799,6 @@ if (bracketEl)
   renderSchedule(groupSchedules)
   applyKnockoutBracket(false)
 })()
-;(async function syncFromRemote() {
-  try {
-    const remoteState = await fetchRemoteState()
-    if (remoteState) {
-      applyRemoteState(remoteState)
-      renderSchedule(currentGroupSchedules)
-      applyKnockoutBracket(false)
-      if (drawStatus) {
-        drawStatus.classList.remove('is-error')
-      }
-    } else {
-      await saveRemoteState(getDefaultRemoteState())
-    }
-  } catch (_e) {
-    // Fallback to local-only when remote is unavailable.
-  }
-})()
-
-setInterval(pullRemoteStateIfNewer, REMOTE_SYNC_INTERVAL_MS)
 
 updateRosterUI()
 
@@ -1032,7 +921,6 @@ function computeServeState(setup, history) {
       setKnockoutInputsFromState()
       applyKnockoutBracket(false)
     }
-    scheduleRemoteSave()
   }
 
   function flashSaved() {
