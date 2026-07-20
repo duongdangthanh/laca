@@ -1,50 +1,30 @@
-// ===== LACA ZOMBIE Championship — landing interactions =====
+// ===== LACA MINI GAME · TEAM RELAY — landing interactions =====
 
-const ROSTER_KEY = 'laca_roster_v7'
-const SCORE_STATE_KEY = 'laca_group_score_state_v1'
-const KNOCKOUT_SCORE_STATE_KEY = 'laca_knockout_score_state_v1'
-const ROSTER_LIMIT = 16
+const GENDERS = ['nam', 'nu']
+const GENDER_LABELS = { nam: 'Nam', nu: 'Nữ' }
+const TEAM_LABELS = ['A', 'B', 'C', 'D']
 
-const DEFAULT_ROSTER = {
-  male: [
-    'Thanh Thật Thà',
-    'Nguyễn Quốc Ân',
-    'Thuận Sovo',
-    'Tùng Nè',
-    'Quang Khánh',
-    'Dinh Thanh',
-    'Trường Trong Trắng',
-    'Minh Dương',
-    'Phương Nam',
-    'Tomm',
-    'Lê Minh Trí',
-    'Chen',
-    'Mr Quy',
-    'Mr Mountain',
-    'Phúc Phan',
-    'Xuân Trường'
-  ],
-  female: [
-    'Mai Thu',
-    'Tiên',
-    'Mai Nguyễn',
-    'Em Trâm',
-    'Thảo Hiếu',
-    'Mai Trân',
-    'Ánh Lê',
-    'Hoa Vũ',
-    'Vân Nguyễn',
-    'Minh Thảo',
-    'Phạm Thoa',
-    'Nana Phan',
-    'Tuyết Mei',
-    'Minh Anh',
-    'Diệu',
-    'Diệp Ann'
-  ]
-}
+// Standard single round-robin for 4 teams: each team plays once per round.
+const TEAM_ROUND_ROBIN = [
+  { match: 1, round: 1, home: 'A', away: 'B' },
+  { match: 2, round: 1, home: 'C', away: 'D' },
+  { match: 3, round: 2, home: 'A', away: 'C' },
+  { match: 4, round: 2, home: 'B', away: 'D' },
+  { match: 5, round: 3, home: 'A', away: 'D' },
+  { match: 6, round: 3, home: 'B', away: 'C' }
+]
 
-const GROUP_LABELS = ['A', 'B', 'C', 'D']
+// The 3 possible sub-pairs from a team's own 3 members (slot indices).
+// Captains pick which of these plays each chặng (leg).
+const PAIR3_DEFS = [
+  [0, 1],
+  [1, 2],
+  [2, 0]
+]
+
+// Cumulative score checkpoints ("chặng" boundaries); the last value is the
+// match target (18, không cách 2 điểm).
+const RELAY_CHECKPOINTS = [6, 12, 18]
 
 // --- Sticky nav background on scroll ---
 const nav = document.getElementById('nav')
@@ -66,8 +46,8 @@ navLinks.querySelectorAll('a').forEach(a =>
   })
 )
 
-// --- Countdown to match day: Sun 12 Jul 2026, 07:00 (local) ---
-const target = new Date('2026-07-12T07:00:00').getTime()
+// --- Countdown to match day: Fri 24 Jul 2026, 19:00 (local) ---
+const target = new Date('2026-07-24T19:00:00').getTime()
 const pad = n => String(n).padStart(2, '0')
 const els = {
   d: document.getElementById('cdD'),
@@ -98,7 +78,7 @@ timer = setInterval(tick, 1000)
 
 // --- Scroll reveal ---
 const revealTargets = document.querySelectorAll(
-  '.sec-head, .about__media, .pillar, .fcard, .bracket, .rules-note, .group, .gallery__item, .timeline li, .prize, .prizes--mini, .venue__info, .venue__map, .stat, .roster-col, .draw-phase'
+  '.sec-head, .pillar, .fcard, .guide-card, .rules-note, .venue__info, .venue__map, .stat, .team-form__card, .gender-block'
 )
 revealTargets.forEach(el => el.classList.add('reveal'))
 const io = new IntersectionObserver(
@@ -150,1015 +130,524 @@ function escapeHtml(str) {
     .replace(/"/g, '&quot;')
 }
 
-function teamLabel(pair) {
-  return `${pair.male.name} & ${pair.female.name}`
+function isCompletedScore(a, b, targetScore) {
+  return Number.isInteger(a) && Number.isInteger(b) && (a >= targetScore || b >= targetScore)
 }
 
-// --- Roster state ---
-function loadRoster() {
+// ===== Team roster (manual entry, per nhóm Nam/Nữ) =====
+function rosterKey(gender) {
+  return `laca_minigame_roster_${gender}_v1`
+}
+function scoreKey(gender) {
+  return `laca_minigame_score_${gender}_v1`
+}
+function orderKey(gender) {
+  return `laca_minigame_order_${gender}_v1`
+}
+
+function loadTeamRoster(gender) {
   try {
-    const raw = localStorage.getItem(ROSTER_KEY)
+    const raw = localStorage.getItem(rosterKey(gender))
     if (raw) {
       const data = JSON.parse(raw)
-      if (Array.isArray(data.male) && Array.isArray(data.female)) return data
+      if (data && TEAM_LABELS.every(t => Array.isArray(data[t]) && data[t].length === 3))
+        return data
     }
   } catch (_e) {
-    /* use default */
+    /* fall through to default */
   }
-  return {
-    male: DEFAULT_ROSTER.male.map(name => ({ id: uid(), name })),
-    female: DEFAULT_ROSTER.female.map(name => ({ id: uid(), name }))
-  }
-}
-
-function loadScoreState() {
-  try {
-    const raw = localStorage.getItem(SCORE_STATE_KEY)
-    if (!raw) return {}
-    const data = JSON.parse(raw)
-    return data && typeof data === 'object' ? data : {}
-  } catch (_e) {
-    return {}
-  }
-}
-
-function saveScoreState() {
-  localStorage.setItem(SCORE_STATE_KEY, JSON.stringify(scoreState))
-}
-
-function loadKnockoutScoreState() {
-  try {
-    const raw = localStorage.getItem(KNOCKOUT_SCORE_STATE_KEY)
-    if (!raw) return {}
-    const data = JSON.parse(raw)
-    return data && typeof data === 'object' ? data : {}
-  } catch (_e) {
-    return {}
-  }
-}
-
-function saveKnockoutScoreState() {
-  localStorage.setItem(
-    KNOCKOUT_SCORE_STATE_KEY,
-    JSON.stringify(knockoutScoreState)
-  )
-}
-
-let roster = loadRoster()
-let scoreState = loadScoreState()
-let knockoutScoreState = loadKnockoutScoreState()
-
-const maleList = document.getElementById('maleList')
-const femaleList = document.getElementById('femaleList')
-const maleCount = document.getElementById('maleCount')
-const femaleCount = document.getElementById('femaleCount')
-const rosterSummary = document.getElementById('rosterSummary')
-const statRegistered = document.getElementById('statRegistered')
-
-const pairsGrid = document.getElementById('pairsGrid')
-const groupsGrid = document.getElementById('groupsGrid')
-const scheduleGrid = document.getElementById('scheduleGrid')
-const phasePairs = document.getElementById('phasePairs')
-const phaseGroups = document.getElementById('phaseGroups')
-const phaseSchedule = document.getElementById('phaseSchedule')
-const bracketEl = document.querySelector('.bracket')
-
-let currentPairs = []
-let currentGroups = []
-let currentGroupSchedules = []
-let qualifierSignature = ''
-let knockoutMatchSides = {}
-
-function renderRosterList(listEl, players, gender) {
-  listEl.innerHTML = ''
-  if (!players.length) {
-    const empty = document.createElement('li')
-    empty.className = 'roster-list__empty'
-    empty.textContent =
-      gender === 'male' ? 'Chưa có VĐV nam.' : 'Chưa có VĐV nữ.'
-    listEl.appendChild(empty)
-    return
-  }
-  players.forEach((p, i) => {
-    const li = document.createElement('li')
-    li.dataset.id = p.id
-    li.innerHTML = `
-      <span class="pair__no">${pad(i + 1)}</span>
-      <span class="roster__name">
-        <small class="roster__code">${gender === 'male' ? 'Nam' : 'Nữ'} ${pad(i + 1)}</small>
-        ${escapeHtml(p.name)}
-      </span>
-    `
-    listEl.appendChild(li)
+  const empty = {}
+  TEAM_LABELS.forEach(t => {
+    empty[t] = ['', '', '']
   })
+  return empty
 }
 
-function updateRosterUI() {
-  renderRosterList(maleList, roster.male, 'male')
-  renderRosterList(femaleList, roster.female, 'female')
+function saveTeamRoster(gender) {
+  localStorage.setItem(rosterKey(gender), JSON.stringify(teamRoster[gender]))
+}
 
-  const m = roster.male.length
-  const f = roster.female.length
-  const total = m + f
-
-  maleCount.textContent = `${m}/${ROSTER_LIMIT}`
-  femaleCount.textContent = `${f}/${ROSTER_LIMIT}`
-  maleCount.classList.toggle('is-full', m >= ROSTER_LIMIT)
-  femaleCount.classList.toggle('is-full', f >= ROSTER_LIMIT)
-  rosterSummary.textContent = `${total}/32 suất`
-
-  if (statRegistered) {
-    statRegistered.textContent = total
-    statRegistered.dataset.count = String(total)
+function loadRelayScoreState(gender) {
+  try {
+    const raw = localStorage.getItem(scoreKey(gender))
+    if (!raw) return {}
+    const data = JSON.parse(raw)
+    return data && typeof data === 'object' ? data : {}
+  } catch (_e) {
+    return {}
   }
 }
 
-// --- Draw render ---
+function saveRelayScoreState(gender) {
+  localStorage.setItem(scoreKey(gender), JSON.stringify(relayScoreState[gender]))
+}
 
-function renderPairs(pairs) {
-  phasePairs.classList.add('is-active', 'is-done')
-  pairsGrid.innerHTML = ''
-  pairs.forEach((pair, i) => {
+function loadTeamOrder(gender) {
+  try {
+    const raw = localStorage.getItem(orderKey(gender))
+    if (!raw) return {}
+    const data = JSON.parse(raw)
+    return data && typeof data === 'object' ? data : {}
+  } catch (_e) {
+    return {}
+  }
+}
+
+function saveTeamOrder(gender) {
+  localStorage.setItem(orderKey(gender), JSON.stringify(teamOrder[gender]))
+}
+
+let teamRoster = { nam: loadTeamRoster('nam'), nu: loadTeamRoster('nu') }
+let relayScoreState = { nam: loadRelayScoreState('nam'), nu: loadRelayScoreState('nu') }
+let teamOrder = { nam: loadTeamOrder('nam'), nu: loadTeamOrder('nu') }
+
+function teamMemberName(gender, team, slot) {
+  const raw = (teamRoster[gender][team] || [])[slot]
+  return raw && raw.trim() ? raw.trim() : `TV${slot + 1}`
+}
+
+function rosterFormEl(gender) {
+  return document.getElementById(gender === 'nam' ? 'teamRosterFormNam' : 'teamRosterFormNu')
+}
+
+function renderTeamRosterForm(gender) {
+  const container = rosterFormEl(gender)
+  if (!container) return
+  container.innerHTML = ''
+  TEAM_LABELS.forEach(t => {
     const card = document.createElement('div')
-    card.className = 'draw-pair is-visible is-locked'
+    card.className = 'team-form__card'
     card.innerHTML = `
-      <span class="draw-pair__no">Cặp ${pad(i + 1)}</span>
-      <div class="draw-pair__names">
-        ${escapeHtml(pair.male.name)}
-        <span>+</span>
-        ${escapeHtml(pair.female.name)}
+      <div class="team-form__head">
+        <span class="group__badge">${t}</span>
+        <h4>Đội ${t}</h4>
       </div>
+      <div class="team-form__inputs"></div>
     `
-    pairsGrid.appendChild(card)
+    const inputsWrap = card.querySelector('.team-form__inputs')
+    for (let i = 0; i < 3; i++) {
+      const inp = document.createElement('input')
+      inp.type = 'text'
+      inp.maxLength = 40
+      inp.placeholder = `Thành viên ${i + 1}`
+      inp.value = teamRoster[gender][t][i] || ''
+      inp.dataset.team = t
+      inp.dataset.slot = String(i)
+      inputsWrap.appendChild(inp)
+    }
+    container.appendChild(card)
   })
 }
 
-function renderGroups(groups) {
-  phaseGroups.classList.add('is-active', 'is-done')
-  groupsGrid.innerHTML = ''
-  groups.forEach((teams, gi) => {
-    const block = document.createElement('div')
-    block.className = 'draw-group is-visible'
-    block.innerHTML = `
-      <div class="draw-group__head">
-        <span class="draw-group__badge">${GROUP_LABELS[gi]}</span>
-        <h4>Bảng ${GROUP_LABELS[gi]}</h4>
-      </div>
-      <ul class="draw-group__teams"></ul>
-    `
-    const ul = block.querySelector('.draw-group__teams')
-    teams.forEach(pair => {
-      const li = document.createElement('li')
-      li.className = 'is-visible'
-      li.textContent = teamLabel(pair)
-      ul.appendChild(li)
-    })
-    groupsGrid.appendChild(block)
-  })
+function onTeamRosterInput(gender) {
+  return event => {
+    const input = event.target
+    if (!(input instanceof HTMLInputElement)) return
+    const t = input.dataset.team
+    const slot = parseInt(input.dataset.slot, 10)
+    if (!t || Number.isNaN(slot)) return
+    teamRoster[gender][t][slot] = input.value
+    saveTeamRoster(gender)
+    renderTeamMatches(gender)
+    updateStats()
+  }
 }
 
-function renderSchedule(groupSchedules) {
-  phaseSchedule.classList.add('is-active', 'is-done')
-  scheduleGrid.innerHTML = ''
-  groupSchedules.forEach((matches, gi) => {
+GENDERS.forEach(g => {
+  const form = rosterFormEl(g)
+  if (form) form.addEventListener('input', onTeamRosterInput(g))
+})
+
+// ===== Relay scoring (cumulative across 3 chặng, per nhóm) =====
+function getRelayMatch(gender, matchId) {
+  const state = relayScoreState[gender]
+  if (!state[matchId]) state[matchId] = { completedLegs: [], current: { a: 0, b: 0 } }
+  return state[matchId]
+}
+
+function relayCumulative(matchState) {
+  const off = matchState.completedLegs.reduce(
+    (acc, leg) => ({ a: acc.a + leg.a, b: acc.b + leg.b }),
+    { a: 0, b: 0 }
+  )
+  return { a: off.a + matchState.current.a, b: off.b + matchState.current.b }
+}
+
+// Status of the CURRENT chặng: whether its checkpoint has been reached, and
+// whether that means the whole match is over (final chặng) or just that the
+// next pair should take over (cumulative score carries forward unchanged).
+function relayStatus(matchState) {
+  const legIndex = matchState.completedLegs.length
+  const cumulative = relayCumulative(matchState)
+  if (legIndex >= RELAY_CHECKPOINTS.length) {
+    return { done: true, legJustFinished: false, legIndex: RELAY_CHECKPOINTS.length - 1, cumulative }
+  }
+  const checkpoint = RELAY_CHECKPOINTS[legIndex]
+  const legDone = cumulative.a >= checkpoint || cumulative.b >= checkpoint
+  const isFinalLeg = legIndex === RELAY_CHECKPOINTS.length - 1
+  return {
+    done: legDone && isFinalLeg,
+    legJustFinished: legDone && !isFinalLeg,
+    legIndex,
+    checkpoint,
+    cumulative
+  }
+}
+
+function applyRelayDelta(gender, matchId, side, delta) {
+  const m = getRelayMatch(gender, matchId)
+  const status = relayStatus(m)
+  if (status.done) return
+  m.current[side] = Math.max(0, m.current[side] + delta)
+  const after = relayStatus(m)
+  if (after.legJustFinished) {
+    m.completedLegs.push({ a: m.current.a, b: m.current.b })
+    m.current = { a: 0, b: 0 }
+  }
+  saveRelayScoreState(gender)
+}
+
+function resetRelayMatch(gender, matchId) {
+  delete relayScoreState[gender][matchId]
+  saveRelayScoreState(gender)
+  delete teamOrder[gender][matchId]
+  saveTeamOrder(gender)
+}
+
+// ===== Team standings & schedule rendering (per nhóm) =====
+function matchStatusIcon(matchState) {
+  const status = relayStatus(matchState)
+  if (status.done) return { cls: 'is-complete', icon: '✓', title: 'Hoàn thành' }
+  if (status.legIndex > 0 || matchState.current.a > 0 || matchState.current.b > 0) {
+    return { cls: 'is-live', icon: '●', title: 'Đang thi đấu' }
+  }
+  return { cls: 'is-pending', icon: '○', title: 'Chưa thi đấu' }
+}
+
+function getTeamStandings(gender) {
+  const state = relayScoreState[gender]
+  const stats = new Map()
+  TEAM_LABELS.forEach(t =>
+    stats.set(t, { team: t, played: 0, wins: 0, losses: 0, scored: 0, conceded: 0, diff: 0 })
+  )
+
+  let completedCount = 0
+  TEAM_ROUND_ROBIN.forEach(m => {
+    const matchId = `T${m.match}`
+    const ms = state[matchId]
+    if (!ms) return
+    const status = relayStatus(ms)
+    if (!status.done) return
+    completedCount += 1
+    const cum = status.cumulative
+    const home = stats.get(m.home)
+    const away = stats.get(m.away)
+    home.played += 1
+    away.played += 1
+    home.scored += cum.a
+    home.conceded += cum.b
+    away.scored += cum.b
+    away.conceded += cum.a
+    if (cum.a > cum.b) {
+      home.wins += 1
+      away.losses += 1
+    } else if (cum.b > cum.a) {
+      away.wins += 1
+      home.losses += 1
+    }
+  })
+
+  stats.forEach(row => {
+    row.diff = row.scored - row.conceded
+  })
+
+  const rows = [...stats.values()].sort((x, y) => {
+    if (y.wins !== x.wins) return y.wins - x.wins
+    if (y.diff !== x.diff) return y.diff - x.diff
+    if (y.scored !== x.scored) return y.scored - x.scored
+    return x.team.localeCompare(y.team)
+  })
+
+  let tieNote = ''
+  if (completedCount === TEAM_ROUND_ROBIN.length) {
+    for (let i = 0; i < rows.length - 1; i++) {
+      if (
+        rows[i].wins === rows[i + 1].wins &&
+        rows[i].diff === rows[i + 1].diff &&
+        rows[i].scored === rows[i + 1].scored
+      ) {
+        tieNote = `Đội ${rows[i].team} và Đội ${rows[i + 1].team} (nhóm ${GENDER_LABELS[gender]}) đang ngang nhau ở mọi chỉ số — đội trưởng 2 đội chọn 2 thành viên đại diện thi đấu phân hạng (ghi nhận kết quả thủ công).`
+        break
+      }
+    }
+  }
+  return { rows, tieNote }
+}
+
+function matchesGridEl(gender) {
+  return document.getElementById(gender === 'nam' ? 'teamMatchesGridNam' : 'teamMatchesGridNu')
+}
+function standingsBodyEl(gender) {
+  return document.getElementById(gender === 'nam' ? 'teamStandingsBodyNam' : 'teamStandingsBodyNu')
+}
+function tieNoteEl(gender) {
+  return document.getElementById(gender === 'nam' ? 'teamTieNoteNam' : 'teamTieNoteNu')
+}
+
+function renderTeamMatches(gender) {
+  const grid = matchesGridEl(gender)
+  if (!grid) return
+  grid.innerHTML = ''
+  ;[1, 2, 3].forEach(r => {
     const block = document.createElement('div')
     block.className = 'schedule-group is-visible'
-    block.innerHTML = `
-      <h4>Bảng ${GROUP_LABELS[gi]}</h4>
-      <ol></ol>
-      <div class="group-standings">
-        <h5>Bảng xếp hạng</h5>
-        <table>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Đội</th>
-              <th>Tr</th>
-              <th>T</th>
-              <th>B</th>
-              <th>HS</th>
-              <th>Điểm</th>
-            </tr>
-          </thead>
-          <tbody data-standings-body="${gi}"></tbody>
-        </table>
-      </div>
-    `
+    block.innerHTML = `<h4>Vòng ${r}</h4><ol></ol>`
     const ol = block.querySelector('ol')
-    matches.forEach((match, mi) => {
-      const matchId = `G${gi + 1}-M${mi + 1}`
-      const saved = scoreState[matchId] || {}
-      const scoreA = Number.isInteger(saved.a) ? saved.a : ''
-      const scoreB = Number.isInteger(saved.b) ? saved.b : ''
-      const status = getGroupMatchStatus(saved)
+    TEAM_ROUND_ROBIN.filter(m => m.round === r).forEach(m => {
+      const matchId = `T${m.match}`
+      const ms = getRelayMatch(gender, matchId)
+      const cum = relayCumulative(ms)
+      const status = matchStatusIcon(ms)
       const li = document.createElement('li')
       li.className = 'is-visible'
+      li.dataset.matchId = matchId
       li.innerHTML = `
-        <span class="schedule-group__no">${pad(mi + 1)}</span>
+        <span class="schedule-group__no">${matchId}</span>
         <span class="schedule-group__match">
-          <strong>${escapeHtml(teamLabel(match.a))}</strong>
-          <span class="schedule-group__score-inputs">
-            <input type="number" min="0" step="1" inputmode="numeric" data-match-id="${matchId}" data-side="a" value="${scoreA}" />
-            <span>-</span>
-            <input type="number" min="0" step="1" inputmode="numeric" data-match-id="${matchId}" data-side="b" value="${scoreB}" />
-          </span>
-          <strong>${escapeHtml(teamLabel(match.b))}</strong>
+          <strong>Đội ${m.home}</strong>
+          <span class="team-match__score">${cum.a} - ${cum.b}</span>
+          <strong>Đội ${m.away}</strong>
         </span>
-        <span class="schedule-group__status ${status.cls}" data-match-status="${matchId}" title="${status.title}" aria-label="${status.title}">
-          ${status.icon}
-        </span>
+        <span class="schedule-group__status ${status.cls}" title="${status.title}" aria-label="${status.title}">${status.icon}</span>
       `
       ol.appendChild(li)
     })
-    scheduleGrid.appendChild(block)
-    renderStandingsForGroup(gi)
+    grid.appendChild(block)
   })
-  applyKnockoutBracket(false)
+  renderTeamStandings(gender)
 }
 
-function isCompletedGroupMatchScore(a, b) {
-  return Number.isInteger(a) && Number.isInteger(b) && (a >= 11 || b >= 11)
-}
-
-function getGroupMatchStatus(saved) {
-  const a = saved && Number.isInteger(saved.a) ? saved.a : null
-  const b = saved && Number.isInteger(saved.b) ? saved.b : null
-
-  if (isCompletedGroupMatchScore(a, b)) {
-    return { cls: 'is-complete', icon: '✓', title: 'Hoan thanh' }
-  }
-  if (a !== null || b !== null) {
-    return { cls: 'is-live', icon: '●', title: 'Dang thi dau' }
-  }
-  return { cls: 'is-pending', icon: '○', title: 'Chua thi dau' }
-}
-
-function getTeamStatsMap(groupIndex) {
-  const teams = currentGroups[groupIndex] || []
-  const schedules = currentGroupSchedules[groupIndex] || []
-  const stats = new Map()
-
-  teams.forEach(team => {
-    stats.set(team.id, {
-      id: team.id,
-      name: teamLabel(team),
-      played: 0,
-      wins: 0,
-      losses: 0,
-      scored: 0,
-      conceded: 0,
-      diff: 0,
-      points: 0
-    })
-  })
-
-  schedules.forEach((match, matchIndex) => {
-    const matchId = `G${groupIndex + 1}-M${matchIndex + 1}`
-    const saved = scoreState[matchId]
-    if (!saved || !isCompletedGroupMatchScore(saved.a, saved.b)) return
-
-    const a = stats.get(match.a.id)
-    const b = stats.get(match.b.id)
-    if (!a || !b) return
-
-    a.played += 1
-    b.played += 1
-    a.scored += saved.a
-    a.conceded += saved.b
-    b.scored += saved.b
-    b.conceded += saved.a
-
-    if (saved.a > saved.b) {
-      a.wins += 1
-      b.losses += 1
-      a.points += 3
-    } else if (saved.b > saved.a) {
-      b.wins += 1
-      a.losses += 1
-      b.points += 3
-    } else {
-      a.points += 1
-      b.points += 1
-    }
-  })
-
-  for (const row of stats.values()) {
-    row.diff = row.scored - row.conceded
-  }
-
-  return [...stats.values()].sort((x, y) => {
-    if (y.points !== x.points) return y.points - x.points
-    if (y.diff !== x.diff) return y.diff - x.diff
-    if (y.scored !== x.scored) return y.scored - x.scored
-    return x.name.localeCompare(y.name, 'vi')
-  })
-}
-
-function getCompletedGroupMatchCount(groupIndex) {
-  const schedules = currentGroupSchedules[groupIndex] || []
-  let count = 0
-  schedules.forEach((_, matchIndex) => {
-    const matchId = `G${groupIndex + 1}-M${matchIndex + 1}`
-    const saved = scoreState[matchId]
-    if (saved && isCompletedGroupMatchScore(saved.a, saved.b)) count += 1
-  })
-  return count
-}
-
-function renderStandingsForGroup(groupIndex) {
-  const tbody = scheduleGrid.querySelector(
-    `[data-standings-body="${groupIndex}"]`
-  )
+function renderTeamStandings(gender) {
+  const tbody = standingsBodyEl(gender)
+  const noteEl = tieNoteEl(gender)
   if (!tbody) return
-  const rows = getTeamStatsMap(groupIndex)
+  const { rows, tieNote } = getTeamStandings(gender)
   tbody.innerHTML = ''
-
   rows.forEach((row, i) => {
     const tr = document.createElement('tr')
     tr.innerHTML = `
       <td>${i + 1}</td>
-      <td>${escapeHtml(row.name)}</td>
+      <td>Đội ${row.team}</td>
       <td>${row.played}</td>
       <td>${row.wins}</td>
       <td>${row.losses}</td>
       <td>${row.diff > 0 ? '+' : ''}${row.diff}</td>
-      <td>${row.points}</td>
+      <td>${row.scored}</td>
     `
     tbody.appendChild(tr)
   })
+  if (noteEl) {
+    noteEl.textContent = tieNote
+    noteEl.hidden = !tieNote
+  }
 }
 
-function updateGroupMatchStatus(matchId) {
-  const statusEl = scheduleGrid.querySelector(
-    `[data-match-status="${matchId}"]`
+// ===== Stats bar (24 VĐV / 2 nhóm / 8 đội / 12 trận) =====
+const statRegistered = document.getElementById('statRegistered')
+
+function updateStats() {
+  if (!statRegistered) return
+  const filled = GENDERS.reduce(
+    (sum, g) =>
+      sum + TEAM_LABELS.reduce((s, t) => s + teamRoster[g][t].filter(n => n && n.trim()).length, 0),
+    0
   )
-  if (!statusEl) return
-  const saved = scoreState[matchId] || {}
-  const status = getGroupMatchStatus(saved)
-  statusEl.textContent = status.icon
-  statusEl.title = status.title
-  statusEl.setAttribute('aria-label', status.title)
-  statusEl.classList.toggle('is-complete', status.cls === 'is-complete')
-  statusEl.classList.toggle('is-live', status.cls === 'is-live')
-  statusEl.classList.toggle('is-pending', status.cls === 'is-pending')
+  statRegistered.textContent = filled
 }
 
-function findTeamById(groupIndex, teamId) {
-  const teams = currentGroups[groupIndex] || []
-  return teams.find(team => team.id === teamId) || null
-}
+GENDERS.forEach(g => {
+  renderTeamRosterForm(g)
+  renderTeamMatches(g)
+})
+updateStats()
 
-function getRankedTeams(groupIndex) {
-  return getTeamStatsMap(groupIndex)
-    .map(row => findTeamById(groupIndex, row.id))
-    .filter(Boolean)
-}
-
-function setBracketSlot(slot, value) {
-  const el = document.querySelector(`[data-slot="${slot}"]`)
-  if (!el) return
-  el.textContent = value
-}
-
-function isResolvedTeam(v) {
-  return !!(v && typeof v === 'object' && v.male && v.female)
-}
-
-function slotLabel(v) {
-  return isResolvedTeam(v) ? teamLabel(v) : v
-}
-
-function normalizeKnockoutScoreInput(code) {
-  const pair = knockoutScoreState[code] || {}
-  const a = Number.isInteger(pair.a) ? pair.a : null
-  const b = Number.isInteger(pair.b) ? pair.b : null
-  return { a, b }
-}
-
-// sideA/sideB are either a resolved pair object ({id, male, female}) or a
-// placeholder label string (e.g. 'Nhất A') while the qualifier isn't known yet.
-function getKnockoutOutcome(code, sideA, sideB) {
-  const { a, b } = normalizeKnockoutScoreInput(code)
-  if (!isResolvedTeam(sideA) || !isResolvedTeam(sideB) || a === null || b === null || a === b) {
-    return { winner: null, loser: null }
-  }
-  return a > b
-    ? { winner: sideA, loser: sideB }
-    : { winner: sideB, loser: sideA }
-}
-
-function setKnockoutInputsFromState() {
-  if (!bracketEl) return
-  bracketEl.querySelectorAll('input[data-ko-match]').forEach(input => {
-    const code = input.dataset.koMatch
-    const side = input.dataset.side
-    if (!code || (side !== 'a' && side !== 'b')) return
-    const pair = knockoutScoreState[code] || {}
-    input.value = Number.isInteger(pair[side]) ? String(pair[side]) : ''
-  })
-}
-
-function applyKnockoutBracket(resetIfQualifierChanged) {
-  const readyA = getCompletedGroupMatchCount(0) > 0
-  const readyB = getCompletedGroupMatchCount(1) > 0
-  const readyC = getCompletedGroupMatchCount(2) > 0
-  const readyD = getCompletedGroupMatchCount(3) > 0
-
-  const rankedA = readyA ? getRankedTeams(0) : []
-  const rankedB = readyB ? getRankedTeams(1) : []
-  const rankedC = readyC ? getRankedTeams(2) : []
-  const rankedD = readyD ? getRankedTeams(3) : []
-
-  const qf = {
-    TK1A: rankedA[0] || 'Nhất A',
-    TK1B: rankedB[1] || 'Nhì B',
-    TK2A: rankedC[0] || 'Nhất C',
-    TK2B: rankedD[1] || 'Nhì D',
-    TK3A: rankedB[0] || 'Nhất B',
-    TK3B: rankedA[1] || 'Nhì A',
-    TK4A: rankedD[0] || 'Nhất D',
-    TK4B: rankedC[1] || 'Nhì C'
-  }
-
-  const nextSignature = [
-    qf.TK1A,
-    qf.TK1B,
-    qf.TK2A,
-    qf.TK2B,
-    qf.TK3A,
-    qf.TK3B,
-    qf.TK4A,
-    qf.TK4B
-  ]
-    .map(slotLabel)
-    .join('|')
-
-  if (
-    resetIfQualifierChanged &&
-    qualifierSignature &&
-    qualifierSignature !== nextSignature
-  ) {
-    knockoutScoreState = {}
-    saveKnockoutScoreState()
-  }
-  qualifierSignature = nextSignature
-
-  setBracketSlot('TK1-A', slotLabel(qf.TK1A))
-  setBracketSlot('TK1-B', slotLabel(qf.TK1B))
-  setBracketSlot('TK2-A', slotLabel(qf.TK2A))
-  setBracketSlot('TK2-B', slotLabel(qf.TK2B))
-  setBracketSlot('TK3-A', slotLabel(qf.TK3A))
-  setBracketSlot('TK3-B', slotLabel(qf.TK3B))
-  setBracketSlot('TK4-A', slotLabel(qf.TK4A))
-  setBracketSlot('TK4-B', slotLabel(qf.TK4B))
-
-  const q1 = getKnockoutOutcome('TK1', qf.TK1A, qf.TK1B)
-  const q2 = getKnockoutOutcome('TK2', qf.TK2A, qf.TK2B)
-  const q3 = getKnockoutOutcome('TK3', qf.TK3A, qf.TK3B)
-  const q4 = getKnockoutOutcome('TK4', qf.TK4A, qf.TK4B)
-
-  const bk1a = q1.winner || 'Thắng TK1'
-  const bk1b = q2.winner || 'Thắng TK2'
-  const bk2a = q3.winner || 'Thắng TK3'
-  const bk2b = q4.winner || 'Thắng TK4'
-
-  setBracketSlot('BK1-A', slotLabel(bk1a))
-  setBracketSlot('BK1-B', slotLabel(bk1b))
-  setBracketSlot('BK2-A', slotLabel(bk2a))
-  setBracketSlot('BK2-B', slotLabel(bk2b))
-
-  const s1 = getKnockoutOutcome('BK1', bk1a, bk1b)
-  const s2 = getKnockoutOutcome('BK2', bk2a, bk2b)
-
-  const cka = s1.winner || 'Thắng BK1'
-  const ckb = s2.winner || 'Thắng BK2'
-  const bra = s1.loser || 'Thua BK1'
-  const brb = s2.loser || 'Thua BK2'
-
-  setBracketSlot('CK-A', slotLabel(cka))
-  setBracketSlot('CK-B', slotLabel(ckb))
-  setBracketSlot('BR-A', slotLabel(bra))
-  setBracketSlot('BR-B', slotLabel(brb))
-
-  knockoutMatchSides = {
-    TK1: { a: qf.TK1A, b: qf.TK1B },
-    TK2: { a: qf.TK2A, b: qf.TK2B },
-    TK3: { a: qf.TK3A, b: qf.TK3B },
-    TK4: { a: qf.TK4A, b: qf.TK4B },
-    BK1: { a: bk1a, b: bk1b },
-    BK2: { a: bk2a, b: bk2b },
-    CK: { a: cka, b: ckb },
-    BR: { a: bra, b: brb }
-  }
-
-  setKnockoutInputsFromState()
-}
-
-function onScheduleScoreInput(event) {
-  const input = event.target
-  if (!(input instanceof HTMLInputElement)) return
-  const matchId = input.dataset.matchId
-  const side = input.dataset.side
-  if (!matchId || (side !== 'a' && side !== 'b')) return
-
-  const value = input.value.trim()
-  if (!scoreState[matchId]) scoreState[matchId] = {}
-
-  if (value === '') {
-    delete scoreState[matchId][side]
-  } else {
-    const parsed = Math.max(0, parseInt(value, 10) || 0)
-    scoreState[matchId][side] = parsed
-    if (String(parsed) !== value) input.value = String(parsed)
-  }
-
-  if (
-    !Number.isInteger(scoreState[matchId].a) &&
-    !Number.isInteger(scoreState[matchId].b)
-  ) {
-    delete scoreState[matchId]
-  }
-
-  saveScoreState()
-  updateGroupMatchStatus(matchId)
-  const groupIndex = parseInt(matchId.slice(1, matchId.indexOf('-')), 10) - 1
-  renderStandingsForGroup(groupIndex)
-  applyKnockoutBracket(true)
-}
-
-scheduleGrid.addEventListener('input', onScheduleScoreInput)
-
-function onKnockoutScoreInput(event) {
-  const input = event.target
-  if (!(input instanceof HTMLInputElement)) return
-  const code = input.dataset.koMatch
-  const side = input.dataset.side
-  if (!code || (side !== 'a' && side !== 'b')) return
-
-  const value = input.value.trim()
-  if (!knockoutScoreState[code]) knockoutScoreState[code] = {}
-
-  if (value === '') {
-    delete knockoutScoreState[code][side]
-  } else {
-    const parsed = Math.max(0, parseInt(value, 10) || 0)
-    knockoutScoreState[code][side] = parsed
-    if (String(parsed) !== value) input.value = String(parsed)
-  }
-
-  if (
-    !Number.isInteger(knockoutScoreState[code].a) &&
-    !Number.isInteger(knockoutScoreState[code].b)
-  ) {
-    delete knockoutScoreState[code]
-  }
-
-  saveKnockoutScoreState()
-  applyKnockoutBracket(false)
-}
-
-if (bracketEl)
-  bracketEl.addEventListener('input', onKnockoutScoreInput)
-
-  // === Kết quả chính thức ===
+// ===== Team Relay Modal =====
 ;(function () {
-  const mk = (m, f) => ({ male: { name: m }, female: { name: f } })
-  const pairs = [
-    mk('Nguyễn Quốc Ân', 'Minh Thao'),
-    mk('Phúc Phan', 'Ánh Lê'),
-    mk('Xuân Trường', 'Em Trâm'),
-    mk('Trường Trong Trắng', 'Hoa Vũ'),
-    mk('Thanh Thật Thà', 'Mai Nguyễn'),
-    mk('Minh Dương', 'Tuyết Mei'),
-    mk('Chen', 'Diệu'),
-    mk('Tùng Nè', 'Minh Anh'),
-    mk('Quang Khánh', 'Mai Thu'),
-    mk('Dinh Thanh', 'Mai Trân'),
-    mk('Phương Nam', 'Thảo Hiếu'),
-    mk('Thuận Sovo', 'Nana Phan'),
-    mk('Tomm', 'Vân Nguyễn'),
-    mk('Mr Mountain', 'Phạm Thoa'),
-    mk('Mr Quy', 'Tiên'),
-    mk('Lê Minh Trí', 'Diệp Ann')
-  ].map((p, i) => ({ ...p, id: i + 1 }))
+  const teamModal = document.getElementById('teamModal')
+  if (!teamModal) return
+  const teamClose = document.getElementById('teamClose')
+  const teamCodeEl = document.getElementById('teamCode')
+  const teamBody = document.getElementById('teamBody')
+  const teamStatusEl = document.getElementById('teamStatus')
 
-  const G = (...ids) => ids.map(i => pairs[i - 1])
-  const groups = [
-    G(1, 11, 14, 12), // Bảng A
-    G(7, 4, 8, 13), // Bảng B
-    G(2, 6, 15, 9), // Bảng C
-    G(10, 3, 16, 5) // Bảng D
-  ]
-
-  const v = (a, b) => ({ a, b })
-  const groupSchedules = [
-    // Bảng A
-    [
-      v(groups[0][2], groups[0][3]),
-      v(groups[0][0], groups[0][1]),
-      v(groups[0][3], groups[0][0]),
-      v(groups[0][1], groups[0][2]),
-      v(groups[0][3], groups[0][1]),
-      v(groups[0][0], groups[0][2])
-    ],
-    // Bảng B
-    [
-      v(groups[1][0], groups[1][2]),
-      v(groups[1][3], groups[1][1]),
-      v(groups[1][0], groups[1][1]),
-      v(groups[1][2], groups[1][3]),
-      v(groups[1][1], groups[1][2]),
-      v(groups[1][0], groups[1][3])
-    ],
-    // Bảng C
-    [
-      v(groups[2][0], groups[2][2]),
-      v(groups[2][2], groups[2][3]),
-      v(groups[2][3], groups[2][0]),
-      v(groups[2][1], groups[2][2]),
-      v(groups[2][1], groups[2][0]),
-      v(groups[2][1], groups[2][3])
-    ],
-    // Bảng D
-    [
-      v(groups[3][2], groups[3][1]),
-      v(groups[3][0], groups[3][3]),
-      v(groups[3][2], groups[3][0]),
-      v(groups[3][1], groups[3][3]),
-      v(groups[3][2], groups[3][3]),
-      v(groups[3][0], groups[3][1])
-    ]
-  ]
-
-  currentPairs = pairs
-  currentGroups = groups
-  currentGroupSchedules = groupSchedules
-
-  renderPairs(pairs)
-  renderGroups(groups)
-  renderSchedule(groupSchedules)
-  applyKnockoutBracket(false)
-})()
-
-updateRosterUI()
-
-// ===== Pickleball side-out scoring engine =====
-// A team's own two players always occupy complementary courts (right/even,
-// left/odd). Only the box of the CURRENT server is meaningful; it always
-// matches the parity of the serving team's own score.
-function otherPlayerKey(key) {
-  return key === 'male' ? 'female' : 'male'
-}
-
-function otherTeamKey(team) {
-  return team === 'a' ? 'b' : 'a'
-}
-
-function createInitialServeCourt(setup) {
-  const servingTeam = setup.servingTeam
-  const receivingTeam = otherTeamKey(servingTeam)
-  const court = {}
-  court[servingTeam] = {
-    right: setup.firstServer,
-    left: otherPlayerKey(setup.firstServer)
-  }
-  court[receivingTeam] = {
-    right: setup.firstReceiver,
-    left: otherPlayerKey(setup.firstReceiver)
-  }
-  return court
-}
-
-// Replays the full rally history from the initial setup so current state is
-// always derived, never stored redundantly — undo is just history.pop().
-function computeServeState(setup, history) {
-  const score = { a: 0, b: 0 }
-  let servingTeam = setup.servingTeam
-  // The very first serve of the whole match is conventionally called "2"
-  // (server #1's turn is skipped) so the score call reads e.g. "0-0-2".
-  let serverNum = 2
-  let firstServeActive = true
-  const court = createInitialServeCourt(setup)
-
-  for (const winner of history) {
-    if (winner === servingTeam) {
-      score[servingTeam] += 1
-      const c = court[servingTeam]
-      const swap = c.right
-      c.right = c.left
-      c.left = swap
-    } else if (firstServeActive) {
-      // First service of the match: only one server before the first side-out.
-      servingTeam = otherTeamKey(servingTeam)
-      serverNum = 1
-      firstServeActive = false
-    } else if (serverNum === 1) {
-      serverNum = 2
-    } else {
-      servingTeam = otherTeamKey(servingTeam)
-      serverNum = 1
-    }
-  }
-
-  const parity = score[servingTeam] % 2 === 0 ? 'right' : 'left'
-  return { score, servingTeam, serverNum, court, serverKey: court[servingTeam][parity] }
-}
-
-// ===== Referee Score Modal =====
-;(function () {
-  const refModal = document.getElementById('refModal')
-  const refClose = document.getElementById('refClose')
-  const refCodeEl = document.getElementById('refCode')
-  const refBody = document.getElementById('refBody')
-  const refStatusEl = document.getElementById('refStatus')
-
-  let refCtx = null // { type, id, code, teamA, teamB }
-  let refView = 'entry' // 'entry' | 'setup' | 'play' | 'manual'
-  let setupChoices = {}
-  let manualScore = { a: 0, b: 0 }
-  let refTrigger = null
+  let ctx = null // { gender, matchId, home, away, round }
+  let view = 'play' // 'order' | 'play'
+  let orderChoices = {} // { side, home: [...], away: [...] }
+  let teamTrigger = null
   let holdTimer = null
   let holdInterval = null
-  let manualSaveTimer = null
   let statusTimer = null
 
-  function getScoreStore() {
-    return refCtx.type === 'group' ? scoreState : knockoutScoreState
-  }
-
-  function getSavedMatch() {
-    return getScoreStore()[refCtx.id] || {}
-  }
-
-  function persistMatch(patch) {
-    const store = getScoreStore()
-    if (!store[refCtx.id]) store[refCtx.id] = {}
-    Object.assign(store[refCtx.id], patch)
-    if (refCtx.type === 'group') saveScoreState()
-    else saveKnockoutScoreState()
-  }
-
-  function clearServeState() {
-    const store = getScoreStore()
-    if (store[refCtx.id]) delete store[refCtx.id].serve
-    if (refCtx.type === 'group') saveScoreState()
-    else saveKnockoutScoreState()
-  }
-
-  function syncExternalAfterScoreChange() {
-    if (refCtx.type === 'group') {
-      const matchId = refCtx.id
-      const saved = scoreState[matchId] || {}
-      const inpA = scheduleGrid.querySelector(`input[data-match-id="${matchId}"][data-side="a"]`)
-      const inpB = scheduleGrid.querySelector(`input[data-match-id="${matchId}"][data-side="b"]`)
-      if (inpA) inpA.value = Number.isInteger(saved.a) ? String(saved.a) : ''
-      if (inpB) inpB.value = Number.isInteger(saved.b) ? String(saved.b) : ''
-      updateGroupMatchStatus(matchId)
-      const groupIndex = parseInt(matchId.slice(1, matchId.indexOf('-')), 10) - 1
-      renderStandingsForGroup(groupIndex)
-      applyKnockoutBracket(true)
-    } else {
-      setKnockoutInputsFromState()
-      applyKnockoutBracket(false)
-    }
+  function matchupLabel() {
+    return `Đội ${ctx.home} vs Đội ${ctx.away} · Nhóm ${GENDER_LABELS[ctx.gender]}`
   }
 
   function flashSaved() {
-    refStatusEl.textContent = '✓ Đã lưu'
-    refStatusEl.style.opacity = '1'
+    teamStatusEl.textContent = '✓ Đã lưu'
+    teamStatusEl.style.opacity = '1'
     clearTimeout(statusTimer)
-    statusTimer = setTimeout(() => { refStatusEl.style.opacity = '0' }, 1800)
+    statusTimer = setTimeout(() => {
+      teamStatusEl.style.opacity = '0'
+    }, 1800)
+  }
+
+  function syncExternal() {
+    renderTeamMatches(ctx.gender)
+  }
+
+  function currentLegPairing() {
+    const m = getRelayMatch(ctx.gender, ctx.matchId)
+    const legIndex = m.completedLegs.length
+    if (legIndex >= RELAY_CHECKPOINTS.length) return null
+    const order = teamOrder[ctx.gender][ctx.matchId]
+    if (!order) return null
+    const homeDef = PAIR3_DEFS[order.home[legIndex]]
+    const awayDef = PAIR3_DEFS[order.away[legIndex]]
+    return {
+      homeMembers: homeDef.map(i => teamMemberName(ctx.gender, ctx.home, i)),
+      awayMembers: awayDef.map(i => teamMemberName(ctx.gender, ctx.away, i))
+    }
   }
 
   function render() {
-    if (refView === 'setup') renderSetup()
-    else if (refView === 'play') renderPlay()
-    else if (refView === 'manual') renderManual()
-    else renderEntry()
+    if (view === 'order') renderOrder()
+    else renderPlay()
   }
 
-  function renderEntry() {
-    const saved = getSavedMatch()
-    const hasServe = saved.serve && Array.isArray(saved.serve.history)
-    const hasLegacyScore = Number.isInteger(saved.a) || Number.isInteger(saved.b)
-
-    let html = `<div class="ref-modal__matchup">${escapeHtml(teamLabel(refCtx.teamA))} <span>vs</span> ${escapeHtml(teamLabel(refCtx.teamB))}</div>`
-
-    if (hasServe) {
-      const state = computeServeState(saved.serve.setup, saved.serve.history)
-      const done = isCompletedGroupMatchScore(state.score.a, state.score.b)
-      html += `<div class="ref-modal__note">Tỷ số hiện tại: ${state.score.a} - ${state.score.b}${done ? ' (đã kết thúc)' : ''}</div>
-        <div class="ref-modal__actions">
-          <button class="ref-modal__action-btn" data-action="continue">Tiếp tục trận đấu</button>
-          <button class="ref-modal__action-btn ref-modal__action-btn--ghost" data-action="restart">Bắt đầu lại trận đấu</button>
-        </div>`
-    } else if (hasLegacyScore) {
-      html += `<div class="ref-modal__note">Trận này đã có tỷ số nhập tay: ${Number.isInteger(saved.a) ? saved.a : 0} - ${Number.isInteger(saved.b) ? saved.b : 0}</div>
-        <div class="ref-modal__actions">
-          <button class="ref-modal__action-btn" data-action="start">Bắt đầu trận đấu tự động (reset 0-0)</button>
-        </div>`
-    } else {
-      html += `<div class="ref-modal__actions">
-          <button class="ref-modal__action-btn" data-action="start">Bắt đầu trận đấu</button>
-        </div>`
+  function renderOrder() {
+    const side = orderChoices.side
+    const chosen = orderChoices[side]
+    if (chosen.length >= 2) {
+      if (side === 'home') {
+        orderChoices.side = 'away'
+        render()
+        return
+      }
+      finishOrderSetup()
+      return
     }
-
-    html += `<button class="ref-modal__link" data-action="manual">Sửa tỷ số thủ công</button>`
-    refBody.innerHTML = html
+    const remaining = [0, 1, 2].filter(i => !chosen.includes(i))
+    const teamLbl = side === 'home' ? ctx.home : ctx.away
+    const stepNum = chosen.length + 1
+    let html = `<div class="ref-modal__matchup">${escapeHtml(matchupLabel())}</div>
+      <div class="ref-modal__step-label">Đội ${teamLbl} · Chọn cặp ra sân Chặng ${stepNum}</div>
+      <div class="ref-modal__choice-grid">`
+    remaining.forEach(i => {
+      const members = PAIR3_DEFS[i].map(mi => teamMemberName(ctx.gender, teamLbl, mi)).join(' + ')
+      html += `<button class="ref-modal__choice-btn" data-order-pick="${i}">${escapeHtml(members)}</button>`
+    })
+    html += `</div><button class="ref-modal__link" data-action="cancel-order">Hủy</button>`
+    teamBody.innerHTML = html
   }
 
-  function renderSetup() {
-    const step = setupChoices.step || 1
-    let html = `<div class="ref-modal__matchup">${escapeHtml(teamLabel(refCtx.teamA))} <span>vs</span> ${escapeHtml(teamLabel(refCtx.teamB))}</div>`
+  function pickOrder(i) {
+    orderChoices[orderChoices.side].push(i)
+    render()
+  }
 
-    if (step === 1) {
-      html += `<div class="ref-modal__step-label">Bước 1/3 · Chọn đội giao bóng</div>
-        <div class="ref-modal__choice-grid">
-          <button class="ref-modal__choice-btn" data-setup="team" data-value="a">${escapeHtml(teamLabel(refCtx.teamA))}</button>
-          <button class="ref-modal__choice-btn" data-setup="team" data-value="b">${escapeHtml(teamLabel(refCtx.teamB))}</button>
-        </div>`
-    } else if (step === 2) {
-      const servingPair = setupChoices.servingTeam === 'a' ? refCtx.teamA : refCtx.teamB
-      html += `<div class="ref-modal__step-label">Bước 2/3 · Chọn người giao bóng đầu tiên</div>
-        <div class="ref-modal__choice-grid">
-          <button class="ref-modal__choice-btn" data-setup="server" data-value="male">${escapeHtml(servingPair.male.name)}</button>
-          <button class="ref-modal__choice-btn" data-setup="server" data-value="female">${escapeHtml(servingPair.female.name)}</button>
-        </div>`
-    } else {
-      const receivingPair = setupChoices.servingTeam === 'a' ? refCtx.teamB : refCtx.teamA
-      html += `<div class="ref-modal__step-label">Bước 3/3 · Chọn người đỡ bóng đầu tiên</div>
-        <div class="ref-modal__choice-grid">
-          <button class="ref-modal__choice-btn" data-setup="receiver" data-value="male">${escapeHtml(receivingPair.male.name)}</button>
-          <button class="ref-modal__choice-btn" data-setup="receiver" data-value="female">${escapeHtml(receivingPair.female.name)}</button>
-        </div>`
+  function finishOrderSetup() {
+    const homeLeftover = [0, 1, 2].find(i => !orderChoices.home.includes(i))
+    const awayLeftover = [0, 1, 2].find(i => !orderChoices.away.includes(i))
+    teamOrder[ctx.gender][ctx.matchId] = {
+      home: orderChoices.home.concat([homeLeftover]),
+      away: orderChoices.away.concat([awayLeftover])
     }
+    saveTeamOrder(ctx.gender)
+    flashSaved()
+    view = 'play'
+    render()
+  }
 
-    html += `<button class="ref-modal__link" data-action="back-entry">Hủy</button>`
-    refBody.innerHTML = html
+  function startOrderSetup() {
+    orderChoices = { side: 'home', home: [], away: [] }
+    view = 'order'
+    render()
   }
 
   function renderPlay() {
-    const saved = getSavedMatch()
-    const state = computeServeState(saved.serve.setup, saved.serve.history)
-    const done = isCompletedGroupMatchScore(state.score.a, state.score.b)
-    const teamAName = teamLabel(refCtx.teamA)
-    const teamBName = teamLabel(refCtx.teamB)
+    const m = getRelayMatch(ctx.gender, ctx.matchId)
+    const cum = relayCumulative(m)
+    const status = relayStatus(m)
+    const pairing = currentLegPairing()
 
-    let html = `<div class="ref-modal__board">
+    let html = `<div class="ref-modal__matchup">${escapeHtml(matchupLabel())}</div>`
+
+    if (!pairing) {
+      html += `<div class="ref-modal__note">Chưa chọn thứ tự ra sân cho trận này.</div>
+        <div class="ref-modal__actions">
+          <button class="ref-modal__action-btn" data-action="start-order">Chọn thứ tự ra sân</button>
+        </div>`
+      teamBody.innerHTML = html
+      return
+    }
+
+    const checkpointLabel = status.done
+      ? RELAY_CHECKPOINTS[RELAY_CHECKPOINTS.length - 1]
+      : status.checkpoint
+    html += `<div class="ref-modal__note">Chặng ${status.legIndex + 1}/${RELAY_CHECKPOINTS.length} · mốc ${checkpointLabel} điểm<br>
+      <strong>${escapeHtml(pairing.homeMembers.join(' + '))}</strong> vs <strong>${escapeHtml(pairing.awayMembers.join(' + '))}</strong></div>`
+
+    html += `<div class="ref-modal__board">
         <div class="ref-modal__col">
-          <div class="ref-modal__name">${escapeHtml(teamAName)}</div>
-          <div class="ref-modal__score">${state.score.a}</div>
+          <div class="ref-modal__name">Đội ${escapeHtml(ctx.home)}</div>
+          <button class="ref-modal__btn" data-step-side="a" data-dir="up" ${status.done ? 'disabled' : ''}>▲</button>
+          <div class="ref-modal__score" id="teamScoreA">${cum.a}</div>
+          <button class="ref-modal__btn" data-step-side="a" data-dir="down" ${status.done ? 'disabled' : ''}>▼</button>
         </div>
         <div class="ref-modal__dash">–</div>
         <div class="ref-modal__col">
-          <div class="ref-modal__name">${escapeHtml(teamBName)}</div>
-          <div class="ref-modal__score">${state.score.b}</div>
+          <div class="ref-modal__name">Đội ${escapeHtml(ctx.away)}</div>
+          <button class="ref-modal__btn" data-step-side="b" data-dir="up" ${status.done ? 'disabled' : ''}>▲</button>
+          <div class="ref-modal__score" id="teamScoreB">${cum.b}</div>
+          <button class="ref-modal__btn" data-step-side="b" data-dir="down" ${status.done ? 'disabled' : ''}>▼</button>
         </div>
       </div>`
 
-    if (done) {
-      const winnerName = state.score.a > state.score.b ? teamAName : teamBName
-      html += `<div class="ref-modal__final-banner">🏆 ${escapeHtml(winnerName)} thắng ${Math.max(state.score.a, state.score.b)}-${Math.min(state.score.a, state.score.b)}</div>`
+    if (status.done) {
+      const winner = cum.a > cum.b ? ctx.home : ctx.away
+      html += `<div class="ref-modal__final-banner">🏆 Đội ${escapeHtml(winner)} thắng ${Math.max(cum.a, cum.b)}-${Math.min(cum.a, cum.b)}</div>`
+    }
+
+    html += `<div class="ref-modal__footer-row">
+        <button class="ref-modal__action-btn ref-modal__action-btn--ghost" data-action="start-order">Đổi thứ tự</button>
+        <button class="ref-modal__action-btn ref-modal__action-btn--ghost" data-action="reset-match">Đặt lại trận</button>
+      </div>`
+
+    teamBody.innerHTML = html
+  }
+
+  function stepRelay(side, dir) {
+    const before = getRelayMatch(ctx.gender, ctx.matchId)
+    const beforeLegIndex = before.completedLegs.length
+    applyRelayDelta(ctx.gender, ctx.matchId, side, dir === 'up' ? 1 : -1)
+    syncExternal()
+    flashSaved()
+    const after = getRelayMatch(ctx.gender, ctx.matchId)
+    if (after.completedLegs.length !== beforeLegIndex || relayStatus(after).done) {
+      render()
     } else {
-      const servingPair = state.servingTeam === 'a' ? refCtx.teamA : refCtx.teamB
-      const servingTeamName = state.servingTeam === 'a' ? teamAName : teamBName
-      const receivingScore = state.score[otherTeamKey(state.servingTeam)]
-      const callText = `${state.score[state.servingTeam]}-${receivingScore}-${state.serverNum}`
-      html += `<div class="ref-modal__score-call" title="Điểm đội giao - điểm đội đỡ - số giao">${callText}</div>
-        <div class="ref-modal__serve-info">Đang giao: <strong>${escapeHtml(servingPair[state.serverKey].name)}</strong> (Đội ${escapeHtml(servingTeamName)})<span class="ref-modal__serve-badge">#${state.serverNum}</span></div>`
+      const cum = relayCumulative(after)
+      const elA = document.getElementById('teamScoreA')
+      const elB = document.getElementById('teamScoreB')
+      if (elA) elA.textContent = String(cum.a)
+      if (elB) elB.textContent = String(cum.b)
     }
-
-    html += `<div class="ref-modal__rally-grid">
-        <button class="ref-modal__rally-btn" data-rally="a" ${done ? 'disabled' : ''}>${escapeHtml(teamAName)} thắng pha</button>
-        <button class="ref-modal__rally-btn" data-rally="b" ${done ? 'disabled' : ''}>${escapeHtml(teamBName)} thắng pha</button>
-      </div>
-      <div class="ref-modal__footer-row">
-        <button class="ref-modal__action-btn ref-modal__action-btn--ghost" data-action="undo" ${saved.serve.history.length === 0 ? 'disabled' : ''}>↩ Hoàn tác</button>
-        <button class="ref-modal__action-btn ref-modal__action-btn--ghost" data-action="manual">Sửa tay</button>
-      </div>`
-
-    refBody.innerHTML = html
-  }
-
-  function renderManual() {
-    const teamAName = teamLabel(refCtx.teamA)
-    const teamBName = teamLabel(refCtx.teamB)
-    refBody.innerHTML = `
-      <div class="ref-modal__board">
-        <div class="ref-modal__col">
-          <div class="ref-modal__name">${escapeHtml(teamAName)}</div>
-          <button class="ref-modal__btn" data-manual-side="a" data-dir="up">▲</button>
-          <div class="ref-modal__score" id="refManualScoreA">${manualScore.a}</div>
-          <button class="ref-modal__btn" data-manual-side="a" data-dir="down">▼</button>
-        </div>
-        <div class="ref-modal__dash">–</div>
-        <div class="ref-modal__col">
-          <div class="ref-modal__name">${escapeHtml(teamBName)}</div>
-          <button class="ref-modal__btn" data-manual-side="b" data-dir="up">▲</button>
-          <div class="ref-modal__score" id="refManualScoreB">${manualScore.b}</div>
-          <button class="ref-modal__btn" data-manual-side="b" data-dir="down">▼</button>
-        </div>
-      </div>
-      <button class="ref-modal__link" data-action="back-entry">Quay lại</button>
-    `
-  }
-
-  function goEntry() {
-    refView = 'entry'
-    setupChoices = {}
-    render()
-  }
-
-  function startSetup() {
-    setupChoices = { step: 1 }
-    refView = 'setup'
-    render()
-  }
-
-  function finishSetup() {
-    persistMatch({
-      a: 0,
-      b: 0,
-      serve: {
-        setup: {
-          servingTeam: setupChoices.servingTeam,
-          firstServer: setupChoices.firstServer,
-          firstReceiver: setupChoices.firstReceiver
-        },
-        history: []
-      }
-    })
-    syncExternalAfterScoreChange()
-    flashSaved()
-    refView = 'play'
-    render()
-  }
-
-  function goManual() {
-    const saved = getSavedMatch()
-    if (saved.serve) {
-      if (!confirm('Chuyển sang sửa tay sẽ dừng chế độ tự động cho trận này. Tiếp tục?')) return
-      clearServeState()
-    }
-    const fresh = getSavedMatch()
-    manualScore = {
-      a: Number.isInteger(fresh.a) ? fresh.a : 0,
-      b: Number.isInteger(fresh.b) ? fresh.b : 0
-    }
-    refView = 'manual'
-    render()
-  }
-
-  function applyRally(side) {
-    const saved = getSavedMatch()
-    const state = computeServeState(saved.serve.setup, saved.serve.history)
-    if (isCompletedGroupMatchScore(state.score.a, state.score.b)) return
-    const history = saved.serve.history.slice()
-    history.push(side)
-    const next = computeServeState(saved.serve.setup, history)
-    persistMatch({ a: next.score.a, b: next.score.b, serve: { setup: saved.serve.setup, history } })
-    syncExternalAfterScoreChange()
-    flashSaved()
-    render()
-  }
-
-  function undoRally() {
-    const saved = getSavedMatch()
-    if (!saved.serve || saved.serve.history.length === 0) return
-    const history = saved.serve.history.slice(0, -1)
-    const next = computeServeState(saved.serve.setup, history)
-    persistMatch({ a: next.score.a, b: next.score.b, serve: { setup: saved.serve.setup, history } })
-    syncExternalAfterScoreChange()
-    flashSaved()
-    render()
-  }
-
-  function doManualSave() {
-    clearTimeout(manualSaveTimer)
-    manualSaveTimer = null
-    persistMatch({ a: manualScore.a, b: manualScore.b })
-    syncExternalAfterScoreChange()
-    flashSaved()
-  }
-
-  function debouncedManualSave() {
-    clearTimeout(manualSaveTimer)
-    refStatusEl.style.opacity = '0'
-    manualSaveTimer = setTimeout(doManualSave, 800)
-  }
-
-  function stepManualScore(side, dir) {
-    const delta = dir === 'up' ? 1 : -1
-    manualScore[side] = Math.max(0, manualScore[side] + delta)
-    const el = document.getElementById(side === 'a' ? 'refManualScoreA' : 'refManualScoreB')
-    if (el) el.textContent = String(manualScore[side])
-    debouncedManualSave()
   }
 
   function startHold(side, dir) {
-    stepManualScore(side, dir)
+    stepRelay(side, dir)
     holdTimer = setTimeout(() => {
-      holdInterval = setInterval(() => stepManualScore(side, dir), 100)
+      holdInterval = setInterval(() => stepRelay(side, dir), 100)
     }, 400)
   }
 
@@ -1169,150 +658,97 @@ function computeServeState(setup, history) {
     holdInterval = null
   }
 
-  function openRefModal({ type, id, code, teamA, teamB }) {
-    refTrigger = document.activeElement
-    refCtx = { type, id, code, teamA, teamB }
-    refView = 'entry'
-    setupChoices = {}
-    refCodeEl.textContent = code
-    refStatusEl.style.opacity = '0'
+  function resetMatch() {
+    if (!confirm('Đặt lại trận này sẽ xóa toàn bộ tỷ số các chặng đã đấu. Tiếp tục?')) return
+    resetRelayMatch(ctx.gender, ctx.matchId)
+    syncExternal()
+    flashSaved()
+    view = 'play'
     render()
-    refModal.classList.add('is-open')
-    refModal.setAttribute('aria-hidden', 'false')
-    document.body.style.overflow = 'hidden'
-    setTimeout(() => refClose.focus(), 50)
   }
 
-  function closeRefModal() {
-    if (manualSaveTimer) doManualSave()
-    refModal.classList.remove('is-open')
-    refModal.setAttribute('aria-hidden', 'true')
+  function openTeamModal({ gender, matchId, home, away, round }) {
+    teamTrigger = document.activeElement
+    ctx = { gender, matchId, home, away, round }
+    view = 'play'
+    teamCodeEl.textContent = matchId
+    teamStatusEl.style.opacity = '0'
+    render()
+    teamModal.classList.add('is-open')
+    teamModal.setAttribute('aria-hidden', 'false')
+    document.body.style.overflow = 'hidden'
+    setTimeout(() => teamClose.focus(), 50)
+  }
+
+  function closeTeamModal() {
+    teamModal.classList.remove('is-open')
+    teamModal.setAttribute('aria-hidden', 'true')
     document.body.style.overflow = ''
     stopHold()
-    refCtx = null
-    if (refTrigger) {
-      refTrigger.focus()
-      refTrigger = null
+    ctx = null
+    if (teamTrigger) {
+      teamTrigger.focus()
+      teamTrigger = null
     }
   }
 
-  refBody.addEventListener('click', e => {
-    const setupBtn = e.target.closest('[data-setup]')
-    if (setupBtn) {
-      const { setup, value } = setupBtn.dataset
-      if (setup === 'team') {
-        setupChoices.servingTeam = value
-        setupChoices.step = 2
-      } else if (setup === 'server') {
-        setupChoices.firstServer = value
-        setupChoices.step = 3
-      } else if (setup === 'receiver') {
-        setupChoices.firstReceiver = value
-        finishSetup()
-        return
-      }
-      render()
+  teamBody.addEventListener('click', e => {
+    const orderBtn = e.target.closest('[data-order-pick]')
+    if (orderBtn) {
+      pickOrder(Number(orderBtn.dataset.orderPick))
       return
     }
-
-    const rallyBtn = e.target.closest('[data-rally]')
-    if (rallyBtn) {
-      applyRally(rallyBtn.dataset.rally)
-      return
-    }
-
     const actionBtn = e.target.closest('[data-action]')
     if (actionBtn) {
       const action = actionBtn.dataset.action
-      if (action === 'start') {
-        const saved = getSavedMatch()
-        if (
-          (Number.isInteger(saved.a) || Number.isInteger(saved.b)) &&
-          !confirm('Bắt đầu chế độ tự động sẽ đưa tỷ số về 0-0. Tiếp tục?')
-        ) return
-        startSetup()
-      } else if (action === 'continue') {
-        refView = 'play'
+      if (action === 'start-order') startOrderSetup()
+      else if (action === 'cancel-order') {
+        view = 'play'
         render()
-      } else if (action === 'restart') {
-        if (!confirm('Bắt đầu lại sẽ xóa toàn bộ lịch sử trận đấu này. Tiếp tục?')) return
-        startSetup()
-      } else if (action === 'manual') {
-        goManual()
-      } else if (action === 'undo') {
-        undoRally()
-      } else if (action === 'back-entry') {
-        goEntry()
-      }
+      } else if (action === 'reset-match') resetMatch()
     }
   })
 
-  // Mouse hold-to-repeat (manual mode)
-  refBody.addEventListener('mousedown', e => {
-    const btn = e.target.closest('[data-manual-side]')
-    if (!btn) return
+  teamBody.addEventListener('mousedown', e => {
+    const btn = e.target.closest('[data-step-side]')
+    if (!btn || btn.disabled) return
     e.preventDefault()
-    startHold(btn.dataset.manualSide, btn.dataset.dir)
+    startHold(btn.dataset.stepSide, btn.dataset.dir)
   })
   document.addEventListener('mouseup', stopHold)
 
-  // Touch hold-to-repeat (manual mode)
-  refBody.addEventListener('touchstart', e => {
-    const btn = e.target.closest('[data-manual-side]')
-    if (!btn) return
-    startHold(btn.dataset.manualSide, btn.dataset.dir)
-  }, { passive: true })
-  refBody.addEventListener('touchend', stopHold)
-  refBody.addEventListener('touchcancel', stopHold)
+  teamBody.addEventListener(
+    'touchstart',
+    e => {
+      const btn = e.target.closest('[data-step-side]')
+      if (!btn || btn.disabled) return
+      startHold(btn.dataset.stepSide, btn.dataset.dir)
+    },
+    { passive: true }
+  )
+  teamBody.addEventListener('touchend', stopHold)
+  teamBody.addEventListener('touchcancel', stopHold)
 
-  refClose.addEventListener('click', closeRefModal)
-  refModal.addEventListener('click', e => {
-    if (e.target === refModal) closeRefModal()
+  teamClose.addEventListener('click', closeTeamModal)
+  teamModal.addEventListener('click', e => {
+    if (e.target === teamModal) closeTeamModal()
   })
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && refModal.classList.contains('is-open')) closeRefModal()
+    if (e.key === 'Escape' && teamModal.classList.contains('is-open')) closeTeamModal()
   })
 
-  // Open modal when clicking a group match row (not directly on an input)
-  scheduleGrid.addEventListener('click', e => {
-    if (e.target instanceof HTMLInputElement) return
-    const li = e.target.closest('.schedule-group li')
-    if (!li) return
-    const inpA = li.querySelector('input[data-match-id][data-side="a"]')
-    if (!inpA) return
-    const matchId = inpA.dataset.matchId
-    const groupIndex = parseInt(matchId.slice(1, matchId.indexOf('-')), 10) - 1
-    const matchIndex = parseInt(matchId.slice(matchId.indexOf('M') + 1), 10) - 1
-    const match = (currentGroupSchedules[groupIndex] || [])[matchIndex]
-    if (!match) return
-    openRefModal({
-      type: 'group',
-      id: matchId,
-      code: matchId,
-      teamA: match.a,
-      teamB: match.b
-    })
-  })
-
-  // Open modal when clicking a knockout bracket match (not directly on an input)
-  if (bracketEl) {
-    bracketEl.addEventListener('click', e => {
-      if (e.target instanceof HTMLInputElement) return
-      const matchEl = e.target.closest('.match')
-      if (!matchEl) return
-      const inp = matchEl.querySelector('input[data-ko-match]')
-      if (!inp) return
-      const code = inp.dataset.koMatch
-      const sides = knockoutMatchSides[code]
-      if (!sides || !isResolvedTeam(sides.a) || !isResolvedTeam(sides.b)) return
-      const codeLabel = matchEl.querySelector('.match__code')?.textContent?.trim() || code
-      openRefModal({
-        type: 'knockout',
-        id: code,
-        code: codeLabel,
-        teamA: sides.a,
-        teamB: sides.b
-      })
+  function wireGrid(gender) {
+    const grid = matchesGridEl(gender)
+    if (!grid) return
+    grid.addEventListener('click', e => {
+      const li = e.target.closest('li[data-match-id]')
+      if (!li) return
+      const matchId = li.dataset.matchId
+      const m = TEAM_ROUND_ROBIN.find(x => `T${x.match}` === matchId)
+      if (!m) return
+      openTeamModal({ gender, matchId, home: m.home, away: m.away, round: m.round })
     })
   }
+
+  GENDERS.forEach(wireGrid)
 })()

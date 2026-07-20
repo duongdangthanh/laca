@@ -3,12 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>
-      LACA ZOMBIE · Team Championship Season 2 — Giải Pickleball nội bộ LacaTeam
-    </title>
+    <title>LACA MINI GAME · TEAM RELAY — Giải tiếp sức đồng đội LacaTeam</title>
     <meta
       name="description"
-      content="Giải Pickleball đôi nam-nữ nội bộ của LacaTeam. 16 nam + 16 nữ đăng ký cá nhân, BTC ghép cặp ngẫu nhiên — Chủ nhật 12.07.2026 tại Kingkong Pickleball Stadium. Are you in?"
+      content="LACA MINI GAME · TEAM RELAY — 24 VĐV chia 2 nhóm Nam/Nữ, mỗi nhóm 4 đội x 3 người thi đấu tiếp sức 3 chặng, tại Kingkong Pickleball Stadium."
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -34,11 +32,11 @@
       <nav class="nav__links" id="navLinks">
         <a href="#about">Giới thiệu</a>
         <a href="#format">Thể thức</a>
-        <a href="#teams">Danh sách</a>
-        <a href="#draw">Bốc thăm</a>
-        <a href="#schedule">Lịch trình</a>
-        <a href="#prizes">Giải thưởng</a>
+        <a href="#guide">Hướng dẫn</a>
+        <a href="#roster">Xếp đội</a>
+        <a href="#draw">Lịch đấu</a>
         <a href="#venue">Địa điểm</a>
+        <a href="#guide" class="nav__cta">Xem hướng dẫn</a>
       </nav>
       <button class="nav__burger" id="burger" aria-label="Mở menu">
         <span></span>
@@ -59,18 +57,17 @@
         <div class="hero__bg-overlay"></div>
       </div>
       <div class="hero__inner">
-        <p class="hero__eyebrow">Something big is coming · Are you in?</p>
+        <p class="hero__eyebrow">LacaTeam · Mini Game</p>
         <h1 class="hero__title">
-          <span class="hero__title-sm">LACA</span>
-          <span class="hero__title-lg">ZOMBIE</span>
+          <span class="hero__title-sm">MINI GAME</span>
+          <span class="hero__title-lg">TEAM RELAY</span>
         </h1>
         <p class="hero__sub">
-          Team Championship —
-          <strong>Season 2</strong>
+          Giải đấu tiếp sức đồng đội —
+          <strong>24 VĐV · 2 nhóm Nam/Nữ · 8 đội</strong>
         </p>
         <p class="hero__tag">
-          Giải Pickleball đôi nam–nữ nội bộ của LacaTeam · 16 nam + 16 nữ đăng
-          ký cá nhân · BTC ghép cặp ngẫu nhiên · 1 ngày tranh tài duy nhất
+          Giao lưu hết mình · Vui chơi hết mức · Cùng nhau bứt phá
         </p>
 
         <!-- Countdown -->
@@ -98,12 +95,15 @@
         </div>
 
         <div class="hero__meta">
-          <span>📅 Chủ nhật, 12.07.2026</span>
+          <span>📅 11h30-13h30 · Thứ Sáu 24.07.2026</span>
           <span>📍 Kingkong Pickleball Stadium</span>
-          <span>🎽 Mixed Doubles</span>
+          <span>🎾 Team relay 3vs3 · Nam &amp; Nữ thi đấu riêng biệt</span>
         </div>
 
         <div class="hero__actions">
+          <a href="#guide" class="btn btn--primary">
+            Đọc hướng dẫn trước khi đánh
+          </a>
           <a href="#format" class="btn btn--ghost">Xem thể thức</a>
         </div>
       </div>
@@ -112,20 +112,20 @@
     <!-- STATS -->
     <section class="stats">
       <div class="stat">
-        <span class="stat__num" data-count="16">16</span>
-        <span class="stat__lbl">Cặp đôi</span>
+        <span class="stat__num" id="statRegistered" data-count="24">24</span>
+        <span class="stat__lbl">VĐV</span>
       </div>
       <div class="stat">
-        <span class="stat__num" data-count="32">32</span>
-        <span class="stat__lbl">Vận động viên</span>
+        <span class="stat__num" data-count="2">2</span>
+        <span class="stat__lbl">Nhóm Nam/Nữ</span>
       </div>
       <div class="stat">
-        <span class="stat__num" id="statRegistered" data-count="25">25</span>
-        <span class="stat__lbl">Đã đăng ký</span>
+        <span class="stat__num" data-count="8">8</span>
+        <span class="stat__lbl">Đội</span>
       </div>
       <div class="stat">
-        <span class="stat__num" data-count="1">1</span>
-        <span class="stat__lbl">Ngày bùng nổ</span>
+        <span class="stat__num" data-count="12">12</span>
+        <span class="stat__lbl">Trận đấu</span>
       </div>
     </section>
 
@@ -134,45 +134,40 @@
       <div class="sec-head">
         <span class="kicker">01 · Giới thiệu</span>
         <h2>
-          Một ngày. Một sân đấu.
-          <em>Cả team lên đỉnh.</em>
+          Đồng đội bứt phá.
+          <em>Cùng nhau về đích.</em>
         </h2>
         <p>
-          LACA ZOMBIE Championship trở lại với
-          <strong>Season 2</strong>
-          — sân chơi Pickleball nội bộ dành riêng cho người LacaTeam. Không chỉ
-          là tranh tài, đây là ngày cả team cùng đổ mồ hôi, cười đến nghẹt thở
-          và viết nên những khoảnh khắc đáng nhớ ngoài giờ làm.
+          LACA MINI GAME · TEAM RELAY là giải Pickleball
+          <strong>tiếp sức đồng đội 3vs3</strong>
+          nội bộ LacaTeam — 24 VĐV chia 2 nhóm
+          <strong>Nam</strong>
+          và
+          <strong>Nữ</strong>
+          , mỗi nhóm 4 đội x 3 người thi đấu vòng tròn, tiếp sức 3 chặng mỗi
+          trận. Giao lưu hết mình — vui chơi hết mức — cùng nhau bứt phá!
         </p>
       </div>
-      <figure class="about__media">
-        <img
-          src="assets/about-season1.jpg"
-          alt="Không khí trận đấu Pickleball đôi nam-nữ"
-          loading="lazy"
-        />
-        <figcaption>Season 1 · Cháy hết mình trên từng đường bóng</figcaption>
-      </figure>
       <div class="pillars">
         <article class="pillar">
+          <div class="pillar__ic">🎯</div>
+          <h3>Thể thức đồng đội</h3>
+          <p>Đấu theo đội 3 người, không phải cá nhân đơn lẻ.</p>
+        </article>
+        <article class="pillar">
+          <div class="pillar__ic">🎾</div>
+          <h3>Nhiều trận hơn</h3>
+          <p>Tiếp sức 3 chặng mỗi trận — ai cũng được ra sân nhiều lần.</p>
+        </article>
+        <article class="pillar">
           <div class="pillar__ic">🏆</div>
-          <h3>Compete</h3>
-          <p>Tranh tài vì vinh quang và niềm tự hào của chính mình.</p>
+          <h3>Tích điểm &amp; xếp hạng</h3>
+          <p>Điểm cộng dồn xuyên suốt, xếp hạng rõ ràng theo từng nhóm.</p>
         </article>
         <article class="pillar">
           <div class="pillar__ic">🤝</div>
-          <h3>Connect</h3>
-          <p>Gắn kết đồng đội, xây dựng cộng đồng LacaTeam vững mạnh.</p>
-        </article>
-        <article class="pillar">
-          <div class="pillar__ic">🎯</div>
-          <h3>Conquer</h3>
-          <p>Chinh phục mặt sân, làm nên lịch sử của riêng bạn.</p>
-        </article>
-        <article class="pillar">
-          <div class="pillar__ic">🎁</div>
-          <h3>Win</h3>
-          <p>Rinh về cúp và huy chương danh giá.</p>
+          <h3>Kết nối đội nhóm</h3>
+          <p>Đội trưởng cùng đồng đội xây dựng chiến thuật, gắn kết cả đội.</p>
         </article>
       </div>
     </section>
@@ -181,536 +176,415 @@
     <section class="section section--alt" id="format">
       <div class="sec-head">
         <span class="kicker">02 · Thể thức thi đấu</span>
-        <h2>
-          Đăng ký cá nhân · Ghép cặp ngẫu nhiên · Vòng bảng + Loại trực tiếp
-        </h2>
+        <h2>24 VĐV → 2 nhóm Nam/Nữ → 4 đội × 3 người</h2>
         <p>
-          <strong>16 VĐV nam</strong>
-          và
-          <strong>16 VĐV nữ</strong>
-          đăng ký cá nhân. BTC bốc thăm ghép cặp ngẫu nhiên thành
-          <strong>16 cặp đôi nam–nữ</strong>
-          , chia
-          <strong>4 bảng</strong>
-          đánh vòng tròn 1 lượt, sau đó loại trực tiếp trong buổi sáng
-          <strong>09:00 – 13:00</strong>
-          .
+          24 VĐV chia đều
+          <strong>2 nhóm: Nam và Nữ</strong>
+          (12 người/nhóm). Mỗi nhóm tự vận hành
+          <strong>4 đội × 3 người</strong>
+          , thi đấu vòng tròn và xếp hạng
+          <strong>độc lập với nhóm còn lại</strong>
+          . Thời lượng dự kiến:
+          <strong>~90 phút mỗi nhóm</strong>
+          (2 nhóm có thể đấu song song trên 2 sân riêng).
         </p>
       </div>
 
-      <div class="format-grid format-grid--3">
+      <div class="format-grid">
         <div class="fcard">
-          <span class="fcard__step">Bước 1</span>
-          <h3>Đăng ký &amp; Ghép cặp</h3>
+          <span class="fcard__step">Ghép đội</span>
+          <h3>3 người → 3 cặp đôi</h3>
           <ul>
             <li>
-              <strong>16 nam + 16 nữ</strong>
-              đăng ký cá nhân (tối đa mỗi giới)
+              Mỗi đội
+              <strong>3 thành viên cố định</strong>
+              (TV1, TV2, TV3)
             </li>
             <li>
-              BTC
-              <strong>bốc thăm ghép cặp ngẫu nhiên</strong>
-              tạo 16 cặp đôi nam–nữ
-            </li>
-            <li>Mỗi cặp được đặt tên đội sau khi ghép (hoặc dùng tên 2 VĐV)</li>
-          </ul>
-        </div>
-        <div class="fcard">
-          <span class="fcard__step">Vòng bảng</span>
-          <h3>4 bảng · Vòng tròn 1 lượt</h3>
-          <ul>
-            <li>
-              <strong>16 cặp</strong>
-              chia đều
-              <strong>4 bảng</strong>
-              , mỗi bảng 4 đội
+              3 cặp khả dĩ:
+              <strong>TV1+TV2</strong>
+              ,
+              <strong>TV2+TV3</strong>
+              ,
+              <strong>TV3+TV1</strong>
             </li>
             <li>
-              Đánh
-              <strong>vòng tròn 1 lượt</strong>
-              trong từng bảng (6 trận/bảng)
-            </li>
-            <li>
-              Mỗi trận 1 ván rally
-              <strong>chạm 11</strong>
-              , không cần cách biệt 2 điểm
-            </li>
-            <li>
-              <strong>Đổi sân ở 6 điểm</strong>
-            </li>
-            <li>
-              <strong>Top 2</strong>
-              mỗi bảng (8 đội) đi tiếp vòng loại trực tiếp
+              Trước mỗi trận, đội trưởng
+              <strong>chọn thứ tự ra sân</strong>
+              của 3 cặp (chặng 1 → 2 → 3) — chiến thuật riêng của từng đội
             </li>
           </ul>
         </div>
         <div class="fcard">
-          <span class="fcard__step">Loại trực tiếp</span>
-          <h3>Tứ kết → Bán kết → Chung kết</h3>
+          <span class="fcard__step">Trận đấu</span>
+          <h3>3 chặng tiếp sức · Cộng dồn điểm</h3>
           <ul>
             <li>
-              <strong>Tứ kết</strong>
-              →
-              <strong>Bán kết</strong>
-              →
-              <strong>Chung kết</strong>
+              Điểm số
+              <strong>cộng dồn liên tục</strong>
+              qua 3 chặng (không reset)
             </li>
             <li>
-              <strong>Tranh hạng 3</strong>
-              trước chung kết
+              <strong>Chặng 1</strong>
+              : đấu tới khi 1 đội cộng dồn
+              <strong>6 điểm</strong>
             </li>
             <li>
-              Tứ kết &amp; Bán kết: rally
-              <strong>chạm 13</strong>
-              , không cần cách biệt 2 điểm
+              <strong>Chặng 2</strong>
+              : tiếp tục tới khi 1 đội cộng dồn
+              <strong>12 điểm</strong>
             </li>
             <li>
-              <strong>Đổi sân ở 7 điểm</strong>
+              <strong>Chặng 3</strong>
+              : tiếp tục tới khi 1 đội chạm
+              <strong>18 điểm</strong>
+              — đội đó thắng cả trận
             </li>
-            <li>
-              Chung kết: rally
-              <strong>chạm 15</strong>
-              , không cần cách biệt 2 điểm
-            </li>
-            <li>
-              <strong>Đổi sân ở 8 điểm</strong>
-            </li>
+            <li>Mỗi khi hết 1 chặng, đổi sang cặp tiếp theo ra sân</li>
           </ul>
         </div>
       </div>
 
-      <div class="bracket" aria-label="Nhánh đấu từ vòng tứ kết">
-        <div class="bracket__round bracket__round--quarters">
-          <div class="bracket__head">Tứ kết</div>
-          <div class="bracket__lane">
-            <div class="bracket__cluster">
-              <div class="match match--quarter">
-                <span class="match__code">TK1</span>
-                <div class="match__team" data-slot="TK1-A">Nhất A</div>
-                <div class="match__vs">gặp</div>
-                <div class="match__team" data-slot="TK1-B">Nhì B</div>
-                <div class="match__score-inputs">
-                  <input
-                    type="number"
-                    min="0"
-                    step="1"
-                    inputmode="numeric"
-                    data-ko-match="TK1"
-                    data-side="a"
-                  />
-                  <span>-</span>
-                  <input
-                    type="number"
-                    min="0"
-                    step="1"
-                    inputmode="numeric"
-                    data-ko-match="TK1"
-                    data-side="b"
-                  />
-                </div>
-              </div>
-              <div class="match match--quarter">
-                <span class="match__code">TK2</span>
-                <div class="match__team" data-slot="TK2-A">Nhất C</div>
-                <div class="match__vs">gặp</div>
-                <div class="match__team" data-slot="TK2-B">Nhì D</div>
-                <div class="match__score-inputs">
-                  <input
-                    type="number"
-                    min="0"
-                    step="1"
-                    inputmode="numeric"
-                    data-ko-match="TK2"
-                    data-side="a"
-                  />
-                  <span>-</span>
-                  <input
-                    type="number"
-                    min="0"
-                    step="1"
-                    inputmode="numeric"
-                    data-ko-match="TK2"
-                    data-side="b"
-                  />
-                </div>
-              </div>
-            </div>
-            <div class="bracket__cluster">
-              <div class="match match--quarter">
-                <span class="match__code">TK3</span>
-                <div class="match__team" data-slot="TK3-A">Nhất B</div>
-                <div class="match__vs">gặp</div>
-                <div class="match__team" data-slot="TK3-B">Nhì A</div>
-                <div class="match__score-inputs">
-                  <input
-                    type="number"
-                    min="0"
-                    step="1"
-                    inputmode="numeric"
-                    data-ko-match="TK3"
-                    data-side="a"
-                  />
-                  <span>-</span>
-                  <input
-                    type="number"
-                    min="0"
-                    step="1"
-                    inputmode="numeric"
-                    data-ko-match="TK3"
-                    data-side="b"
-                  />
-                </div>
-              </div>
-              <div class="match match--quarter">
-                <span class="match__code">TK4</span>
-                <div class="match__team" data-slot="TK4-A">Nhất D</div>
-                <div class="match__vs">gặp</div>
-                <div class="match__team" data-slot="TK4-B">Nhì C</div>
-                <div class="match__score-inputs">
-                  <input
-                    type="number"
-                    min="0"
-                    step="1"
-                    inputmode="numeric"
-                    data-ko-match="TK4"
-                    data-side="a"
-                  />
-                  <span>-</span>
-                  <input
-                    type="number"
-                    min="0"
-                    step="1"
-                    inputmode="numeric"
-                    data-ko-match="TK4"
-                    data-side="b"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
+      <div class="format-grid">
+        <div class="fcard">
+          <span class="fcard__step">Lịch thi đấu</span>
+          <h3>Vòng tròn 1 lượt · 6 trận / nhóm</h3>
+          <ul>
+            <li>
+              Mỗi nhóm
+              <strong>4 đội (A·B·C·D)</strong>
+              đấu vòng tròn 1 lượt — mỗi đội gặp cả 3 đội còn lại trong nhóm
+            </li>
+            <li>
+              <strong>3 vòng đấu</strong>
+              , mỗi vòng 2 trận song song (2 sân): Vòng 1: A-B, C-D · Vòng 2:
+              A-C, B-D · Vòng 3: A-D, B-C
+            </li>
+            <li>Nhóm Nam và nhóm Nữ có lịch, sân và tỷ số hoàn toàn riêng</li>
+          </ul>
         </div>
-        <div class="bracket__round bracket__round--semis">
-          <div class="bracket__head">Bán kết</div>
-          <div class="bracket__lane">
-            <div class="match match--semi">
-              <span class="match__code">BK1</span>
-              <div class="match__team" data-slot="BK1-A">Thắng TK1</div>
-              <div class="match__vs">gặp</div>
-              <div class="match__team" data-slot="BK1-B">Thắng TK2</div>
-              <div class="match__score-inputs">
-                <input
-                  type="number"
-                  min="0"
-                  step="1"
-                  inputmode="numeric"
-                  data-ko-match="BK1"
-                  data-side="a"
-                />
-                <span>-</span>
-                <input
-                  type="number"
-                  min="0"
-                  step="1"
-                  inputmode="numeric"
-                  data-ko-match="BK1"
-                  data-side="b"
-                />
-              </div>
-            </div>
-            <div class="match match--semi">
-              <span class="match__code">BK2</span>
-              <div class="match__team" data-slot="BK2-A">Thắng TK3</div>
-              <div class="match__vs">gặp</div>
-              <div class="match__team" data-slot="BK2-B">Thắng TK4</div>
-              <div class="match__score-inputs">
-                <input
-                  type="number"
-                  min="0"
-                  step="1"
-                  inputmode="numeric"
-                  data-ko-match="BK2"
-                  data-side="a"
-                />
-                <span>-</span>
-                <input
-                  type="number"
-                  min="0"
-                  step="1"
-                  inputmode="numeric"
-                  data-ko-match="BK2"
-                  data-side="b"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="bracket__round bracket__round--finals">
-          <div class="bracket__head">Chung cuộc</div>
-          <div class="bracket__lane">
-            <div class="match match--final">
-              <span class="match__code">CK</span>
-              <div class="match__team" data-slot="CK-A">Thắng BK1</div>
-              <div class="match__vs">gặp</div>
-              <div class="match__team" data-slot="CK-B">Thắng BK2</div>
-              <div class="match__score-inputs">
-                <input
-                  type="number"
-                  min="0"
-                  step="1"
-                  inputmode="numeric"
-                  data-ko-match="CK"
-                  data-side="a"
-                />
-                <span>-</span>
-                <input
-                  type="number"
-                  min="0"
-                  step="1"
-                  inputmode="numeric"
-                  data-ko-match="CK"
-                  data-side="b"
-                />
-              </div>
-            </div>
-            <div class="match match--bronze">
-              <span class="match__code">Hạng 3</span>
-              <div class="match__team" data-slot="BR-A">Thua BK1</div>
-              <div class="match__vs">gặp</div>
-              <div class="match__team" data-slot="BR-B">Thua BK2</div>
-            </div>
-          </div>
+        <div class="fcard">
+          <span class="fcard__step">Xếp hạng</span>
+          <h3>Thứ tự ưu tiên (theo từng nhóm)</h3>
+          <ul>
+            <li>
+              <strong>1.</strong>
+              Số trận thắng
+            </li>
+            <li>
+              <strong>2.</strong>
+              Hiệu số điểm (tổng điểm ghi được − tổng điểm mất)
+            </li>
+            <li>
+              <strong>3.</strong>
+              Tổng điểm ghi được
+            </li>
+            <li>
+              Nếu vẫn ngang nhau: đội trưởng 2 đội chọn 2 thành viên đại diện
+              thi đấu
+              <strong>phân hạng</strong>
+            </li>
+          </ul>
         </div>
       </div>
 
       <div class="rules-note">
         <strong>Luật chung:</strong>
         Áp dụng luật Pickleball tiêu chuẩn (giao bóng dưới hông, double-bounce,
-        không lấn vạch kitchen). Mỗi cặp được 1 timeout/ván. Trọng tài điều hành
-        mọi trận đấu loại trực tiếp.
+        không lấn vạch kitchen). Bí mật thứ tự ra sân — thứ tự 3 cặp (chặng
+        1/2/3) hoàn toàn không bắt buộc theo khuôn mẫu, đội trưởng tự chọn chiến
+        thuật phù hợp trước mỗi trận. Luật giống hệt nhau cho cả 2 nhóm Nam và
+        Nữ.
       </div>
     </section>
 
-    <!-- REGISTRATION LIST -->
-    <section class="section" id="teams">
+    <!-- GUIDE -->
+    <section class="section" id="guide">
       <div class="sec-head">
-        <span class="kicker">03 · Danh sách đăng ký</span>
-        <h2>16 nam · 16 nữ · Đăng ký cá nhân</h2>
+        <span class="kicker">03 · Hướng dẫn cho VĐV</span>
+        <h2>
+          Đọc trước khi ra sân —
+          <em>5 phút là đủ</em>
+        </h2>
         <p>
-          Danh sách VĐV chính thức do BTC xác nhận. Khi đủ
-          <strong id="rosterSummary">25/32 suất</strong>
-          , sẵn sàng bốc thăm ghép cặp.
+          Áp dụng y hệt cho cả nhóm Nam và nhóm Nữ. Nếu mới tham gia lần đầu,
+          hãy đọc mục
+          <strong>3 chặng tiếp sức</strong>
+          và
+          <strong>Chọn thứ tự ra sân</strong>
+          trước.
         </p>
       </div>
 
-      <div class="roster-board">
-        <div class="roster-col roster-col--male">
-          <div class="roster-col__head">
-            <h3>
-              <span class="roster-col__icon" aria-hidden="true">♂</span>
-              VĐV Nam
-            </h3>
-            <span class="roster-col__count" id="maleCount">0/16</span>
+      <div class="guide-grid">
+        <article class="guide-card guide-card--wide">
+          <h3>🔄 3 chặng tiếp sức, điểm cộng dồn không reset</h3>
+          <p class="guide-card__lead">
+            Mỗi trận gồm
+            <strong>3 chặng</strong>
+            , mỗi chặng là 1 cặp của đội này gặp 1 cặp của đội kia. Điểm số
+            <strong>cộng dồn liên tục</strong>
+            qua cả 3 chặng — không quay lại 0-0 giữa các chặng.
+          </p>
+          <div class="score-demo">
+            <div class="score-demo__board score-demo__board--doubles">
+              <div class="score-demo__team">
+                <span>Đội A · Chặng 1 (TV1 + TV2)</span>
+                <strong class="score-demo__pts">4</strong>
+              </div>
+              <div class="score-demo__vs">vs</div>
+              <div class="score-demo__team">
+                <span>Đội B · Chặng 1 (TV1 + TV2)</span>
+                <strong class="score-demo__pts">6</strong>
+              </div>
+            </div>
+            <div class="score-demo__callout score-demo__callout--swap">
+              🔄 Hết Chặng 1 (mốc 6 điểm) — đổi sang cặp thứ 2 của mỗi đội, tỷ
+              số giữ nguyên 4-6
+            </div>
+            <div
+              class="score-demo__board score-demo__board--after score-demo__board--doubles"
+            >
+              <div class="score-demo__team">
+                <span>Đội A · Chặng 2 (TV2 + TV3)</span>
+                <strong class="score-demo__pts">12</strong>
+              </div>
+              <div class="score-demo__vs">vs</div>
+              <div class="score-demo__team score-demo__team--lose">
+                <span>Đội B · Chặng 2 (TV2 + TV3)</span>
+                <strong class="score-demo__pts">9</strong>
+              </div>
+            </div>
+            <div class="score-demo__callout score-demo__callout--swap">
+              🔄 Hết Chặng 2 (mốc 12 điểm) — đổi sang cặp thứ 3, tỷ số giữ
+              nguyên 12-9
+            </div>
+            <div class="score-demo__board score-demo__board--after">
+              <div class="score-demo__player score-demo__player--lose">
+                <span>Đội A (TV1 + TV3)</span>
+                <strong class="score-demo__pts">17</strong>
+              </div>
+              <div class="score-demo__vs">vs</div>
+              <div class="score-demo__player score-demo__player--win">
+                <span>Đội B (TV1 + TV3)</span>
+                <strong class="score-demo__pts">18</strong>
+              </div>
+            </div>
+            <div class="score-demo__callout score-demo__callout--win">
+              🏆 Đội B chạm mốc 18 trước — thắng cả trận 18-17!
+            </div>
           </div>
-          <ol
-            class="roster-list"
-            id="maleList"
-            aria-label="Danh sách VĐV nam"
-          ></ol>
-        </div>
+        </article>
 
-        <div class="roster-col roster-col--female">
-          <div class="roster-col__head">
-            <h3>
-              <span class="roster-col__icon" aria-hidden="true">♀</span>
-              VĐV Nữ
-            </h3>
-            <span class="roster-col__count" id="femaleCount">0/16</span>
+        <article class="guide-card">
+          <h3>🎯 Chọn thứ tự ra sân</h3>
+          <p>
+            Trước mỗi trận, mỗi đội trưởng tự chọn 1 trong 3 cặp (TV1+TV2,
+            TV2+TV3, TV3+TV1) ra sân
+            <strong>Chặng 1</strong>
+            , rồi chọn tiếp cho
+            <strong>Chặng 2</strong>
+            — cặp còn lại tự động vào
+            <strong>Chặng 3</strong>
+            . Đây là lựa chọn chiến thuật riêng của từng đội, hai đội không cần
+            khớp nhau.
+          </p>
+          <p class="guide-tip">
+            💡
+            <strong>Mẹo:</strong>
+            Đưa cặp mạnh nhất ra sân sớm để tạo khoảng cách điểm an toàn, hoặc
+            giữ cặp chủ lực ở Chặng 3 để quyết định.
+          </p>
+          <p class="guide-card__sub">
+            Ví dụ: Đội có TV1, TV2, TV3 — đội trưởng chọn thứ tự sau (cặp còn
+            lại của mỗi chặng đương nhiên nghỉ):
+          </p>
+          <div class="ref-table-wrap">
+            <table class="ref-table ref-table--compact">
+              <thead>
+                <tr>
+                  <th>Chặng</th>
+                  <th>Cặp ra sân</th>
+                  <th>Người nghỉ</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>TV1 + TV2</td>
+                  <td class="ref-cell">TV3</td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>TV2 + TV3</td>
+                  <td class="ref-cell">TV1</td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td>TV3 + TV1</td>
+                  <td class="ref-cell">TV2</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-          <ol
-            class="roster-list"
-            id="femaleList"
-            aria-label="Danh sách VĐV nữ"
-          ></ol>
-        </div>
+          <p class="guide-tip">
+            📌 Với thứ tự này, mỗi thành viên đánh đúng
+            <strong>2 trong 3 chặng</strong>
+            và nghỉ đúng 1 chặng — công bằng cho cả 3 người. Đội có thể chọn thứ
+            tự khác (ví dụ TV2+TV3 trước) tuỳ chiến thuật, không bắt buộc theo
+            ví dụ này.
+          </p>
+        </article>
+
+        <article class="guide-card">
+          <h3>📈 Xếp hạng &amp; lịch đấu</h3>
+          <p>
+            Mỗi nhóm (Nam, Nữ) có 4 đội đấu vòng tròn 1 lượt riêng (mỗi đội 3
+            trận, 6 trận/nhóm). Xếp hạng theo: số trận thắng → hiệu số điểm →
+            tổng điểm ghi được. Nếu vẫn ngang nhau, 2 đội cử đại diện đấu phân
+            hạng. Nhóm Nam và nhóm Nữ xếp hạng hoàn toàn độc lập.
+          </p>
+        </article>
       </div>
     </section>
 
-    <!-- DRAW / RANDOM -->
-    <section class="section section--alt" id="draw">
+    <!-- ROSTER -->
+    <section class="section section--alt" id="roster">
       <div class="sec-head">
-        <span class="kicker">04 · Xếp bảng chính thức</span>
-        <h2>Ghép cặp · Chia bảng · Lịch vòng bảng</h2>
-        <p>Kết quả bốc thăm chính thức — 16 cặp đôi chia thành 4 bảng đấu.</p>
-      </div>
-
-      <div class="draw-results">
-        <div class="draw-phase" id="phasePairs">
-          <h3 class="draw-phase__title">
-            <span class="draw-phase__num">1</span>
-            Cặp đôi sau bốc thăm
-          </h3>
-          <div class="pairs-grid" id="pairsGrid"></div>
-        </div>
-
-        <div class="draw-phase" id="phaseGroups">
-          <h3 class="draw-phase__title">
-            <span class="draw-phase__num">2</span>
-            Chia 4 bảng
-          </h3>
-          <div class="groups draw-groups" id="groupsGrid"></div>
-        </div>
-
-        <div class="draw-phase" id="phaseSchedule">
-          <h3 class="draw-phase__title">
-            <span class="draw-phase__num">3</span>
-            Thứ tự thi đấu vòng bảng
-          </h3>
-          <div class="schedule-board" id="scheduleGrid"></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- GALLERY -->
-    <section class="gallery-sec" id="gallery" aria-label="Khoảnh khắc giải đấu">
-      <div class="gallery">
-        <figure class="gallery__item gallery__item--tall">
-          <img
-            src="assets/gallery-smash.jpg"
-            alt="Cú smash dứt điểm"
-            loading="lazy"
-          />
-          <figcaption>Smash dứt điểm</figcaption>
-        </figure>
-        <figure class="gallery__item">
-          <img
-            src="assets/gallery-court.jpg"
-            alt="Mặt sân thi đấu"
-            loading="lazy"
-          />
-          <figcaption>Trên mặt sân</figcaption>
-        </figure>
-        <figure class="gallery__item">
-          <img
-            src="assets/gallery-paddle.jpg"
-            alt="Vợt và bóng pickleball"
-            loading="lazy"
-          />
-          <figcaption>Sẵn sàng ra sân</figcaption>
-        </figure>
-        <figure class="gallery__item gallery__item--wide">
-          <img
-            src="assets/gallery-crowd.jpg"
-            alt="Khán đài cổ vũ"
-            loading="lazy"
-          />
-          <figcaption>Cả team cùng cháy</figcaption>
-        </figure>
-      </div>
-    </section>
-
-    <!-- SCHEDULE -->
-    <section class="section section--alt" id="schedule">
-      <div class="sec-head">
-        <span class="kicker">05 · Lịch trình trong ngày</span>
-        <h2>Chủ nhật, 12.07.2026 · 09:00 – 13:00</h2>
+        <span class="kicker">04 · Xếp đội</span>
+        <h2>2 nhóm × 4 đội × 3 người</h2>
         <p>
-          Lịch thi đấu gọn trong buổi sáng, kết thúc lúc
-          <strong>13:00</strong>
-          .
+          BTC/đội trưởng nhập tên 3 thành viên cố định cho mỗi đội, ở cả 2 nhóm.
+          Tên hiện ở đây sẽ dùng luôn cho lịch đấu và chấm điểm bên dưới.
         </p>
       </div>
-      <ol class="timeline">
-        <li>
-          <span class="tl__time">09:00 – 09:20</span>
-          <div class="tl__body">
-            <h4>Check-in &amp; Bốc thăm ghép cặp</h4>
-            <p>Xác nhận danh sách và bốc thăm ghép cặp ngẫu nhiên.</p>
-          </div>
-        </li>
-        <li>
-          <span class="tl__time">09:20 – 09:30</span>
-          <div class="tl__body">
-            <h4>Lễ khai mạc &amp; Khởi động</h4>
-            <p>Phát biểu khai mạc, chụp hình toàn team, warm-up chung.</p>
-          </div>
-        </li>
-        <li>
-          <span class="tl__time">09:30 – 11:00</span>
-          <div class="tl__body">
-            <h4>Vòng bảng</h4>
-            <p>Các trận vòng bảng diễn ra liên tục trên nhiều sân.</p>
-          </div>
-        </li>
-        <li>
-          <span class="tl__time">11:00 – 11:45</span>
-          <div class="tl__body">
-            <h4>Loại trực tiếp</h4>
-            <p>Tứ kết và bán kết — xác định 2 cặp vào chung kết.</p>
-          </div>
-        </li>
-        <li>
-          <span class="tl__time">11:45 – 12:15</span>
-          <div class="tl__body">
-            <h4>Tranh hạng 3 &amp; Chung kết</h4>
-            <p>
-              Tranh hạng 3 trước, sau đó trận chung kết quyết định nhà vô địch
-              Season 2.
-            </p>
-          </div>
-        </li>
-        <li>
-          <span class="tl__time">12:15 – 12:30</span>
-          <div class="tl__body">
-            <h4>Team Photo &amp; Giao lưu nhanh</h4>
-            <p>
-              Chụp hình toàn team, giao lưu vận động viên trước lễ trao giải.
-            </p>
-          </div>
-        </li>
-        <li>
-          <span class="tl__time">12:30 – 13:00</span>
-          <div class="tl__body">
-            <h4>Lễ trao giải &amp; Bế mạc</h4>
-            <p>Trao cúp, chụp hình kỷ niệm, tiệc nhẹ đóng giải.</p>
-          </div>
-        </li>
-      </ol>
+
+      <div class="gender-block">
+        <div class="gender-block__head gender-block__head--nam">
+          <span class="gender-block__icon" aria-hidden="true">♂</span>
+          <h3>Nhóm Nam · 4 đội × 3 người</h3>
+        </div>
+        <div class="team-form" id="teamRosterFormNam"></div>
+      </div>
+
+      <div class="gender-block">
+        <div class="gender-block__head gender-block__head--nu">
+          <span class="gender-block__icon" aria-hidden="true">♀</span>
+          <h3>Nhóm Nữ · 4 đội × 3 người</h3>
+        </div>
+        <div class="team-form" id="teamRosterFormNu"></div>
+      </div>
     </section>
 
-    <!-- PRIZES -->
-    <section class="section" id="prizes">
+    <!-- DRAW / SCHEDULE -->
+    <section class="section" id="draw">
       <div class="sec-head">
-        <span class="kicker">06 · Giải thưởng</span>
-        <h2>Vinh quang trên mặt sân</h2>
-        <p>Cúp dành cho ba cặp đôi xuất sắc nhất.</p>
+        <span class="kicker">05 · Lịch đấu &amp; Chấm điểm</span>
+        <h2>Vòng tròn 4 đội · Tiếp sức 3 chặng</h2>
+        <p>
+          Bấm vào một trận để chọn thứ tự ra sân (chặng đầu tiên) và chấm điểm
+          tiếp sức. Tỷ số cộng dồn tự động chuyển chặng khi chạm mốc 6 → 12 → 18
+          điểm.
+        </p>
       </div>
-      <div class="prizes">
-        <article class="prize prize--1">
-          <span class="prize__rank">🥇</span>
-          <h3>Vô địch</h3>
-          <p>Cúp vô địch</p>
-        </article>
-        <article class="prize prize--2">
-          <span class="prize__rank">🥈</span>
-          <h3>Á quân</h3>
-          <p>Cúp hạng nhì</p>
-        </article>
-        <article class="prize prize--3">
-          <span class="prize__rank">🥉</span>
-          <h3>Hạng ba</h3>
-          <p>Cúp hạng ba</p>
-        </article>
+
+      <div class="gender-block">
+        <div class="gender-block__head gender-block__head--nam">
+          <span class="gender-block__icon" aria-hidden="true">♂</span>
+          <h3>Nhóm Nam</h3>
+        </div>
+        <div class="draw-results">
+          <div class="draw-phase is-active is-done">
+            <h3 class="draw-phase__title">
+              <span class="draw-phase__num">1</span>
+              Lịch thi đấu (3 vòng · 6 trận)
+            </h3>
+            <div
+              class="schedule-board schedule-board--rounds3"
+              id="teamMatchesGridNam"
+            ></div>
+          </div>
+          <div class="draw-phase is-active is-done">
+            <h3 class="draw-phase__title">
+              <span class="draw-phase__num">2</span>
+              Bảng xếp hạng
+            </h3>
+            <div class="schedule-group is-visible">
+              <div class="group-standings">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Đội</th>
+                      <th>Tr</th>
+                      <th>T</th>
+                      <th>B</th>
+                      <th>HS</th>
+                      <th>Điểm ghi</th>
+                    </tr>
+                  </thead>
+                  <tbody id="teamStandingsBodyNam"></tbody>
+                </table>
+              </div>
+            </div>
+            <p class="tie-note" id="teamTieNoteNam" hidden></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="gender-block">
+        <div class="gender-block__head gender-block__head--nu">
+          <span class="gender-block__icon" aria-hidden="true">♀</span>
+          <h3>Nhóm Nữ</h3>
+        </div>
+        <div class="draw-results">
+          <div class="draw-phase is-active is-done">
+            <h3 class="draw-phase__title">
+              <span class="draw-phase__num">1</span>
+              Lịch thi đấu (3 vòng · 6 trận)
+            </h3>
+            <div
+              class="schedule-board schedule-board--rounds3"
+              id="teamMatchesGridNu"
+            ></div>
+          </div>
+          <div class="draw-phase is-active is-done">
+            <h3 class="draw-phase__title">
+              <span class="draw-phase__num">2</span>
+              Bảng xếp hạng
+            </h3>
+            <div class="schedule-group is-visible">
+              <div class="group-standings">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Đội</th>
+                      <th>Tr</th>
+                      <th>T</th>
+                      <th>B</th>
+                      <th>HS</th>
+                      <th>Điểm ghi</th>
+                    </tr>
+                  </thead>
+                  <tbody id="teamStandingsBodyNu"></tbody>
+                </table>
+              </div>
+            </div>
+            <p class="tie-note" id="teamTieNoteNu" hidden></p>
+          </div>
+        </div>
       </div>
     </section>
 
     <!-- VENUE -->
     <section class="section section--alt" id="venue">
       <div class="sec-head">
-        <span class="kicker">07 · Địa điểm</span>
+        <span class="kicker">06 · Địa điểm</span>
         <h2>Kingkong Pickleball Stadium</h2>
         <p>
           Hệ thống sân tiêu chuẩn thi đấu, mái che, ánh sáng tốt — sẵn sàng cho
-          một ngày tranh tài bùng nổ.
+          một buổi tranh tài bùng nổ.
         </p>
       </div>
       <div class="venue">
@@ -722,11 +596,11 @@
             </li>
             <li>
               <strong>🗓️ Thời gian:</strong>
-              Chủ nhật, 12.07.2026 · 09:00 – 13:00
+              Thứ Sáu, 24.07.2026 · 19:00 – 21:00
             </li>
             <li>
               <strong>🎾 Số sân:</strong>
-              Nhiều sân thi đấu song song
+              Ít nhất 2 sân (nhóm Nam &amp; nhóm Nữ đấu song song)
             </li>
             <li>
               <strong>🅿️ Tiện ích:</strong>
@@ -759,6 +633,24 @@
       </div>
     </section>
 
+    <!-- CTA -->
+    <section class="register" id="register">
+      <div class="register__inner">
+        <p class="hero__eyebrow">LacaTeam · Mini Game · Team Relay · 24 VĐV</p>
+        <h2>Sẵn sàng ra sân chưa?</h2>
+        <p class="register__sub">
+          Đọc kỹ phần
+          <a href="#guide">Hướng dẫn VĐV</a>
+          trước ngày thi đấu — đặc biệt cách tính điểm 3 chặng và quy tắc chọn
+          thứ tự ra sân. Hẹn gặp Thứ Sáu 24.07 tại sân!
+        </p>
+        <div class="hero__actions">
+          <a href="#guide" class="btn btn--primary">Xem hướng dẫn chi tiết</a>
+          <a href="#roster" class="btn btn--ghost">Danh sách đội</a>
+        </div>
+      </div>
+    </section>
+
     <!-- FOOTER -->
     <footer class="footer">
       <div class="footer__brand">
@@ -766,24 +658,32 @@
           LACA
           <strong>TEAM</strong>
         </span>
-        <p>LACA ZOMBIE · Team Championship Season 2</p>
+        <p>LACA MINI GAME · Team Relay</p>
       </div>
       <div class="footer__meta">
-        <span>Mixed Doubles · 16 cặp · 32 VĐV</span>
-        <span>12.07.2026 · Kingkong Pickleball Stadium</span>
+        <span>Team relay 3vs3 · 24 VĐV · 2 nhóm · 8 đội</span>
+        <span>24.07.2026 · Kingkong Pickleball Stadium</span>
         <span>© 2026 LacaTeam. Made for the team.</span>
       </div>
     </footer>
 
-    <!-- Referee Score Modal -->
-    <div class="ref-modal" id="refModal" aria-modal="true" role="dialog" aria-hidden="true">
+    <!-- Team Relay Modal -->
+    <div
+      class="ref-modal"
+      id="teamModal"
+      aria-modal="true"
+      role="dialog"
+      aria-hidden="true"
+    >
       <div class="ref-modal__inner">
         <div class="ref-modal__head">
-          <span class="ref-modal__code" id="refCode"></span>
-          <button class="ref-modal__close" id="refClose" aria-label="Đóng">✕</button>
+          <span class="ref-modal__code" id="teamCode"></span>
+          <button class="ref-modal__close" id="teamClose" aria-label="Đóng">
+            ✕
+          </button>
         </div>
-        <div class="ref-modal__body" id="refBody"></div>
-        <p class="ref-modal__status" id="refStatus"></p>
+        <div class="ref-modal__body" id="teamBody"></div>
+        <p class="ref-modal__status" id="teamStatus"></p>
       </div>
     </div>
 
