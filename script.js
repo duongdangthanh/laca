@@ -752,3 +752,164 @@ updateStats()
 
   GENDERS.forEach(wireGrid)
 })()
+
+// ===== Guide: visual relay demo (mục 03) =====
+;(function () {
+  const demo = document.getElementById('relayDemo')
+  if (!demo) return
+
+  const players = {
+    a1: demo.querySelector('.relay-demo__player--a1'),
+    a2: demo.querySelector('.relay-demo__player--a2'),
+    b1: demo.querySelector('.relay-demo__player--b1'),
+    b2: demo.querySelector('.relay-demo__player--b2')
+  }
+  const ball = document.getElementById('relayBall')
+  const legBadge = document.getElementById('relayLegBadge')
+  const pairLabelEl = document.getElementById('relayPairLabel')
+  const scoreAEl = document.getElementById('relayScoreA')
+  const scoreBEl = document.getElementById('relayScoreB')
+  const noteEl = document.getElementById('relayNote')
+  const playBtn = document.getElementById('relayPlayBtn')
+  const muteBtn = document.getElementById('relayMuteBtn')
+  const swapEl = document.getElementById('relaySwap')
+  const swapTitleEl = document.getElementById('relaySwapTitle')
+  const swapScoreEl = document.getElementById('relaySwapScore')
+  const swapNoteEl = document.getElementById('relaySwapNote')
+
+  // Cùng bộ mốc điểm với ví dụ tĩnh phía trên: 4-6 → 12-9 → 17-18.
+  const PAIR_SLOTS = [
+    ['TV1', 'TV2'],
+    ['TV2', 'TV3'],
+    ['TV3', 'TV1']
+  ]
+  const CHECKPOINTS = [6, 12, 18]
+  const LEGS = [
+    { seq: [[0, 0], [1, 2], [3, 4], [4, 6]] },
+    { seq: [[4, 6], [7, 7], [10, 8], [12, 9]] },
+    { seq: [[12, 9], [14, 12], [16, 15], [17, 17], [17, 18]] }
+  ]
+
+  let running = false
+  let muted = false
+  let audioCtx = null
+
+  function beep() {
+    if (muted) return
+    try {
+      audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)()
+      const t = audioCtx.currentTime
+      const osc = audioCtx.createOscillator()
+      const gain = audioCtx.createGain()
+      osc.type = 'sine'
+      osc.frequency.setValueAtTime(720, t)
+      osc.frequency.exponentialRampToValueAtTime(280, t + 0.08)
+      gain.gain.setValueAtTime(0.15, t)
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.1)
+      osc.connect(gain)
+      gain.connect(audioCtx.destination)
+      osc.start(t)
+      osc.stop(t + 0.12)
+    } catch (_e) {
+      /* Web Audio not available — skip sound */
+    }
+  }
+
+  function wait(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms))
+  }
+
+  function setScore(a, b, bump) {
+    scoreAEl.textContent = a
+    scoreBEl.textContent = b
+    if (bump) {
+      ;[scoreAEl, scoreBEl].forEach(el => {
+        el.classList.remove('is-bump')
+        void el.offsetWidth
+        el.classList.add('is-bump')
+      })
+      beep()
+    }
+  }
+
+  function setPlayerLabels(legIndex) {
+    const [first, second] = PAIR_SLOTS[legIndex]
+    if (players.a1) players.a1.textContent = first.replace('TV', '')
+    if (players.a2) players.a2.textContent = second.replace('TV', '')
+    if (players.b1) players.b1.textContent = first.replace('TV', '')
+    if (players.b2) players.b2.textContent = second.replace('TV', '')
+  }
+
+  function showPlayers() {
+    Object.values(players).forEach(el => el && el.classList.add('is-visible'))
+  }
+
+  function hidePlayers() {
+    Object.values(players).forEach(el => el && el.classList.remove('is-visible'))
+  }
+
+  // legIndex = chặng VỪA kết thúc (0-based). Giải thích rõ: đã chạm mốc nào,
+  // tỷ số đang là bao nhiêu, và cặp nào sắp vào sân thay thế.
+  async function showSwap(legIndex) {
+    const checkpoint = CHECKPOINTS[legIndex]
+    const [a, b] = LEGS[legIndex].seq[LEGS[legIndex].seq.length - 1]
+    const [nextFirst, nextSecond] = PAIR_SLOTS[legIndex + 1]
+
+    swapTitleEl.textContent = `🔄 Hết Chặng ${legIndex + 1} — chạm mốc ${checkpoint} điểm`
+    swapScoreEl.textContent = `${a} – ${b}`
+    swapNoteEl.textContent = `Tỷ số giữ nguyên, không reset — Cặp ${nextFirst} + ${nextSecond} vào sân (Chặng ${legIndex + 2})`
+
+    swapEl.classList.add('is-active')
+    await wait(5000)
+    swapEl.classList.remove('is-active')
+    await wait(600)
+  }
+
+  async function playLeg(legIndex) {
+    const [first, second] = PAIR_SLOTS[legIndex]
+    legBadge.textContent = `Chặng ${legIndex + 1}`
+    pairLabelEl.textContent = `Cặp ${first} + ${second} thi đấu`
+    setPlayerLabels(legIndex)
+    hidePlayers()
+    await wait(300)
+    showPlayers()
+    ball.classList.add('is-active')
+
+    const seq = LEGS[legIndex].seq
+    for (let i = 0; i < seq.length; i++) {
+      await wait(i === 0 ? 900 : 1500)
+      const [a, b] = seq[i]
+      setScore(a, b, i > 0)
+    }
+    await wait(900)
+    ball.classList.remove('is-active')
+  }
+
+  async function playDemo() {
+    if (running) return
+    running = true
+    playBtn.disabled = true
+    playBtn.textContent = '▶ Đang chạy…'
+    noteEl.textContent = ''
+    setScore(0, 0, false)
+
+    for (let leg = 0; leg < LEGS.length; leg++) {
+      await playLeg(leg)
+      if (leg < LEGS.length - 1) await showSwap(leg)
+    }
+
+    hidePlayers()
+    noteEl.textContent = '🏆 Đội B chạm mốc 18 trước — thắng cả trận 17-18!'
+    playBtn.disabled = false
+    playBtn.textContent = '↻ Xem lại'
+    running = false
+  }
+
+  playBtn.addEventListener('click', playDemo)
+  muteBtn.addEventListener('click', () => {
+    muted = !muted
+    muteBtn.textContent = muted ? '🔇' : '🔊'
+    muteBtn.setAttribute('aria-pressed', String(muted))
+    muteBtn.setAttribute('aria-label', muted ? 'Bật âm thanh' : 'Tắt âm thanh')
+  })
+})()

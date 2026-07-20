@@ -445,6 +445,69 @@
             hạng. Nhóm Nam và nhóm Nữ xếp hạng hoàn toàn độc lập.
           </p>
         </article>
+
+        <article class="guide-card guide-card--wide">
+          <h3>🎬 Xem trực quan 1 trận đấu</h3>
+          <p class="guide-card__lead">
+            Bấm nút bên dưới để xem nhanh cách 1 trận tiếp sức diễn ra — cặp
+            thi đấu đổi qua từng chặng, điểm số cộng dồn không reset, đúng với
+            ví dụ 4-6 → 12-9 → 17-18 ở trên.
+          </p>
+
+          <div class="relay-demo" id="relayDemo">
+            <div class="relay-demo__court">
+              <div class="relay-demo__net" aria-hidden="true"></div>
+              <div class="relay-demo__kitchen relay-demo__kitchen--top" aria-hidden="true"></div>
+              <div class="relay-demo__kitchen relay-demo__kitchen--bot" aria-hidden="true"></div>
+              <div class="relay-demo__player relay-demo__player--a1" data-slot="a1"></div>
+              <div class="relay-demo__player relay-demo__player--a2" data-slot="a2"></div>
+              <div class="relay-demo__player relay-demo__player--b1" data-slot="b1"></div>
+              <div class="relay-demo__player relay-demo__player--b2" data-slot="b2"></div>
+              <div class="relay-demo__ball" id="relayBall" aria-hidden="true"></div>
+              <div class="relay-demo__swap" id="relaySwap" aria-hidden="true">
+                <span class="relay-demo__swap-title" id="relaySwapTitle">
+                  🔄 Hết Chặng 1 — chạm mốc 6 điểm
+                </span>
+                <strong class="relay-demo__swap-score" id="relaySwapScore">4 – 6</strong>
+                <span class="relay-demo__swap-note" id="relaySwapNote">
+                  Tỷ số giữ nguyên, không reset — Cặp TV2 + TV3 vào sân
+                  (Chặng 2)
+                </span>
+              </div>
+            </div>
+
+            <div class="relay-demo__panel">
+              <span class="relay-demo__leg" id="relayLegBadge">Chặng 1</span>
+              <p class="relay-demo__pair" id="relayPairLabel">Cặp TV1 + TV2 thi đấu</p>
+              <div class="relay-demo__score">
+                <div class="relay-demo__score-team">
+                  <span>Đội A</span>
+                  <strong id="relayScoreA">0</strong>
+                </div>
+                <span class="relay-demo__score-sep">–</span>
+                <div class="relay-demo__score-team">
+                  <span>Đội B</span>
+                  <strong id="relayScoreB">0</strong>
+                </div>
+              </div>
+              <p class="relay-demo__note" id="relayNote">Bấm nút để xem minh họa.</p>
+              <div class="relay-demo__actions">
+                <button class="btn btn--primary" id="relayPlayBtn" type="button">
+                  ▶ Xem minh họa
+                </button>
+                <button
+                  class="relay-demo__mute"
+                  id="relayMuteBtn"
+                  type="button"
+                  aria-label="Tắt âm thanh"
+                  aria-pressed="false"
+                >
+                  🔊
+                </button>
+              </div>
+            </div>
+          </div>
+        </article>
       </div>
     </section>
 
