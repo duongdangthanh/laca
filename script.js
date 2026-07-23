@@ -2,17 +2,54 @@
 
 const GENDERS = ['nam', 'nu']
 const GENDER_LABELS = { nam: 'Nam', nu: 'Nữ' }
-const TEAM_LABELS = ['A', 'B', 'C', 'D']
 
-// Standard single round-robin for 4 teams: each team plays once per round.
-const TEAM_ROUND_ROBIN = [
-  { match: 1, round: 1, home: 'A', away: 'B' },
-  { match: 2, round: 1, home: 'C', away: 'D' },
-  { match: 3, round: 2, home: 'A', away: 'C' },
-  { match: 4, round: 2, home: 'B', away: 'D' },
-  { match: 5, round: 3, home: 'A', away: 'D' },
-  { match: 6, round: 3, home: 'B', away: 'C' }
-]
+// Nhóm Nam: 4 đội (A-D). Nhóm Nữ: 5 đội (A-E).
+const TEAM_LABELS = {
+  nam: ['A', 'B', 'C', 'D'],
+  nu: ['A', 'B', 'C', 'D', 'E']
+}
+
+// Tên mặc định theo danh sách đội chính thức (BTC có thể sửa lại trong form).
+const ROSTER_DEFAULTS = {
+  nam: {
+    A: ['Mr Quy', 'Phương Nam', 'Thanh'],
+    B: ['Quang V', 'Minh Pandora', 'Quang Khánh'],
+    C: ['Minh Dương', 'Chú Vương', 'Khẩy Trường'],
+    D: ['Tùng Nè', 'Sơn Núi', 'Quốc Ân']
+  },
+  nu: {
+    A: ['Thảo Hiếu', 'Diệp Ann', 'Minh Thảo'],
+    B: ['Vạn Duyên', 'Mai Thu', 'Mai Nguyễn'],
+    C: ['Mai Trân', 'Bubu Phạm', 'Toại Thủy'],
+    D: ['Ánh Lê', 'Tiên', 'Nana Phan'],
+    E: ['Vân Nguyễn', 'Minh Anh', 'Diệu']
+  }
+}
+
+// Nhóm Nam: vòng tròn 1 lượt 4 đội (3 vòng · 6 trận, không đội nào nghỉ).
+// Nhóm Nữ: vòng tròn 1 lượt 5 đội (5 vòng · 10 trận, mỗi vòng 1 đội nghỉ).
+const TEAM_ROUND_ROBIN = {
+  nam: [
+    { match: 1, round: 1, home: 'A', away: 'B' },
+    { match: 2, round: 1, home: 'C', away: 'D' },
+    { match: 3, round: 2, home: 'A', away: 'C' },
+    { match: 4, round: 2, home: 'B', away: 'D' },
+    { match: 5, round: 3, home: 'A', away: 'D' },
+    { match: 6, round: 3, home: 'B', away: 'C' }
+  ],
+  nu: [
+    { match: 1, round: 1, home: 'A', away: 'E', rest: 'D' },
+    { match: 2, round: 1, home: 'B', away: 'C', rest: 'D' },
+    { match: 3, round: 2, home: 'A', away: 'D', rest: 'B' },
+    { match: 4, round: 2, home: 'E', away: 'C', rest: 'B' },
+    { match: 5, round: 3, home: 'A', away: 'B', rest: 'C' },
+    { match: 6, round: 3, home: 'D', away: 'E', rest: 'C' },
+    { match: 7, round: 4, home: 'B', away: 'E', rest: 'A' },
+    { match: 8, round: 4, home: 'C', away: 'D', rest: 'A' },
+    { match: 9, round: 5, home: 'A', away: 'C', rest: 'E' },
+    { match: 10, round: 5, home: 'B', away: 'D', rest: 'E' }
+  ]
+}
 
 // The 3 possible sub-pairs from a team's own 3 members (slot indices).
 // Captains pick which of these plays each chặng (leg).
@@ -23,8 +60,11 @@ const PAIR3_DEFS = [
 ]
 
 // Cumulative score checkpoints ("chặng" boundaries); the last value is the
-// match target (18, không cách 2 điểm).
-const RELAY_CHECKPOINTS = [6, 12, 18]
+// match target. Nhóm Nam đấu dài hơi hơn (8-16-24), nhóm Nữ giữ 6-12-18.
+const RELAY_CHECKPOINTS = {
+  nam: [8, 16, 24],
+  nu: [6, 12, 18]
+}
 
 // --- Sticky nav background on scroll ---
 const nav = document.getElementById('nav')
@@ -136,13 +176,13 @@ function isCompletedScore(a, b, targetScore) {
 
 // ===== Team roster (manual entry, per nhóm Nam/Nữ) =====
 function rosterKey(gender) {
-  return `laca_minigame_roster_${gender}_v1`
+  return `laca_minigame_roster_${gender}_v2`
 }
 function scoreKey(gender) {
-  return `laca_minigame_score_${gender}_v1`
+  return `laca_minigame_score_${gender}_v2`
 }
 function orderKey(gender) {
-  return `laca_minigame_order_${gender}_v1`
+  return `laca_minigame_order_${gender}_v2`
 }
 
 function loadTeamRoster(gender) {
@@ -150,17 +190,17 @@ function loadTeamRoster(gender) {
     const raw = localStorage.getItem(rosterKey(gender))
     if (raw) {
       const data = JSON.parse(raw)
-      if (data && TEAM_LABELS.every(t => Array.isArray(data[t]) && data[t].length === 3))
+      if (data && TEAM_LABELS[gender].every(t => Array.isArray(data[t]) && data[t].length === 3))
         return data
     }
   } catch (_e) {
     /* fall through to default */
   }
-  const empty = {}
-  TEAM_LABELS.forEach(t => {
-    empty[t] = ['', '', '']
+  const defaults = {}
+  TEAM_LABELS[gender].forEach(t => {
+    defaults[t] = [...ROSTER_DEFAULTS[gender][t]]
   })
-  return empty
+  return defaults
 }
 
 function saveTeamRoster(gender) {
@@ -214,7 +254,7 @@ function renderTeamRosterForm(gender) {
   const container = rosterFormEl(gender)
   if (!container) return
   container.innerHTML = ''
-  TEAM_LABELS.forEach(t => {
+  TEAM_LABELS[gender].forEach(t => {
     const card = document.createElement('div')
     card.className = 'team-form__card'
     card.innerHTML = `
@@ -276,15 +316,16 @@ function relayCumulative(matchState) {
 // Status of the CURRENT chặng: whether its checkpoint has been reached, and
 // whether that means the whole match is over (final chặng) or just that the
 // next pair should take over (cumulative score carries forward unchanged).
-function relayStatus(matchState) {
+function relayStatus(matchState, gender) {
+  const checkpoints = RELAY_CHECKPOINTS[gender]
   const legIndex = matchState.completedLegs.length
   const cumulative = relayCumulative(matchState)
-  if (legIndex >= RELAY_CHECKPOINTS.length) {
-    return { done: true, legJustFinished: false, legIndex: RELAY_CHECKPOINTS.length - 1, cumulative }
+  if (legIndex >= checkpoints.length) {
+    return { done: true, legJustFinished: false, legIndex: checkpoints.length - 1, cumulative }
   }
-  const checkpoint = RELAY_CHECKPOINTS[legIndex]
+  const checkpoint = checkpoints[legIndex]
   const legDone = cumulative.a >= checkpoint || cumulative.b >= checkpoint
-  const isFinalLeg = legIndex === RELAY_CHECKPOINTS.length - 1
+  const isFinalLeg = legIndex === checkpoints.length - 1
   return {
     done: legDone && isFinalLeg,
     legJustFinished: legDone && !isFinalLeg,
@@ -296,10 +337,10 @@ function relayStatus(matchState) {
 
 function applyRelayDelta(gender, matchId, side, delta) {
   const m = getRelayMatch(gender, matchId)
-  const status = relayStatus(m)
+  const status = relayStatus(m, gender)
   if (status.done) return
   m.current[side] = Math.max(0, m.current[side] + delta)
-  const after = relayStatus(m)
+  const after = relayStatus(m, gender)
   if (after.legJustFinished) {
     m.completedLegs.push({ a: m.current.a, b: m.current.b })
     m.current = { a: 0, b: 0 }
@@ -315,8 +356,8 @@ function resetRelayMatch(gender, matchId) {
 }
 
 // ===== Team standings & schedule rendering (per nhóm) =====
-function matchStatusIcon(matchState) {
-  const status = relayStatus(matchState)
+function matchStatusIcon(matchState, gender) {
+  const status = relayStatus(matchState, gender)
   if (status.done) return { cls: 'is-complete', icon: '✓', title: 'Hoàn thành' }
   if (status.legIndex > 0 || matchState.current.a > 0 || matchState.current.b > 0) {
     return { cls: 'is-live', icon: '●', title: 'Đang thi đấu' }
@@ -327,16 +368,16 @@ function matchStatusIcon(matchState) {
 function getTeamStandings(gender) {
   const state = relayScoreState[gender]
   const stats = new Map()
-  TEAM_LABELS.forEach(t =>
+  TEAM_LABELS[gender].forEach(t =>
     stats.set(t, { team: t, played: 0, wins: 0, losses: 0, scored: 0, conceded: 0, diff: 0 })
   )
 
   let completedCount = 0
-  TEAM_ROUND_ROBIN.forEach(m => {
+  TEAM_ROUND_ROBIN[gender].forEach(m => {
     const matchId = `T${m.match}`
     const ms = state[matchId]
     if (!ms) return
-    const status = relayStatus(ms)
+    const status = relayStatus(ms, gender)
     if (!status.done) return
     completedCount += 1
     const cum = status.cumulative
@@ -369,7 +410,7 @@ function getTeamStandings(gender) {
   })
 
   let tieNote = ''
-  if (completedCount === TEAM_ROUND_ROBIN.length) {
+  if (completedCount === TEAM_ROUND_ROBIN[gender].length) {
     for (let i = 0; i < rows.length - 1; i++) {
       if (
         rows[i].wins === rows[i + 1].wins &&
@@ -398,16 +439,19 @@ function renderTeamMatches(gender) {
   const grid = matchesGridEl(gender)
   if (!grid) return
   grid.innerHTML = ''
-  ;[1, 2, 3].forEach(r => {
+  const rounds = [...new Set(TEAM_ROUND_ROBIN[gender].map(m => m.round))]
+  rounds.forEach(r => {
+    const roundMatches = TEAM_ROUND_ROBIN[gender].filter(m => m.round === r)
+    const restTeam = roundMatches.find(m => m.rest)?.rest
     const block = document.createElement('div')
     block.className = 'schedule-group is-visible'
-    block.innerHTML = `<h4>Vòng ${r}</h4><ol></ol>`
+    block.innerHTML = `<h4>Vòng ${r}${restTeam ? ` · Nghỉ: Đội ${restTeam}` : ''}</h4><ol></ol>`
     const ol = block.querySelector('ol')
-    TEAM_ROUND_ROBIN.filter(m => m.round === r).forEach(m => {
+    roundMatches.forEach(m => {
       const matchId = `T${m.match}`
       const ms = getRelayMatch(gender, matchId)
       const cum = relayCumulative(ms)
-      const status = matchStatusIcon(ms)
+      const status = matchStatusIcon(ms, gender)
       const li = document.createElement('li')
       li.className = 'is-visible'
       li.dataset.matchId = matchId
@@ -459,7 +503,7 @@ function updateStats() {
   if (!statRegistered) return
   const filled = GENDERS.reduce(
     (sum, g) =>
-      sum + TEAM_LABELS.reduce((s, t) => s + teamRoster[g][t].filter(n => n && n.trim()).length, 0),
+      sum + TEAM_LABELS[g].reduce((s, t) => s + teamRoster[g][t].filter(n => n && n.trim()).length, 0),
     0
   )
   statRegistered.textContent = filled
@@ -508,7 +552,7 @@ updateStats()
   function currentLegPairing() {
     const m = getRelayMatch(ctx.gender, ctx.matchId)
     const legIndex = m.completedLegs.length
-    if (legIndex >= RELAY_CHECKPOINTS.length) return null
+    if (legIndex >= RELAY_CHECKPOINTS[ctx.gender].length) return null
     const order = teamOrder[ctx.gender][ctx.matchId]
     if (!order) return null
     const homeDef = PAIR3_DEFS[order.home[legIndex]]
@@ -575,9 +619,10 @@ updateStats()
   }
 
   function renderPlay() {
+    const checkpoints = RELAY_CHECKPOINTS[ctx.gender]
     const m = getRelayMatch(ctx.gender, ctx.matchId)
     const cum = relayCumulative(m)
-    const status = relayStatus(m)
+    const status = relayStatus(m, ctx.gender)
     const pairing = currentLegPairing()
 
     let html = `<div class="ref-modal__matchup">${escapeHtml(matchupLabel())}</div>`
@@ -591,10 +636,8 @@ updateStats()
       return
     }
 
-    const checkpointLabel = status.done
-      ? RELAY_CHECKPOINTS[RELAY_CHECKPOINTS.length - 1]
-      : status.checkpoint
-    html += `<div class="ref-modal__note">Chặng ${status.legIndex + 1}/${RELAY_CHECKPOINTS.length} · mốc ${checkpointLabel} điểm<br>
+    const checkpointLabel = status.done ? checkpoints[checkpoints.length - 1] : status.checkpoint
+    html += `<div class="ref-modal__note">Chặng ${status.legIndex + 1}/${checkpoints.length} · mốc ${checkpointLabel} điểm<br>
       <strong>${escapeHtml(pairing.homeMembers.join(' + '))}</strong> vs <strong>${escapeHtml(pairing.awayMembers.join(' + '))}</strong></div>`
 
     html += `<div class="ref-modal__board">
@@ -633,7 +676,7 @@ updateStats()
     syncExternal()
     flashSaved()
     const after = getRelayMatch(ctx.gender, ctx.matchId)
-    if (after.completedLegs.length !== beforeLegIndex || relayStatus(after).done) {
+    if (after.completedLegs.length !== beforeLegIndex || relayStatus(after, ctx.gender).done) {
       render()
     } else {
       const cum = relayCumulative(after)
@@ -744,7 +787,7 @@ updateStats()
       const li = e.target.closest('li[data-match-id]')
       if (!li) return
       const matchId = li.dataset.matchId
-      const m = TEAM_ROUND_ROBIN.find(x => `T${x.match}` === matchId)
+      const m = TEAM_ROUND_ROBIN[gender].find(x => `T${x.match}` === matchId)
       if (!m) return
       openTeamModal({ gender, matchId, home: m.home, away: m.away, round: m.round })
     })

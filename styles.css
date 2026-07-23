@@ -2745,6 +2745,9 @@ em {
 .schedule-board--rounds3 {
   grid-template-columns: repeat(3, 1fr);
 }
+.schedule-board--rounds5 {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
 .team-match__score {
   font-family: var(--display);
   font-weight: 800;
