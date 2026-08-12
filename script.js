@@ -306,7 +306,7 @@ const REGISTERED = {
     'Phương Nam',
     'Quang V',
     'Vũ V',
-    'Khoa SPC'
+    'Sony Bui'
   ]
 }
 const REGISTERED_LIMIT = 24
