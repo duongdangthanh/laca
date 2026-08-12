@@ -122,8 +122,14 @@ const ROTATION = [
 // Sân cố định theo vị trí trận lớn trong lượt (mục IX): trận lớn thứ nhất /
 // thứ hai của mỗi bảng luôn dùng cùng cặp sân, bất kể hai đội nào gặp nhau.
 const BOARD_COURTS = {
-  A: [[1, 5], [2, 6]],
-  B: [[3, 7], [4, 8]]
+  A: [
+    [1, 5],
+    [2, 6]
+  ],
+  B: [
+    [3, 7],
+    [4, 8]
+  ]
 }
 
 // Giờ thi đấu theo lượt (mục XI) — mỗi trận con 20 phút: sub 1&2 (đôi nam/đôi
@@ -146,9 +152,18 @@ const SUB_LABELS = {
 function buildBoardBigMatches(board) {
   const t = BOARD_TEAMS[board]
   const rounds = [
-    [[t[0], t[1]], [t[2], t[3]]],
-    [[t[0], t[2]], [t[1], t[3]]],
-    [[t[0], t[3]], [t[1], t[2]]]
+    [
+      [t[0], t[1]],
+      [t[2], t[3]]
+    ],
+    [
+      [t[0], t[2]],
+      [t[1], t[3]]
+    ],
+    [
+      [t[0], t[3]],
+      [t[1], t[2]]
+    ]
   ]
   const matches = []
   rounds.forEach((pair, roundIdx) => {
@@ -172,9 +187,30 @@ function buildSubDefs(match) {
   const rt = ROUND_TIME[match.round - 1]
   const courts = match.courts
   return [
-    { idx: 1, kind: 'nam', label: SUB_LABELS.nam, time: rt.ab, court: courts[0], roles: r.nam },
-    { idx: 2, kind: 'nu', label: SUB_LABELS.nu, time: rt.ab, court: courts[1], roles: r.nu },
-    { idx: 3, kind: 'mix', label: SUB_LABELS.mix, time: rt.c, court: courts[0], roles: r.mix }
+    {
+      idx: 1,
+      kind: 'nam',
+      label: SUB_LABELS.nam,
+      time: rt.ab,
+      court: courts[0],
+      roles: r.nam
+    },
+    {
+      idx: 2,
+      kind: 'nu',
+      label: SUB_LABELS.nu,
+      time: rt.ab,
+      court: courts[1],
+      roles: r.nu
+    },
+    {
+      idx: 3,
+      kind: 'mix',
+      label: SUB_LABELS.mix,
+      time: rt.c,
+      court: courts[0],
+      roles: r.mix
+    }
   ]
 }
 
@@ -222,16 +258,55 @@ const ROSTER = {
 // Cập nhật trực tiếp 2 mảng dưới đây khi có người đăng ký mới.
 const REGISTERED = {
   nu: [
-    'Tiên', 'Mai Trân', 'Toại Thuỷ', 'Diệu', 'Hoàng Phúc', 'Mai Nguyễn',
-    'Vạn Duyên', 'Tuyết Mai', 'Ánh Lê', 'Utky Hiền', 'Minh Anh', 'Phạm Thoa',
-    'Thảo', 'Thảo Hiếu', 'Trang Lê', 'Minh Thảo', 'Ngọc', 'Thanh Tâm',
-    'Mai Thu', 'Khanh', 'Ly Xynk', 'Thiên Hà', 'Hoa Vũ', 'Trúc Quyên'
+    'Tiên',
+    'Mai Trân',
+    'Toại Thuỷ',
+    'Diệu',
+    'Hoàng Phúc',
+    'Mai Nguyễn',
+    'Vạn Duyên',
+    'Tuyết Mai',
+    'Ánh Lê',
+    'Utky Hiền',
+    'Minh Anh',
+    'Phạm Thoa',
+    'Thảo',
+    'Thảo Hiếu',
+    'Trang Lê',
+    'Minh Thảo',
+    'Ngọc',
+    'Thanh Tâm',
+    'Mai Thu',
+    'Khanh',
+    'Ly Xynk',
+    'Thiên Hà',
+    'Hoa Vũ',
+    'Trúc Quyên'
   ],
   nam: [
-    'Minh Pandora', 'Khoa', 'Mr Quy', 'Thắng Nguyễn', 'Hùng', 'Tùng Nè',
-    'Quang Khánh', 'Quốc Ân', 'Thanh Mập', 'Huy Lưu', 'Thuận Sovo',
-    'Chú Vương', 'Khắc Trà', 'Hoàng', 'Thuy Dang', 'Khầy Trường',
-    'Khánh Diệp', 'Chen', 'Lukita', 'Phương Nam', 'Quang V', 'Vũ V', 'Khoa FPT'
+    'Minh Pandora',
+    'Khoa',
+    'Mr Quy',
+    'Thắng Nguyễn',
+    'Hùng',
+    'Tùng Nè',
+    'Quang Khánh',
+    'Quốc Ân',
+    'Thanh Mập',
+    'Huy Lưu',
+    'Thuận Sovo',
+    'Chú Vương',
+    'Khắc Trà',
+    'Hoàng',
+    'Thuy Dang',
+    'Khầy Trường',
+    'Khánh Diệp',
+    'Chen',
+    'Lukita',
+    'Phương Nam',
+    'Quang V',
+    'Vũ V',
+    'Khoa SPC'
   ]
 }
 const REGISTERED_LIMIT = 24
@@ -255,8 +330,16 @@ function renderRegisteredList(listId, countId, names) {
   }
 }
 
-renderRegisteredList('registeredFemaleList', 'registeredFemaleCount', REGISTERED.nu)
-renderRegisteredList('registeredMaleList', 'registeredMaleCount', REGISTERED.nam)
+renderRegisteredList(
+  'registeredFemaleList',
+  'registeredFemaleCount',
+  REGISTERED.nu
+)
+renderRegisteredList(
+  'registeredMaleList',
+  'registeredMaleCount',
+  REGISTERED.nam
+)
 
 // ===== Persisted state (chỉ lưu tỷ số — không lưu đăng ký) =====
 const SCORE_KEY = 'laca_s4_scores_v1'
@@ -324,7 +407,14 @@ function getMatchAggregate(vm) {
     const a = Number.isInteger(sc.a) ? sc.a : null
     const b = Number.isInteger(sc.b) ? sc.b : null
     const done = isGameDone(a, b)
-    return { ...s, key, a, b, done, winner: done ? (a > b ? 'home' : 'away') : null }
+    return {
+      ...s,
+      key,
+      a,
+      b,
+      done,
+      winner: done ? (a > b ? 'home' : 'away') : null
+    }
   })
   const homeWins = subs.filter(s => s.winner === 'home').length
   const awayWins = subs.filter(s => s.winner === 'away').length
@@ -336,8 +426,21 @@ function getMatchAggregate(vm) {
   const complete = !unresolved && doneCount === 3
   const homeScored = subs.reduce((sum, s) => sum + (s.a || 0), 0)
   const awayScored = subs.reduce((sum, s) => sum + (s.b || 0), 0)
-  const winner = complete ? (homeWins > awayWins ? vm.home.code : vm.away.code) : null
-  return { subs, homeWins, awayWins, doneCount, complete, homeScored, awayScored, winner }
+  const winner = complete
+    ? homeWins > awayWins
+      ? vm.home.code
+      : vm.away.code
+    : null
+  return {
+    subs,
+    homeWins,
+    awayWins,
+    doneCount,
+    complete,
+    homeScored,
+    awayScored,
+    winner
+  }
 }
 
 function buildKoMatchVM(id) {
@@ -349,7 +452,11 @@ function buildKoMatchVM(id) {
     const srcVm = buildKoMatchVM(def.homeFrom)
     const agg = getMatchAggregate(srcVm)
     home = agg.complete
-      ? { code: agg.winner, label: agg.winner === srcVm.home.code ? srcVm.home.label : srcVm.away.label }
+      ? {
+          code: agg.winner,
+          label:
+            agg.winner === srcVm.home.code ? srcVm.home.label : srcVm.away.label
+        }
       : { code: null, label: `Thắng ${KO_DEFS[def.homeFrom].label}` }
   }
   if (def.awaySlot) {
@@ -358,7 +465,11 @@ function buildKoMatchVM(id) {
     const srcVm = buildKoMatchVM(def.awayFrom)
     const agg = getMatchAggregate(srcVm)
     away = agg.complete
-      ? { code: agg.winner, label: agg.winner === srcVm.home.code ? srcVm.home.label : srcVm.away.label }
+      ? {
+          code: agg.winner,
+          label:
+            agg.winner === srcVm.home.code ? srcVm.home.label : srcVm.away.label
+        }
       : { code: null, label: `Thắng ${KO_DEFS[def.awayFrom].label}` }
   }
   const kinds = ['nam', 'nu', 'mix']
@@ -379,7 +490,10 @@ function getBoardStandings(board) {
   const teams = BOARD_TEAMS[board]
   const matches = buildBoardBigMatches(board)
   const stats = new Map(
-    teams.map(t => [t, { team: t, played: 0, scored: 0, conceded: 0, diff: 0, subW: 0, subL: 0 }])
+    teams.map(t => [
+      t,
+      { team: t, played: 0, scored: 0, conceded: 0, diff: 0, subW: 0, subL: 0 }
+    ])
   )
   let completedCount = 0
   matches.forEach(m => {
@@ -441,13 +555,17 @@ function resolveBoardRank(board, rank) {
   const { rows } = getBoardStandings(board)
   const row = rows[rank - 1]
   if (row) return { code: row.team, label: `Đội ${row.team}` }
-  return { code: null, label: rank === 1 ? `Nhất bảng ${board}` : `Nhì bảng ${board}` }
+  return {
+    code: null,
+    label: rank === 1 ? `Nhất bảng ${board}` : `Nhì bảng ${board}`
+  }
 }
 
 // ===== Rendering =====
 function slotHead(vm, side) {
   const v = vm[side]
-  if (vm.freeLineup) return `<span data-slot="${vm.id}-${side}">${escapeHtml(v.label)}</span>`
+  if (vm.freeLineup)
+    return `<span data-slot="${vm.id}-${side}">${escapeHtml(v.label)}</span>`
   return `<span>${escapeHtml(v.label)}</span>`
 }
 
@@ -509,8 +627,12 @@ function refreshMatchDerived(vm) {
       statusEl.textContent = st.icon
       statusEl.className = `schedule-group__status ${st.cls}`
     }
-    const homeSpan = document.querySelector(`[data-pair="${vm.id}-${s.idx}-home"]`)
-    const awaySpan = document.querySelector(`[data-pair="${vm.id}-${s.idx}-away"]`)
+    const homeSpan = document.querySelector(
+      `[data-pair="${vm.id}-${s.idx}-home"]`
+    )
+    const awaySpan = document.querySelector(
+      `[data-pair="${vm.id}-${s.idx}-away"]`
+    )
     if (homeSpan) homeSpan.classList.toggle('is-winner', s.winner === 'home')
     if (awaySpan) awaySpan.classList.toggle('is-winner', s.winner === 'away')
   })
@@ -557,10 +679,14 @@ function refreshKnockoutDerived() {
 }
 
 function boardScheduleEl(board) {
-  return document.getElementById(board === 'A' ? 'scheduleBoardA' : 'scheduleBoardB')
+  return document.getElementById(
+    board === 'A' ? 'scheduleBoardA' : 'scheduleBoardB'
+  )
 }
 function boardStandingsBodyEl(board) {
-  return document.getElementById(board === 'A' ? 'standingsBodyA' : 'standingsBodyB')
+  return document.getElementById(
+    board === 'A' ? 'standingsBodyA' : 'standingsBodyB'
+  )
 }
 function boardTieNoteEl(board) {
   return document.getElementById(board === 'A' ? 'tieNoteA' : 'tieNoteB')
@@ -610,13 +736,18 @@ function renderStandings(board) {
 function renderKnockout() {
   const bkGrid = document.getElementById('knockoutBk')
   const ckSlot = document.getElementById('knockoutCk')
-  if (bkGrid) bkGrid.innerHTML = matchCardHTML(buildKoMatchVM('BK1')) + matchCardHTML(buildKoMatchVM('BK2'))
+  if (bkGrid)
+    bkGrid.innerHTML =
+      matchCardHTML(buildKoMatchVM('BK1')) +
+      matchCardHTML(buildKoMatchVM('BK2'))
   if (ckSlot) ckSlot.innerHTML = matchCardHTML(buildKoMatchVM('CK'))
 }
 
 function refreshAllDerived() {
   BOARDS.forEach(board => {
-    buildBoardBigMatches(board).forEach(m => refreshMatchDerived(buildGroupMatchVM(m)))
+    buildBoardBigMatches(board).forEach(m =>
+      refreshMatchDerived(buildGroupMatchVM(m))
+    )
     renderStandings(board)
   })
   refreshKnockoutDerived()
@@ -642,7 +773,8 @@ document.addEventListener('input', e => {
     scores[key][side] = n
     if (String(n) !== val) input.value = String(n)
   }
-  if (!Number.isInteger(scores[key].a) && !Number.isInteger(scores[key].b)) delete scores[key]
+  if (!Number.isInteger(scores[key].a) && !Number.isInteger(scores[key].b))
+    delete scores[key]
   saveScores()
 
   const matchId = key.slice(0, key.indexOf('#'))
