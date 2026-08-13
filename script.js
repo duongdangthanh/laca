@@ -55,7 +55,7 @@ timer = setInterval(tick, 1000)
 
 // --- Scroll reveal ---
 const revealTargets = document.querySelectorAll(
-  '.sec-head, .pillar, .fcard, .rules-note, .venue__info, .venue__map, .stat, .guide-flow__step, .guide-card, .gender-block, .roster-col, .bigmatch, .timeline li, .prize, .ref-table-wrap'
+  '.sec-head, .pillar, .fcard, .rules-note, .venue__info, .venue__map, .stat, .guide-flow__step, .guide-card, .gender-block, .roster-col, .bigmatch, .timeline li, .prize, .ref-table-wrap, .draw-tool'
 )
 revealTargets.forEach(el => el.classList.add('reveal'))
 const io = new IntersectionObserver(
@@ -253,61 +253,55 @@ const ROSTER = {
   H: { M1: '', M2: '', M3: '', W1: '', W2: '', W3: '' }
 }
 
-// ===== Danh sách đã đăng ký (chưa chia đội — chờ bốc thăm theo mục IV) =====
+// ===== Nhóm hạt giống (RIÊNG TƯ — không hiển thị trực tiếp lên web) =====
+// Chỉ dùng cho công cụ bốc thăm chia đội bên dưới (mục IV). Mỗi giới 5 tier;
+// tier có 08 người là tier dùng chung, được chia đều 4–4 cho 2 nhóm đội khi
+// bốc thăm. Cập nhật trực tiếp các mảng này khi danh sách hạt giống thay đổi.
+const SEED_TIERS = {
+  nu: {
+    T1: ['Tiên', 'Mai Trân', 'Toại Thuỷ', 'Diệu'],
+    T2: [
+      'Hoàng Phúc',
+      'Mai Nguyễn',
+      'Vạn Duyên',
+      'Tuyết Mai',
+      'Ánh Lê',
+      'Utky Hiền',
+      'Minh Anh',
+      'Phạm Thoa'
+    ],
+    T3: ['Thảo', 'Thảo Hiếu', 'Trang Lê', 'Minh Thảo'],
+    T4: ['Ngọc', 'Thanh Tâm', 'Mai Thu', 'Khanh'],
+    T5: ['Ly Xynk', 'Thiên Hà', 'Hoa Vũ', 'Trúc Quyên']
+  },
+  nam: {
+    T1: ['Minh Pandora', 'Khoa', 'Mr Quy', 'Thắng Nguyễn'],
+    T2: [
+      'Hùng',
+      'Tùng Nè',
+      'Quang Khánh',
+      'Quốc Ân',
+      'Thanh Mập',
+      'Huy Lưu',
+      'Thuận Sovo',
+      'Chú Vương'
+    ],
+    T3: ['Khắc Trà', 'Hoàng', 'Thuy Dang', 'Mạnh Ngô'],
+    T4: ['Khầy Trường', 'Khánh Diệp', 'Chen', 'Lukita'],
+    T5: ['Phương Nam', 'Quang V', 'Vũ V-Tech', 'Sony Bui']
+  }
+}
+const TIER_ORDER = ['T1', 'T2', 'T3', 'T4', 'T5']
+
+function flattenTiers(tiers) {
+  return TIER_ORDER.flatMap(t => tiers[t])
+}
+
+// ===== Danh sách đã đăng ký (hiển thị công khai — không lộ tier/hạt giống) =====
 // Chỉ mang tính hiển thị/tham khảo; thứ tự liệt kê không phải mã số hay đội.
-// Cập nhật trực tiếp 2 mảng dưới đây khi có người đăng ký mới.
 const REGISTERED = {
-  nu: [
-    'Tiên',
-    'Mai Trân',
-    'Toại Thuỷ',
-    'Diệu',
-    'Hoàng Phúc',
-    'Mai Nguyễn',
-    'Vạn Duyên',
-    'Tuyết Mai',
-    'Ánh Lê',
-    'Utky Hiền',
-    'Minh Anh',
-    'Phạm Thoa',
-    'Thảo',
-    'Thảo Hiếu',
-    'Trang Lê',
-    'Minh Thảo',
-    'Ngọc',
-    'Thanh Tâm',
-    'Mai Thu',
-    'Khanh',
-    'Ly Xynk',
-    'Thiên Hà',
-    'Hoa Vũ',
-    'Trúc Quyên'
-  ],
-  nam: [
-    'Minh Pandora',
-    'Khoa',
-    'Mr Quy',
-    'Thắng Nguyễn',
-    'Hùng',
-    'Tùng Nè',
-    'Quang Khánh',
-    'Quốc Ân',
-    'Thanh Mập',
-    'Huy Lưu',
-    'Thuận Sovo',
-    'Chú Vương',
-    'Khắc Trà',
-    'Hoàng',
-    'Thuy Dang',
-    'Khầy Trường',
-    'Khánh Diệp',
-    'Chen',
-    'Lukita',
-    'Phương Nam',
-    'Quang V',
-    'Vũ V',
-    'Sony Bui'
-  ]
+  nu: flattenTiers(SEED_TIERS.nu),
+  nam: flattenTiers(SEED_TIERS.nam)
 }
 const REGISTERED_LIMIT = 24
 
@@ -752,6 +746,249 @@ function refreshAllDerived() {
   })
   refreshKnockoutDerived()
 }
+
+// ===== Công cụ bốc thăm chia đội (mục IV) =====
+const TEAMS = [...BOARD_TEAMS.A, ...BOARD_TEAMS.B]
+// Nhóm đội theo mục IV.2 — khác với Bảng A/B (mục V.1) ở trên.
+const NHOM_TEAMS = { 1: ['A', 'C', 'E', 'G'], 2: ['B', 'D', 'F', 'H'] }
+
+function shuffle(list) {
+  const a = list.slice()
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[a[i], a[j]] = [a[j], a[i]]
+  }
+  return a
+}
+
+// Chia đều 1 tier cho các đội của 1 nhóm đội — mỗi đội bốc đúng 01 người.
+function dealTier(people, teams) {
+  const shuffled = shuffle(people)
+  const map = {}
+  teams.forEach((team, i) => {
+    map[team] = shuffled[i]
+  })
+  return map
+}
+
+// Bốc thăm 1 giới theo cơ chế mục IV: tier 08 người chia đều 4–4 cho 2 nhóm
+// đội; 4 tier còn lại (04 người/tier) ghép cặp đối xứng {nhỏ nhất, lớn nhất}
+// vs {2 tier giữa} để tổng bậc hạt giống của 2 nhóm đội cân bằng nhau.
+function drawGender(tiers) {
+  const sharedKey = TIER_ORDER.find(t => tiers[t].length === 8)
+  const soloRanks = TIER_ORDER.filter(t => t !== sharedKey)
+    .map(t => parseInt(t.slice(1), 10))
+    .sort((a, b) => a - b)
+  const soloByGroup = {
+    1: [soloRanks[0], soloRanks[soloRanks.length - 1]].map(r => `T${r}`),
+    2: soloRanks.slice(1, soloRanks.length - 1).map(r => `T${r}`)
+  }
+  const sharedShuffled = shuffle(tiers[sharedKey])
+  const sharedByGroup = {
+    1: sharedShuffled.slice(0, 4),
+    2: sharedShuffled.slice(4, 8)
+  }
+
+  const perTeam = {}
+  ;[1, 2].forEach(groupNo => {
+    const teams = NHOM_TEAMS[groupNo]
+    const dealt = [
+      ...soloByGroup[groupNo].map(key => dealTier(tiers[key], teams)),
+      dealTier(sharedByGroup[groupNo], teams)
+    ]
+    // Xáo lại thứ tự 3 người/đội trước khi gán M1-M3/W1-W3 — vị trí không
+    // còn phản ánh tier nữa, đúng yêu cầu giữ bí mật hạt giống.
+    teams.forEach(team => {
+      perTeam[team] = shuffle(dealt.map(d => d[team]))
+    })
+  })
+  return perTeam
+}
+
+function drawTeams() {
+  const namByTeam = drawGender(SEED_TIERS.nam)
+  const nuByTeam = drawGender(SEED_TIERS.nu)
+  const result = {}
+  TEAMS.forEach(team => {
+    result[team] = {
+      M1: namByTeam[team][0],
+      M2: namByTeam[team][1],
+      M3: namByTeam[team][2],
+      W1: nuByTeam[team][0],
+      W2: nuByTeam[team][1],
+      W3: nuByTeam[team][2]
+    }
+  })
+  return result
+}
+
+function applyDrawResult(result) {
+  TEAMS.forEach(team => Object.assign(roster[team], result[team]))
+}
+
+function formatRosterCode(result) {
+  const lines = TEAMS.map(team => {
+    const r = result[team]
+    return `  ${team}: { M1: ${JSON.stringify(r.M1)}, M2: ${JSON.stringify(r.M2)}, M3: ${JSON.stringify(r.M3)}, W1: ${JSON.stringify(r.W1)}, W2: ${JSON.stringify(r.W2)}, W3: ${JSON.stringify(r.W3)} }`
+  })
+  return `const ROSTER = {\n${lines.join(',\n')}\n}`
+}
+
+function wait(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
+
+// Hiệu ứng "quay số" trước khi chốt — mỗi ô tên nhảy ngẫu nhiên một lúc rồi
+// dừng lại theo kết quả thật, hiện từng đội một (cuốn từ trái qua phải).
+// Chỉ là hiệu ứng hình ảnh, không ảnh hưởng tới kết quả bốc thăm.
+async function playDrawReveal(result) {
+  const container = document.getElementById('drawResult')
+  if (!container) return
+
+  container.innerHTML = TEAMS.map(
+    team => `<div class="draw-team" data-team="${team}">
+        <div class="draw-team__head">
+          <span class="group__badge">${team}</span>
+          <h4>Đội ${team}</h4>
+        </div>
+        <ul class="draw-team__list">
+          ${[0, 1, 2, 3, 4, 5].map(i => `<li class="draw-team__slot" data-slot="${i}">···</li>`).join('')}
+        </ul>
+      </div>`
+  ).join('')
+
+  const pool = [...REGISTERED.nam, ...REGISTERED.nu]
+  const slots = container.querySelectorAll('.draw-team__slot')
+  const flicker = setInterval(() => {
+    slots.forEach(slot => {
+      slot.textContent = pool[Math.floor(Math.random() * pool.length)]
+    })
+  }, 65)
+  await wait(2000)
+  clearInterval(flicker)
+
+  await Promise.all(
+    TEAMS.map((team, i) =>
+      wait(i * 500).then(() => {
+        const card = container.querySelector(`[data-team="${team}"]`)
+        if (!card) return
+        const names = shuffle(Object.values(result[team]))
+        card.querySelectorAll('.draw-team__slot').forEach((el, si) => {
+          el.textContent = names[si]
+        })
+        card.classList.add('is-settled')
+      })
+    )
+  )
+}
+
+;(function () {
+  const drawBtn = document.getElementById('drawBtn')
+  const drawCopyBtn = document.getElementById('drawCopyBtn')
+  const drawStatusEl = document.getElementById('drawStatus')
+  const drawCodeEl = document.getElementById('drawCode')
+  if (!drawBtn) return
+  let lastDrawResult = null
+
+  drawBtn.addEventListener('click', async () => {
+    if (
+      Object.keys(scores).length > 0 &&
+      !confirm(
+        'Đã có tỷ số được ghi nhận cho một số trận. Bốc thăm lại sẽ đổi tên VĐV theo từng mã đội (tỷ số không bị xóa) — tiếp tục?'
+      )
+    )
+      return
+
+    drawBtn.disabled = true
+    drawBtn.classList.add('is-running')
+    if (drawCopyBtn) drawCopyBtn.hidden = true
+    if (drawCodeEl) drawCodeEl.hidden = true
+    if (drawStatusEl) drawStatusEl.textContent = '🎲 Đang quay số...'
+
+    lastDrawResult = drawTeams()
+    applyDrawResult(lastDrawResult)
+    await playDrawReveal(lastDrawResult)
+    BOARDS.forEach(renderBoardSchedule)
+    renderKnockout()
+    refreshAllDerived()
+
+    drawBtn.disabled = false
+    drawBtn.classList.remove('is-running')
+
+    if (drawCodeEl) {
+      drawCodeEl.value = formatRosterCode(lastDrawResult)
+      drawCodeEl.hidden = false
+    }
+    if (drawCopyBtn) drawCopyBtn.hidden = false
+    if (drawStatusEl) {
+      drawStatusEl.textContent =
+        '✓ Đã bốc thăm — có thể bốc lại nếu muốn, hoặc sao chép mã ROSTER để lưu cố định vào script.js.'
+    }
+  })
+
+  if (drawCopyBtn) {
+    drawCopyBtn.addEventListener('click', async () => {
+      if (!drawCodeEl) return
+      try {
+        await navigator.clipboard.writeText(drawCodeEl.value)
+        if (drawStatusEl)
+          drawStatusEl.textContent =
+            '✓ Đã sao chép mã ROSTER — dán vào script.js để lưu cố định.'
+      } catch (_e) {
+        drawCodeEl.hidden = false
+        drawCodeEl.select()
+        if (drawStatusEl) {
+          drawStatusEl.textContent =
+            'Không tự sao chép được — hãy bôi đen và Ctrl+C từ khung mã bên dưới.'
+        }
+      }
+    })
+  }
+})()
+
+// ===== Bản xem thử: nếu công khai danh sách hạt giống =====
+// Chỉ dựng khi người dùng chủ động bấm nút — mặc định KHÔNG hiển thị, để
+// không vô tình công khai hạt giống trên trang chính thức.
+function seedTierTableHTML(genderLabel, tiers) {
+  const total = TIER_ORDER.reduce((sum, t) => sum + tiers[t].length, 0)
+  const rows = TIER_ORDER.map(
+    (key, i) => `<tr>
+        <td>Tier ${i + 1}</td>
+        <td>${tiers[key].length}</td>
+        <td style="text-align: left">${tiers[key].map(escapeHtml).join(', ')}</td>
+      </tr>`
+  ).join('')
+  return `<div class="ref-table-wrap">
+      <table class="ref-table ref-table--compact">
+        <caption class="ref-table__caption">Nhóm hạt giống ${genderLabel} (${total} VĐV)</caption>
+        <thead>
+          <tr><th>Tier</th><th>Số VĐV</th><th>Thành viên</th></tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`
+}
+
+function renderSeedPreview() {
+  const el = document.getElementById('seedPreviewTables')
+  if (!el) return
+  el.innerHTML =
+    seedTierTableHTML('Nam', SEED_TIERS.nam) + seedTierTableHTML('Nữ', SEED_TIERS.nu)
+}
+
+;(function () {
+  const toggleBtn = document.getElementById('seedPreviewToggle')
+  const panel = document.getElementById('seedPreviewPanel')
+  if (!toggleBtn || !panel) return
+  renderSeedPreview()
+  toggleBtn.addEventListener('click', () => {
+    const willShow = panel.hidden
+    panel.hidden = !willShow
+    toggleBtn.textContent = willShow
+      ? '🙈 Ẩn danh sách hạt giống'
+      : '👁 Hiện danh sách hạt giống'
+  })
+})()
 
 // ===== Event wiring =====
 document.addEventListener('input', e => {

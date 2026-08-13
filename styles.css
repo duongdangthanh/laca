@@ -3432,3 +3432,131 @@ em {
     align-items: flex-start;
   }
 }
+
+/* ---------- Draw tool (bốc thăm chia đội) ---------- */
+.draw-tool {
+  margin-top: 32px;
+  padding: 28px 26px;
+  border-radius: var(--radius);
+  background: var(--panel-strong);
+  border: 1px solid var(--border-pink);
+}
+.draw-tool__head h3 {
+  font-family: var(--display);
+  font-size: 20px;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+.draw-tool__head p {
+  color: var(--text-soft);
+  font-size: 14.5px;
+  margin-bottom: 18px;
+}
+.draw-tool__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.draw-tool__status {
+  font-size: 13.5px;
+  color: var(--pink-soft);
+  margin-bottom: 18px;
+  min-height: 1.4em;
+}
+.draw-tool__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+.draw-team {
+  padding: 16px 14px;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+}
+.draw-team__head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+.draw-team__head h4 {
+  font-family: var(--display);
+  font-size: 15px;
+  font-weight: 800;
+}
+.draw-team__list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13.5px;
+  color: var(--text-soft);
+}
+.draw-team {
+  transition:
+    box-shadow 0.4s,
+    border-color 0.4s;
+}
+.draw-team__slot {
+  transition: color 0.1s;
+}
+.draw-team.is-settled {
+  border-color: var(--border-pink);
+  box-shadow: 0 0 20px rgba(236, 30, 121, 0.25);
+  animation: drawSettlePop 0.4s ease;
+}
+.draw-team.is-settled .draw-team__slot {
+  color: var(--text);
+}
+@keyframes drawSettlePop {
+  0% {
+    transform: scale(0.94);
+  }
+  60% {
+    transform: scale(1.03);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.draw-tool__code {
+  width: 100%;
+  margin-top: 18px;
+  padding: 14px 16px;
+  border-radius: var(--radius-sm);
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 12.5px;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+@media (max-width: 900px) {
+  .draw-tool__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 480px) {
+  .draw-tool__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- Seed preview (demo — ẩn mặc định) ---------- */
+.seed-preview {
+  margin-top: 20px;
+  text-align: center;
+}
+.seed-preview__panel {
+  margin-top: 18px;
+  text-align: left;
+}
+.seed-preview__panel .format-grid {
+  margin-bottom: 0;
+}
