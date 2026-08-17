@@ -771,18 +771,17 @@ function dealTier(people, teams) {
   return map
 }
 
+// Phân nhóm tier theo mục IV.2. Nữ dùng sơ đồ đảo với nam để HM-2 và HW-2
+// không bao giờ được xếp vào cùng một đội.
+const TIER_GROUPS = {
+  nam: { 1: ['T1', 'T5'], 2: ['T2', 'T4'] },
+  nu: { 1: ['T2', 'T4'], 2: ['T1', 'T5'] }
+}
+
 // Bốc thăm 1 giới theo cơ chế mục IV: tier 08 người chia đều 4–4 cho 2 nhóm
-// đội; 4 tier còn lại (04 người/tier) ghép cặp đối xứng {nhỏ nhất, lớn nhất}
-// vs {2 tier giữa} để tổng bậc hạt giống của 2 nhóm đội cân bằng nhau.
-function drawGender(tiers) {
+// đội; mỗi tier 04 người được chia theo cấu hình riêng của nam/nữ ở trên.
+function drawGender(tiers, tierGroups) {
   const sharedKey = TIER_ORDER.find(t => tiers[t].length === 8)
-  const soloRanks = TIER_ORDER.filter(t => t !== sharedKey)
-    .map(t => parseInt(t.slice(1), 10))
-    .sort((a, b) => a - b)
-  const soloByGroup = {
-    1: [soloRanks[0], soloRanks[soloRanks.length - 1]].map(r => `T${r}`),
-    2: soloRanks.slice(1, soloRanks.length - 1).map(r => `T${r}`)
-  }
   const sharedShuffled = shuffle(tiers[sharedKey])
   const sharedByGroup = {
     1: sharedShuffled.slice(0, 4),
@@ -793,7 +792,7 @@ function drawGender(tiers) {
   ;[1, 2].forEach(groupNo => {
     const teams = NHOM_TEAMS[groupNo]
     const dealt = [
-      ...soloByGroup[groupNo].map(key => dealTier(tiers[key], teams)),
+      ...tierGroups[groupNo].map(key => dealTier(tiers[key], teams)),
       dealTier(sharedByGroup[groupNo], teams)
     ]
     // Xáo lại thứ tự 3 người/đội trước khi gán M1-M3/W1-W3 — vị trí không
@@ -806,8 +805,8 @@ function drawGender(tiers) {
 }
 
 function drawTeams() {
-  const namByTeam = drawGender(SEED_TIERS.nam)
-  const nuByTeam = drawGender(SEED_TIERS.nu)
+  const namByTeam = drawGender(SEED_TIERS.nam, TIER_GROUPS.nam)
+  const nuByTeam = drawGender(SEED_TIERS.nu, TIER_GROUPS.nu)
   const result = {}
   TEAMS.forEach(team => {
     result[team] = {
