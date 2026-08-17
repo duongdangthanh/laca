@@ -876,8 +876,17 @@ async function playDrawReveal(result) {
 
 ;(function () {
   const drawBtn = document.getElementById('drawBtn')
+  const viewScheduleBtn = document.getElementById('viewScheduleExampleBtn')
   const drawStatusEl = document.getElementById('drawStatus')
   if (!drawBtn) return
+
+  if (viewScheduleBtn) {
+    viewScheduleBtn.addEventListener('click', () => {
+      document
+        .getElementById('schedule')
+        ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    })
+  }
 
   drawBtn.addEventListener('click', async () => {
     if (
@@ -890,6 +899,7 @@ async function playDrawReveal(result) {
 
     drawBtn.disabled = true
     drawBtn.classList.add('is-running')
+    if (viewScheduleBtn) viewScheduleBtn.hidden = true
     if (drawStatusEl) drawStatusEl.textContent = '🎲 Đang quay số...'
 
     const drawResult = drawTeams()
@@ -906,13 +916,7 @@ async function playDrawReveal(result) {
       drawStatusEl.textContent =
         '✓ Đã xếp xong 08 đội và tự động lên lịch 12 trận lớn · 36 trận con.'
     }
-
-    const scheduleSection = document.getElementById('schedule')
-    if (scheduleSection) {
-      requestAnimationFrame(() => {
-        scheduleSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
-      })
-    }
+    if (viewScheduleBtn) viewScheduleBtn.hidden = false
   })
 })()
 

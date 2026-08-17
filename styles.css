@@ -29,6 +29,9 @@
   margin: 0;
   padding: 0;
 }
+[hidden] {
+  display: none !important;
+}
 html {
   scroll-behavior: smooth;
 }
@@ -3457,6 +3460,11 @@ em {
   flex-wrap: wrap;
   gap: 12px;
   margin-bottom: 14px;
+}
+.draw-tool__actions--result {
+  justify-content: center;
+  margin-top: 20px;
+  margin-bottom: 0;
 }
 .draw-tool__status {
   font-size: 13.5px;
