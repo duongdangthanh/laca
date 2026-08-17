@@ -260,35 +260,35 @@ const ROSTER = {
 const SEED_TIERS = {
   nu: {
     T1: ['Tiên', 'Mai Trân', 'Toại Thuỷ', 'Diệu'],
-    T2: [
-      'Hoàng Phúc',
-      'Mai Nguyễn',
-      'Vạn Duyên',
-      'Tuyết Mai',
-      'Ánh Lê',
+    T2: ['Hoàng Phúc', 'Mai Nguyễn', 'Vạn Duyên', 'Ánh Lê'],
+    T3: [
+      'Nana HR',
       'Utky Hiền',
       'Minh Anh',
-      'Phạm Thoa'
+      'Phạm Thoa',
+      'Mai Thu',
+      'Thảo Hiếu',
+      'Trang Lê',
+      'Minh Thảo'
     ],
-    T3: ['Thảo', 'Thảo Hiếu', 'Trang Lê', 'Minh Thảo'],
-    T4: ['Ngọc', 'Thanh Tâm', 'Mai Thu', 'Khanh'],
+    T4: ['Ngọc', 'Thanh Tâm', 'Thảo', 'Khanh'],
     T5: ['Ly Xynk', 'Thiên Hà', 'Hoa Vũ', 'Trúc Quyên']
   },
   nam: {
-    T1: ['Minh Pandora', 'Khoa', 'Mr Quy', 'Thắng Nguyễn'],
-    T2: [
-      'Hùng',
-      'Tùng Nè',
-      'Quang Khánh',
-      'Quốc Ân',
+    T1: ['Minh Pandora', 'Khoa', 'Hùng', 'Đình Tiến'],
+    T2: ['Tùng Nè', 'Quang Khánh', 'Huy Lưu', 'Tiến Hoàng'],
+    T3: [
       'Thanh Mập',
-      'Huy Lưu',
+      'Lukita',
       'Thuận Sovo',
-      'Chú Vương'
+      'Khầy Trường',
+      'Hiếu Trương',
+      'Thuy Dang',
+      'Châu Đỗ',
+      'Quân Trần'
     ],
-    T3: ['Khắc Trà', 'Hoàng', 'Thuy Dang', 'Mạnh Ngô'],
-    T4: ['Khầy Trường', 'Khánh Diệp', 'Chen', 'Lukita'],
-    T5: ['Phương Nam', 'Quang V', 'Vũ V-Tech', 'Sony Bui']
+    T4: ['Mạnh Ngô', 'Khánh Diệp', 'Chen', 'Khắc Trà'],
+    T5: ['Phương Nam', 'Quang V', 'Xuân Trường', 'Mr Mountain']
   }
 }
 const TIER_ORDER = ['T1', 'T2', 'T3', 'T4', 'T5']
@@ -826,14 +826,6 @@ function applyDrawResult(result) {
   TEAMS.forEach(team => Object.assign(roster[team], result[team]))
 }
 
-function formatRosterCode(result) {
-  const lines = TEAMS.map(team => {
-    const r = result[team]
-    return `  ${team}: { M1: ${JSON.stringify(r.M1)}, M2: ${JSON.stringify(r.M2)}, M3: ${JSON.stringify(r.M3)}, W1: ${JSON.stringify(r.W1)}, W2: ${JSON.stringify(r.W2)}, W3: ${JSON.stringify(r.W3)} }`
-  })
-  return `const ROSTER = {\n${lines.join(',\n')}\n}`
-}
-
 function wait(ms) {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
@@ -884,11 +876,8 @@ async function playDrawReveal(result) {
 
 ;(function () {
   const drawBtn = document.getElementById('drawBtn')
-  const drawCopyBtn = document.getElementById('drawCopyBtn')
   const drawStatusEl = document.getElementById('drawStatus')
-  const drawCodeEl = document.getElementById('drawCode')
   if (!drawBtn) return
-  let lastDrawResult = null
 
   drawBtn.addEventListener('click', async () => {
     if (
@@ -901,13 +890,11 @@ async function playDrawReveal(result) {
 
     drawBtn.disabled = true
     drawBtn.classList.add('is-running')
-    if (drawCopyBtn) drawCopyBtn.hidden = true
-    if (drawCodeEl) drawCodeEl.hidden = true
     if (drawStatusEl) drawStatusEl.textContent = '🎲 Đang quay số...'
 
-    lastDrawResult = drawTeams()
-    applyDrawResult(lastDrawResult)
-    await playDrawReveal(lastDrawResult)
+    const drawResult = drawTeams()
+    applyDrawResult(drawResult)
+    await playDrawReveal(drawResult)
     BOARDS.forEach(renderBoardSchedule)
     renderKnockout()
     refreshAllDerived()
@@ -915,40 +902,21 @@ async function playDrawReveal(result) {
     drawBtn.disabled = false
     drawBtn.classList.remove('is-running')
 
-    if (drawCodeEl) {
-      drawCodeEl.value = formatRosterCode(lastDrawResult)
-      drawCodeEl.hidden = false
-    }
-    if (drawCopyBtn) drawCopyBtn.hidden = false
     if (drawStatusEl) {
       drawStatusEl.textContent =
-        '✓ Đã bốc thăm — có thể bốc lại nếu muốn, hoặc sao chép mã ROSTER để lưu cố định vào script.js.'
+        '✓ Đã xếp xong 08 đội và tự động lên lịch 12 trận lớn · 36 trận con.'
+    }
+
+    const scheduleSection = document.getElementById('schedule')
+    if (scheduleSection) {
+      requestAnimationFrame(() => {
+        scheduleSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      })
     }
   })
-
-  if (drawCopyBtn) {
-    drawCopyBtn.addEventListener('click', async () => {
-      if (!drawCodeEl) return
-      try {
-        await navigator.clipboard.writeText(drawCodeEl.value)
-        if (drawStatusEl)
-          drawStatusEl.textContent =
-            '✓ Đã sao chép mã ROSTER — dán vào script.js để lưu cố định.'
-      } catch (_e) {
-        drawCodeEl.hidden = false
-        drawCodeEl.select()
-        if (drawStatusEl) {
-          drawStatusEl.textContent =
-            'Không tự sao chép được — hãy bôi đen và Ctrl+C từ khung mã bên dưới.'
-        }
-      }
-    })
-  }
 })()
 
-// ===== Bản xem thử: nếu công khai danh sách hạt giống =====
-// Chỉ dựng khi người dùng chủ động bấm nút — mặc định KHÔNG hiển thị, để
-// không vô tình công khai hạt giống trên trang chính thức.
+// ===== Danh sách hạt giống công khai =====
 function seedTierTableHTML(genderLabel, tiers) {
   const total = TIER_ORDER.reduce((sum, t) => sum + tiers[t].length, 0)
   const rows = TIER_ORDER.map(
@@ -973,22 +941,11 @@ function renderSeedPreview() {
   const el = document.getElementById('seedPreviewTables')
   if (!el) return
   el.innerHTML =
-    seedTierTableHTML('Nam', SEED_TIERS.nam) + seedTierTableHTML('Nữ', SEED_TIERS.nu)
+    seedTierTableHTML('Nam', SEED_TIERS.nam) +
+    seedTierTableHTML('Nữ', SEED_TIERS.nu)
 }
 
-;(function () {
-  const toggleBtn = document.getElementById('seedPreviewToggle')
-  const panel = document.getElementById('seedPreviewPanel')
-  if (!toggleBtn || !panel) return
-  renderSeedPreview()
-  toggleBtn.addEventListener('click', () => {
-    const willShow = panel.hidden
-    panel.hidden = !willShow
-    toggleBtn.textContent = willShow
-      ? '🙈 Ẩn danh sách hạt giống'
-      : '👁 Hiện danh sách hạt giống'
-  })
-})()
+renderSeedPreview()
 
 // ===== Event wiring =====
 document.addEventListener('input', e => {

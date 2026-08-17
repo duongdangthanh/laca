@@ -3523,20 +3523,6 @@ em {
     transform: scale(1);
   }
 }
-.draw-tool__code {
-  width: 100%;
-  margin-top: 18px;
-  padding: 14px 16px;
-  border-radius: var(--radius-sm);
-  background: rgba(0, 0, 0, 0.35);
-  border: 1px solid var(--border);
-  color: var(--text);
-  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
-  font-size: 12.5px;
-  line-height: 1.5;
-  resize: vertical;
-}
-
 @media (max-width: 900px) {
   .draw-tool__grid {
     grid-template-columns: repeat(2, 1fr);

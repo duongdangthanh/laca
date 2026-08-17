@@ -557,37 +557,24 @@
           <h3>🎲 Công cụ bốc thăm chia đội</h3>
           <p>
             Bấm để bốc thăm ngẫu nhiên đúng theo cơ chế nhóm hạt giống ở trên —
-            danh sách hạt giống không hiển thị công khai. Có thể bốc lại nhiều
-            lần trước khi chốt chính thức.
+            danh sách hạt giống được hiển thị ngay bên dưới. Có thể bốc lại
+            nhiều lần trước khi chốt chính thức.
           </p>
         </div>
         <div class="draw-tool__actions">
           <button class="btn btn--primary btn--draw" id="drawBtn" type="button">
             <span class="draw-btn__label">🎲 Bốc thăm chia đội</span>
           </button>
-          <button class="btn btn--ghost" id="drawCopyBtn" type="button" hidden>
-            📋 Sao chép mã ROSTER
-          </button>
         </div>
         <p class="draw-tool__status" id="drawStatus">
-          Bấm nút để bốc thăm — kết quả 8 đội × 6 người sẽ hiện ngay bên dưới.
+          Bấm nút để bốc thăm — kết quả 8 đội × 6 người và lịch thi đấu hai
+          bảng sẽ được xếp tự động.
         </p>
         <div class="draw-tool__grid" id="drawResult"></div>
-        <textarea
-          class="draw-tool__code"
-          id="drawCode"
-          rows="10"
-          readonly
-          hidden
-          aria-label="Mã ROSTER sau khi bốc thăm"
-        ></textarea>
       </div>
 
       <div class="seed-preview" id="seedPreview">
-        <button class="btn btn--ghost" id="seedPreviewToggle" type="button">
-          🙈 Ẩn danh sách hạt giống
-        </button>
-        <div class="seed-preview__panel" id="seedPreviewPanel">
+        <div class="seed-preview__panel">
           <p class="ref-table__note">
             Danh sách hạt giống công khai theo nhóm Tier 1–5 mỗi giới, dùng làm
             cơ sở cho công cụ bốc thăm chia đội ở trên.
