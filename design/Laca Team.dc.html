@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&amp;family=Be+Vietnam+Pro:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<script src="./image-slot.js"></script>
+<style>
+  html, body { margin: 0; padding: 0; }
+  body { background: #FAF8F8; color: #14161B; font-family: "Be Vietnam Pro", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  * { box-sizing: border-box; }
+  a { color: #C40D4B; text-decoration: none; }
+  a:hover { color: #14161B; }
+  h1, h2, h3, h4 { font-family: Archivo, system-ui, sans-serif; margin: 0; }
+</style>
+</helmet>
+
+<div style="width:100%;overflow-x:hidden">
+
+  <header style="position:sticky;top:0;z-index:50;background:rgba(250,248,248,0.92);backdrop-filter:blur(10px);border-bottom:1px solid #E7E3E3">
+    <div style="max-width:1280px;margin:0 auto;padding:14px clamp(16px,4vw,40px);display:flex;align-items:center;gap:24px">
+      <a href="#" style="display:flex;align-items:center;gap:10px;flex:none">
+        <img src="./logo-mark.png" alt="Laca Team" style="height:30px;width:auto;display:block">
+        <img src="./logo-wordmark.png" alt="LACA TEAM" style="height:17px;width:auto;display:block">
+      </a>
+      <nav style="flex:1;display:flex;align-items:center;gap:4px;overflow-x:auto;scrollbar-width:none">
+        <a href="#gioi-thieu" style="padding:9px 12px;border-radius:8px;font-size:14.5px;font-weight:500;color:#3F4146;white-space:nowrap" style-hover="background:#F1EFEF;color:#C40D4B">Giới thiệu</a>
+        <a href="#thanh-vien" style="padding:9px 12px;border-radius:8px;font-size:14.5px;font-weight:500;color:#3F4146;white-space:nowrap" style-hover="background:#F1EFEF;color:#C40D4B">Thành viên</a>
+        <a href="#bxh" style="padding:9px 12px;border-radius:8px;font-size:14.5px;font-weight:500;color:#3F4146;white-space:nowrap" style-hover="background:#F1EFEF;color:#C40D4B">Bảng xếp hạng</a>
+        <a href="#su-kien" style="padding:9px 12px;border-radius:8px;font-size:14.5px;font-weight:500;color:#3F4146;white-space:nowrap" style-hover="background:#F1EFEF;color:#C40D4B">Sự kiện</a>
+        <a href="#ket-qua" style="padding:9px 12px;border-radius:8px;font-size:14.5px;font-weight:500;color:#3F4146;white-space:nowrap" style-hover="background:#F1EFEF;color:#C40D4B">Kết quả</a>
+        <a href="#album" style="padding:9px 12px;border-radius:8px;font-size:14.5px;font-weight:500;color:#3F4146;white-space:nowrap" style-hover="background:#F1EFEF;color:#C40D4B">Thư viện</a>
+      </nav>
+      <div style="display:flex;align-items:center;gap:10px;flex:none">
+        <a href="#" style="padding:11px 16px;border-radius:10px;font-size:14.5px;font-weight:600;color:#14161B;border:1.5px solid #DCD8D8;min-height:44px;display:flex;align-items:center" style-hover="border-color:#C40D4B;color:#C40D4B">Đăng nhập</a>
+        <a href="#tham-gia" style="padding:11px 18px;border-radius:10px;font-size:14.5px;font-weight:700;color:#FFFFFF;background:#F1105B;min-height:44px;display:flex;align-items:center;box-shadow:0 2px 0 #B00944" style-hover="background:#D30C4E;color:#FFFFFF">Tham gia</a>
+      </div>
+    </div>
+  </header>
+
+  <section style="max-width:1280px;margin:0 auto;padding:clamp(28px,5vw,64px) clamp(16px,4vw,40px) 0">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:clamp(28px,4vw,56px);align-items:center">
+      <div>
+        <div style="display:inline-flex;align-items:center;gap:8px;padding:6px 12px 6px 8px;border-radius:999px;background:#E9F3EE;color:#C40D4B;font-size:13px;font-weight:600;margin-bottom:20px">
+          <span style="width:8px;height:8px;border-radius:50%;background:#F1105B"></span>
+          Câu lạc bộ Pickleball · Sinh hoạt 4 buổi/tuần
+        </div>
+        <h1 style="font-size:clamp(38px,6.4vw,68px);line-height:1.06;font-weight:900;letter-spacing:-2px;text-transform:uppercase">
+          Chơi thật.<br>
+          Đấu thật.<br>
+          <span style="color:#C40D4B;background:linear-gradient(to top,#FFC6DA 0,#FFC6DA 0.18em,transparent 0.18em);-webkit-box-decoration-break:clone;box-decoration-break:clone;padding:0 2px">Tiến bộ thật.</span>
+        </h1>
+        <p style="margin:22px 0 0;font-size:clamp(16px,1.5vw,18.5px);line-height:1.6;color:#4B4D53;max-width:46ch;text-wrap:pretty">
+          Laca Team là nơi những người chơi Pickleball ở mọi trình độ cùng tập luyện, thi đấu và theo dõi sự tiến bộ của mình. Mỗi trận đấu đều được ghi nhận, mỗi điểm rating đều có lý do.
+        </p>
+        <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:28px">
+          <a href="#gioi-thieu" style="padding:15px 24px;border-radius:12px;background:#F1105B;color:#FFFFFF;font-weight:700;font-size:16px;min-height:52px;display:flex;align-items:center;box-shadow:0 3px 0 #B00944" style-hover="background:#D30C4E;color:#FFFFFF">Khám phá CLB</a>
+          <a href="#tham-gia" style="padding:15px 24px;border-radius:12px;background:#FFFFFF;color:#14161B;font-weight:700;font-size:16px;min-height:52px;display:flex;align-items:center;border:1.5px solid #DCD8D8" style-hover="border-color:#C40D4B;color:#C40D4B">Tham gia Laca Team</a>
+        </div>
+      </div>
+      <div style="position:relative">
+        <div style="position:relative;border-radius:20px;overflow:hidden;background:#EFEAEC;color:#585A60;aspect-ratio:4/5;min-height:340px">
+          <image-slot id="laca-hero" shape="rect" placeholder="Ảnh buổi tập / trận đấu của CLB (dọc 4:5)"></image-slot>
+        </div>
+        <div style="position:absolute;left:-10px;bottom:24px;background:#14161B;color:#FF6EA0;padding:14px 18px;border-radius:14px;font-family:Archivo;font-weight:800;font-size:14px;letter-spacing:0.4px;text-transform:uppercase;box-shadow:0 8px 24px rgba(19,26,23,0.18)">Sân KingKong · Thứ 6 · 19:30</div>
+      </div>
+    </div>
+  </section>
+
+  <section style="max-width:1280px;margin:clamp(32px,5vw,64px) auto 0;padding:0 clamp(16px,4vw,40px)">
+    <div style="background:#14161B;border-radius:20px;padding:clamp(22px,3vw,34px);display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:clamp(18px,3vw,28px);position:relative;overflow:hidden">
+      <div style="position:absolute;inset:0;background:repeating-linear-gradient(90deg,rgba(255,255,255,0.09) 0 2px,transparent 2px 120px);pointer-events:none"></div>
+      <div style="position:relative">
+        <div style="font-family:Archivo;font-weight:900;font-size:clamp(34px,4.5vw,46px);color:#FFFFFF;letter-spacing:-1.5px;line-height:1">86</div>
+        <div style="margin-top:6px;font-size:14px;font-weight:500;color:#ABACB2">Thành viên đang sinh hoạt</div>
+      </div>
+      <div style="position:relative">
+        <div style="font-family:Archivo;font-weight:900;font-size:clamp(34px,4.5vw,46px);color:#FF6EA0;letter-spacing:-1.5px;line-height:1">1.240</div>
+        <div style="margin-top:6px;font-size:14px;font-weight:500;color:#ABACB2">Trận đấu đã ghi nhận</div>
+      </div>
+      <div style="position:relative">
+        <div style="font-family:Archivo;font-weight:900;font-size:clamp(34px,4.5vw,46px);color:#FFFFFF;letter-spacing:-1.5px;line-height:1">37</div>
+        <div style="margin-top:6px;font-size:14px;font-weight:500;color:#ABACB2">Sự kiện đã tổ chức</div>
+      </div>
+      <div style="position:relative">
+        <div style="font-family:Archivo;font-weight:900;font-size:clamp(34px,4.5vw,46px);color:#FFFFFF;letter-spacing:-1.5px;line-height:1">7</div>
+        <div style="margin-top:6px;font-size:14px;font-weight:500;color:#ABACB2">Nội dung thi đấu</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="su-kien" style="max-width:1280px;margin:clamp(48px,7vw,88px) auto 0;padding:0 clamp(16px,4vw,40px)">
+    <div style="display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:24px">
+      <div>
+        <div style="font-size:13px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:#F1105B;margin-bottom:8px">Lịch sắp tới</div>
+        <h2 style="font-size:clamp(28px,3.6vw,40px);font-weight:800;letter-spacing:-1.2px">Sự kiện đang mở đăng ký</h2>
+      </div>
+      <a href="#" style="font-weight:600;font-size:15px;display:flex;align-items:center;gap:6px;min-height:44px">Xem tất cả sự kiện →</a>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:20px">
+
+      <article style="background:#FFFFFF;border:1px solid #E7E3E3;border-radius:18px;overflow:hidden;display:flex;flex-direction:column" style-hover="border-color:#C40D4B;box-shadow:0 10px 30px rgba(19,26,23,0.08)">
+        <div style="position:relative;height:164px;background:#EFEAEC">
+          <image-slot id="laca-ev1" shape="rect" placeholder="Ảnh giải đấu"></image-slot>
+          <span style="position:absolute;top:12px;left:12px;background:#14161B;color:#FF6EA0;padding:6px 11px;border-radius:8px;font-family:Archivo;font-weight:800;font-size:11.5px;letter-spacing:0.8px;text-transform:uppercase">Giải đấu lớn</span>
+        </div>
+        <div style="padding:18px;display:flex;flex-direction:column;gap:12px;flex:1">
+          <h3 style="font-size:19px;font-weight:800;letter-spacing:-0.5px;line-height:1.25">Laca Summer Championship 2026</h3>
+          <div style="display:flex;flex-direction:column;gap:6px;font-size:14px;color:#4B4D53">
+            <div>12–13/09 · 08:00 · Cụm sân Mỹ Đình</div>
+            <div>Đơn nam, đôi nam, đôi nam nữ</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <span style="display:inline-flex;align-items:center;gap:6px;background:#FFF3E6;color:#A9520A;padding:5px 10px;border-radius:7px;font-size:12.5px;font-weight:700">Sắp hết chỗ · 44/48</span>
+            <span style="font-size:12.5px;color:#6E7076">Hạn ĐK 05/09</span>
+          </div>
+          <div style="height:6px;border-radius:99px;background:#EDEAEA;overflow:hidden">
+            <div style="width:92%;height:100%;background:#F1105B"></div>
+          </div>
+          <a href="#" style="margin-top:auto;padding:13px 16px;border-radius:11px;background:#F1105B;color:#FFFFFF;font-weight:700;font-size:15px;text-align:center;min-height:46px;display:flex;align-items:center;justify-content:center" style-hover="background:#D30C4E;color:#FFFFFF">Đăng ký thi đấu</a>
+        </div>
+      </article>
+
+      <article style="background:#FFFFFF;border:1px solid #E7E3E3;border-radius:18px;overflow:hidden;display:flex;flex-direction:column" style-hover="border-color:#C40D4B;box-shadow:0 10px 30px rgba(19,26,23,0.08)">
+        <div style="position:relative;height:164px;background:#EFEAEC">
+          <image-slot id="laca-ev2" shape="rect" placeholder="Ảnh Mini Game"></image-slot>
+          <span style="position:absolute;top:12px;left:12px;background:#F1105B;color:#FFFFFF;padding:6px 11px;border-radius:8px;font-family:Archivo;font-weight:800;font-size:11.5px;letter-spacing:0.8px;text-transform:uppercase">Mini Game</span>
+        </div>
+        <div style="padding:18px;display:flex;flex-direction:column;gap:12px;flex:1">
+          <h3 style="font-size:19px;font-weight:800;letter-spacing:-0.5px;line-height:1.25">Mini Game Tháng 8</h3>
+          <div style="display:flex;flex-direction:column;gap:6px;font-size:14px;color:#4B4D53">
+            <div>29/08 · 19:00 · Sân Cầu Giấy</div>
+            <div>Đôi nam nữ, đồng đội 3v3</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <span style="display:inline-flex;align-items:center;gap:6px;background:#FDE7EE;color:#B00B45;padding:5px 10px;border-radius:7px;font-size:12.5px;font-weight:700">Đang mở đăng ký · 18/32</span>
+            <span style="font-size:12.5px;color:#6E7076">Hạn ĐK 27/08</span>
+          </div>
+          <div style="height:6px;border-radius:99px;background:#EDEAEA;overflow:hidden">
+            <div style="width:56%;height:100%;background:#14161B"></div>
+          </div>
+          <a href="#" style="margin-top:auto;padding:13px 16px;border-radius:11px;background:#F1105B;color:#FFFFFF;font-weight:700;font-size:15px;text-align:center;min-height:46px;display:flex;align-items:center;justify-content:center" style-hover="background:#D30C4E;color:#FFFFFF">Đăng ký tham gia</a>
+        </div>
+      </article>
+
+      <article style="background:#FFFFFF;border:1px solid #E7E3E3;border-radius:18px;overflow:hidden;display:flex;flex-direction:column" style-hover="border-color:#C40D4B;box-shadow:0 10px 30px rgba(19,26,23,0.08)">
+        <div style="position:relative;height:164px;background:#EFEAEC">
+          <image-slot id="laca-ev3" shape="rect" placeholder="Ảnh buổi tập"></image-slot>
+          <span style="position:absolute;top:12px;left:12px;background:#14161B;color:#FFFFFF;padding:6px 11px;border-radius:8px;font-family:Archivo;font-weight:800;font-size:11.5px;letter-spacing:0.8px;text-transform:uppercase">Tập luyện</span>
+        </div>
+        <div style="padding:18px;display:flex;flex-direction:column;gap:12px;flex:1">
+          <h3 style="font-size:19px;font-weight:800;letter-spacing:-0.5px;line-height:1.25">Buổi tập chiến thuật đôi nam nữ</h3>
+          <div style="display:flex;flex-direction:column;gap:6px;font-size:14px;color:#4B4D53">
+            <div>22/08 · 19:30 · Sân Cầu Giấy</div>
+            <div>Trình độ Phong trào → Trung cấp</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <span style="display:inline-flex;align-items:center;gap:6px;background:#F2F0F0;color:#4B4D53;padding:5px 10px;border-radius:7px;font-size:12.5px;font-weight:700">Danh sách chờ · 16/16</span>
+            <span style="font-size:12.5px;color:#6E7076">3 người đang chờ</span>
+          </div>
+          <div style="height:6px;border-radius:99px;background:#EDEAEA;overflow:hidden">
+            <div style="width:100%;height:100%;background:#93949A"></div>
+          </div>
+          <a href="#" style="margin-top:auto;padding:13px 16px;border-radius:11px;background:#FFFFFF;color:#14161B;border:1.5px solid #DCD8D8;font-weight:700;font-size:15px;text-align:center;min-height:46px;display:flex;align-items:center;justify-content:center" style-hover="border-color:#C40D4B;color:#C40D4B">Vào danh sách chờ</a>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <section id="bxh" style="max-width:1280px;margin:clamp(48px,7vw,88px) auto 0;padding:0 clamp(16px,4vw,40px)">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:clamp(24px,3vw,40px);align-items:start">
+
+      <div>
+        <div style="font-size:13px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:#F1105B;margin-bottom:8px">Bảng xếp hạng</div>
+        <h2 style="font-size:clamp(26px,3.4vw,38px);font-weight:800;letter-spacing:-1.2px;margin-bottom:8px">Top thành viên tháng 8</h2>
+        <p style="margin:0 0 20px;font-size:15px;line-height:1.6;color:#4B4D53;max-width:44ch">Rating được cập nhật sau mỗi trận đã xác nhận. Thành viên cần tối thiểu 10 trận trong 90 ngày để được xếp hạng.</p>
+
+        <div style="background:#FFFFFF;border:1px solid #E7E3E3;border-radius:18px;overflow:hidden">
+
+          <div style="display:flex;align-items:center;gap:14px;padding:14px 16px;border-bottom:1px solid #F1EFEF;background:#FFF5F8">
+            <div style="width:34px;font-family:Archivo;font-weight:900;font-size:20px;color:#C40D4B;text-align:center">1</div>
+            <div style="width:44px;height:44px;border-radius:50%;flex:none;background:#EFEAEC;color:#585A60;display:flex;align-items:center;justify-content:center;font-family:Archivo;font-weight:800;font-size:15px">QH</div>
+            <div style="flex:1;min-width:0">
+              <div style="font-weight:700;font-size:15.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Trần Quốc Huy</div>
+              <div style="font-size:12.5px;color:#6E7076">Nâng cao · 68 trận</div>
+            </div>
+            <div style="display:flex;gap:3px">
+              <span style="width:20px;height:20px;border-radius:5px;background:#14161B;color:#FFFFFF;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center">T</span>
+              <span style="width:20px;height:20px;border-radius:5px;background:#14161B;color:#FFFFFF;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center">T</span>
+              <span style="width:20px;height:20px;border-radius:5px;background:#E7E3E3;color:#585A60;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center">B</span>
+              <span style="width:20px;height:20px;border-radius:5px;background:#14161B;color:#FFFFFF;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center">T</span>
+            </div>
+            <div style="text-align:right;flex:none;width:78px">
+              <div style="font-family:Archivo;font-weight:800;font-size:18px;letter-spacing:-0.5px">1.842</div>
+              <div style="font-size:12px;font-weight:600;color:#15803D">▲ 2 bậc</div>
+            </div>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:14px;padding:14px 16px;border-bottom:1px solid #F1EFEF">
+            <div style="width:34px;font-family:Archivo;font-weight:900;font-size:20px;color:#C40D4B;text-align:center">2</div>
+            <div style="width:44px;height:44px;border-radius:50%;flex:none;background:#EFEAEC;color:#585A60;display:flex;align-items:center;justify-content:center;font-family:Archivo;font-weight:800;font-size:15px">MA</div>
+            <div style="flex:1;min-width:0">
+              <div style="font-weight:700;font-size:15.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Nguyễn Minh Anh</div>
+              <div style="font-size:12.5px;color:#6E7076">Nâng cao · 54 trận</div>
+            </div>
+            <div style="display:flex;gap:3px">
+              <span style="width:20px;height:20px;border-radius:5px;background:#14161B;color:#FFFFFF;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center">T</span>
+              <span style="width:20px;height:20px;border-radius:5px;background:#14161B;color:#FFFFFF;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center">T</span>
+              <span style="width:20px;height:20px;border-radius:5px;background:#14161B;color:#FFFFFF;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center">T</span>
+              <span style="width:20px;height:20px;border-radius:5px;background:#E7E3E3;color:#585A60;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center">B</span>
+            </div>
+            <div style="text-align:right;flex:none;width:78px">
+              <div style="font-family:Archivo;font-weight:800;font-size:18px;letter-spacing:-0.5px">1.796</div>
+              <div style="font-size:12px;font-weight:600;color:#6E7076">— giữ hạng</div>
+            </div>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:14px;padding:14px 16px;border-bottom:1px solid #F1EFEF">
+            <div style="width:34px;font-family:Archivo;font-weight:900;font-size:20px;color:#C40D4B;text-align:center">3</div>
+            <div style="width:44px;height:44px;border-radius:50%;flex:none;background:#EFEAEC;color:#585A60;display:flex;align-items:center;justify-content:center;font-family:Archivo;font-weight:800;font-size:15px">NL</div>
+            <div style="flex:1;min-width:0">
+              <div style="font-weight:700;font-size:15.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Đặng Ngọc Linh</div>
+              <div style="font-size:12.5px;color:#6E7076">Trung cấp · 61 trận</div>
+            </div>
+            <div style="display:flex;gap:3px">
+              <span style="width:20px;height:20px;border-radius:5px;background:#E7E3E3;color:#585A60;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center">B</span>
+              <span style="width:20px;height:20px;border-radius:5px;background:#14161B;color:#FFFFFF;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center">T</span>
+              <span style="width:20px;height:20px;border-radius:5px;background:#14161B;color:#FFFFFF;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center">T</span>
+              <span style="width:20px;height:20px;border-radius:5px;background:#14161B;color:#FFFFFF;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center">T</span>
+            </div>
+            <div style="text-align:right;flex:none;width:78px">
+              <div style="font-family:Archivo;font-weight:800;font-size:18px;letter-spacing:-0.5px">1.771</div>
+              <div style="font-size:12px;font-weight:600;color:#15803D">▲ 1 bậc</div>
+            </div>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:14px;padding:14px 16px;border-bottom:1px solid #F1EFEF">
+            <div style="width:34px;font-family:Archivo;font-weight:800;font-size:17px;color:#93949A;text-align:center">4</div>
+            <div style="width:44px;height:44px;border-radius:50%;flex:none;background:#EFEAEC;color:#585A60;display:flex;align-items:center;justify-content:center;font-family:Archivo;font-weight:800;font-size:15px">ĐL</div>
+            <div style="flex:1;min-width:0">
+              <div style="font-weight:700;font-size:15.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Vũ Đức Long</div>
+              <div style="font-size:12.5px;color:#6E7076">Trung cấp · 47 trận</div>
+            </div>
+            <div style="display:flex;gap:3px">
+              <span style="width:20px;height:20px;border-radius:5px;background:#14161B;color:#FFFFFF;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center">T</span>
+              <span style="width:20px;height:20px;border-radius:5px;background:#E7E3E3;color:#585A60;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center">B</span>
+              <span style="width:20px;height:20px;border-radius:5px;background:#14161B;color:#FFFFFF;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center">T</span>
+              <span style="width:20px;height:20px;border-radius:5px;background:#E7E3E3;color:#585A60;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center">B</span>
+            </div>
+            <div style="text-align:right;flex:none;width:78px">
+              <div style="font-family:Archivo;font-weight:800;font-size:18px;letter-spacing:-0.5px">1.688</div>
+              <div style="font-size:12px;font-weight:600;color:#B42318">▼ 1 bậc</div>
+            </div>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:14px;padding:14px 16px">
+            <div style="width:34px;font-family:Archivo;font-weight:800;font-size:17px;color:#93949A;text-align:center">5</div>
+            <div style="width:44px;height:44px;border-radius:50%;flex:none;background:#EFEAEC;color:#585A60;display:flex;align-items:center;justify-content:center;font-family:Archivo;font-weight:800;font-size:15px">TT</div>
+            <div style="flex:1;min-width:0">
+              <div style="font-weight:700;font-size:15.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Phạm Thu Trang</div>
+              <div style="font-size:12.5px;color:#6E7076">Trung cấp · 39 trận</div>
+            </div>
+            <div style="display:flex;gap:3px">
+              <span style="width:20px;height:20px;border-radius:5px;background:#14161B;color:#FFFFFF;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center">T</span>
+              <span style="width:20px;height:20px;border-radius:5px;background:#14161B;color:#FFFFFF;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center">T</span>
+              <span style="width:20px;height:20px;border-radius:5px;background:#14161B;color:#FFFFFF;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center">T</span>
+              <span style="width:20px;height:20px;border-radius:5px;background:#14161B;color:#FFFFFF;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center">T</span>
+            </div>
+            <div style="text-align:right;flex:none;width:78px">
+              <div style="font-family:Archivo;font-weight:800;font-size:18px;letter-spacing:-0.5px">1.654</div>
+              <div style="font-size:12px;font-weight:600;color:#15803D">▲ 4 bậc</div>
+            </div>
+          </div>
+
+        </div>
+        <a href="#" style="display:inline-flex;align-items:center;min-height:44px;margin-top:14px;font-weight:600;font-size:15px">Xem bảng xếp hạng đầy đủ →</a>
+      </div>
+
+      <div id="ket-qua">
+        <div style="font-size:13px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:#F1105B;margin-bottom:8px">Kết quả nổi bật</div>
+        <h2 style="font-size:clamp(26px,3.4vw,38px);font-weight:800;letter-spacing:-1.2px;margin-bottom:20px">Trận đấu của tuần</h2>
+
+        <div style="background:#14161B;border-radius:18px;padding:20px;color:#FFFFFF">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:12.5px;color:#A5A6AC;margin-bottom:16px">
+            <span>Đôi nam nữ · Laca Friday Night</span>
+            <span style="display:inline-flex;align-items:center;gap:6px;background:rgba(207,245,74,0.15);color:#FF6EA0;padding:4px 9px;border-radius:6px;font-weight:700">Đã hoàn thành</span>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid rgba(255,255,255,0.12)">
+            <span style="width:26px;height:26px;border-radius:7px;background:#F1105B;color:#FFFFFF;font-family:Archivo;font-weight:900;font-size:12px;display:flex;align-items:center;justify-content:center;flex:none">W</span>
+            <div style="flex:1;min-width:0">
+              <div style="font-weight:700;font-size:15.5px">Nguyễn Minh Anh &amp; Vũ Đức Long</div>
+              <div style="font-size:12.5px;color:#A5A6AC">Đội A · rating 1.796 / 1.688</div>
+            </div>
+            <div style="display:flex;gap:8px;font-family:Archivo;font-weight:900;font-size:20px">
+              <span>11</span><span>9</span><span>11</span>
+            </div>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid rgba(255,255,255,0.12)">
+            <span style="width:26px;height:26px;border-radius:7px;background:rgba(255,255,255,0.14);color:#DEDFE2;font-family:Archivo;font-weight:900;font-size:12px;display:flex;align-items:center;justify-content:center;flex:none">L</span>
+            <div style="flex:1;min-width:0">
+              <div style="font-weight:600;font-size:15.5px;color:#DEDFE2">Đặng Ngọc Linh &amp; Trần Quốc Huy</div>
+              <div style="font-size:12.5px;color:#A5A6AC">Đội B · rating 1.771 / 1.842</div>
+            </div>
+            <div style="display:flex;gap:8px;font-family:Archivo;font-weight:900;font-size:20px;color:#A5A6AC">
+              <span>9</span><span>11</span><span>7</span>
+            </div>
+          </div>
+
+          <div style="margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.12);display:flex;flex-wrap:wrap;gap:14px;font-size:13px;color:#A5A6AC">
+            <span>16/08 · Sân Cầu Giấy</span>
+            <span style="color:#FF6EA0;font-weight:600">Minh Anh +18 rating</span>
+          </div>
+        </div>
+
+        <div style="margin-top:20px;background:#FFFFFF;border:1px solid #E7E3E3;border-radius:18px;padding:20px">
+          <h3 style="font-size:17px;font-weight:800;margin-bottom:6px">Rating hoạt động như thế nào?</h3>
+          <p style="margin:0;font-size:14.5px;line-height:1.6;color:#4B4D53">Mỗi trận đấu được cả hai đội xác nhận sẽ tạo ra một giao dịch rating: điểm trước trận, mức tăng/giảm và điểm sau trận. Thắng đối thủ mạnh hơn được cộng nhiều hơn. Trận đang có tranh chấp không tính rating cho đến khi ban tổ chức xử lý.</p>
+          <a href="#" style="display:inline-flex;align-items:center;min-height:44px;margin-top:10px;font-weight:600;font-size:14.5px">Tìm hiểu hệ thống rating &amp; trình độ →</a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section id="thanh-vien" style="max-width:1280px;margin:clamp(48px,7vw,88px) auto 0;padding:0 clamp(16px,4vw,40px)">
+    <div style="display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:24px">
+      <div>
+        <div style="font-size:13px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:#F1105B;margin-bottom:8px">Con người</div>
+        <h2 style="font-size:clamp(28px,3.6vw,40px);font-weight:800;letter-spacing:-1.2px">Thành viên Laca Team</h2>
+      </div>
+      <a href="#" style="font-weight:600;font-size:15px;display:flex;align-items:center;min-height:44px">Xem tất cả 86 thành viên →</a>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px">
+
+      <a href="#" style="background:#FFFFFF;border:1px solid #E7E3E3;border-radius:18px;overflow:hidden;display:block;color:#14161B" style-hover="border-color:#C40D4B;color:#14161B;box-shadow:0 10px 30px rgba(19,26,23,0.08)">
+        <div style="height:190px;background:#EFEAEC">
+          <image-slot id="laca-m1" shape="rect" placeholder="Ảnh thành viên"></image-slot>
+        </div>
+        <div style="padding:14px">
+          <div style="font-weight:700;font-size:16px">Lê Hoàng Nam</div>
+          <div style="font-size:13px;color:#6E7076;margin-top:2px">Nâng cao · Tay phải</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:10px">
+            <span style="font-family:Archivo;font-weight:800;font-size:15px">1.712</span>
+            <span style="font-size:12.5px;color:#6E7076">#6 · 52 trận</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="#" style="background:#FFFFFF;border:1px solid #E7E3E3;border-radius:18px;overflow:hidden;display:block;color:#14161B" style-hover="border-color:#C40D4B;color:#14161B;box-shadow:0 10px 30px rgba(19,26,23,0.08)">
+        <div style="height:190px;background:#EFEAEC">
+          <image-slot id="laca-m2" shape="rect" placeholder="Ảnh thành viên"></image-slot>
+        </div>
+        <div style="padding:14px">
+          <div style="font-weight:700;font-size:16px">Phạm Thu Trang</div>
+          <div style="font-size:13px;color:#6E7076;margin-top:2px">Trung cấp · Tay phải</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:10px">
+            <span style="font-family:Archivo;font-weight:800;font-size:15px">1.654</span>
+            <span style="font-size:12.5px;color:#6E7076">#5 · 39 trận</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="#" style="background:#FFFFFF;border:1px solid #E7E3E3;border-radius:18px;overflow:hidden;display:block;color:#14161B" style-hover="border-color:#C40D4B;color:#14161B;box-shadow:0 10px 30px rgba(19,26,23,0.08)">
+        <div style="height:190px;background:#EFEAEC">
+          <image-slot id="laca-m3" shape="rect" placeholder="Ảnh thành viên"></image-slot>
+        </div>
+        <div style="padding:14px">
+          <div style="font-weight:700;font-size:16px">Đặng Ngọc Linh</div>
+          <div style="font-size:13px;color:#6E7076;margin-top:2px">Trung cấp · Tay trái</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:10px">
+            <span style="font-family:Archivo;font-weight:800;font-size:15px">1.771</span>
+            <span style="font-size:12.5px;color:#6E7076">#3 · 61 trận</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="#" style="background:#FFFFFF;border:1px solid #E7E3E3;border-radius:18px;overflow:hidden;display:block;color:#14161B" style-hover="border-color:#C40D4B;color:#14161B;box-shadow:0 10px 30px rgba(19,26,23,0.08)">
+        <div style="height:190px;background:#EFEAEC">
+          <image-slot id="laca-m4" shape="rect" placeholder="Ảnh thành viên"></image-slot>
+        </div>
+        <div style="padding:14px">
+          <div style="font-weight:700;font-size:16px">Trần Quốc Huy</div>
+          <div style="font-size:13px;color:#6E7076;margin-top:2px">Nâng cao · Tay phải</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:10px">
+            <span style="font-family:Archivo;font-weight:800;font-size:15px">1.842</span>
+            <span style="font-size:12.5px;color:#6E7076">#1 · 68 trận</span>
+          </div>
+        </div>
+      </a>
+
+    </div>
+  </section>
+
+  <section id="gioi-thieu" style="max-width:1280px;margin:clamp(48px,7vw,88px) auto 0;padding:0 clamp(16px,4vw,40px)">
+    <div style="background:#FFFFFF;border:1px solid #E7E3E3;border-radius:22px;padding:clamp(24px,4vw,44px);display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:clamp(24px,4vw,44px);align-items:center">
+      <div>
+        <div style="font-size:13px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:#F1105B;margin-bottom:10px">Câu chuyện Laca</div>
+        <h2 style="font-size:clamp(24px,3vw,34px);font-weight:800;letter-spacing:-1px;line-height:1.15;margin-bottom:14px">Bắt đầu từ 6 người và một sân thuê tối thứ sáu</h2>
+        <p style="margin:0 0 14px;font-size:15.5px;line-height:1.65;color:#4B4D53;text-wrap:pretty">Năm 2023, vài người bạn rủ nhau ra sân sau giờ làm. Ba năm sau, Laca Team có 86 thành viên, lịch tập bốn buổi mỗi tuần, hệ thống rating riêng và một giải đấu thường niên.</p>
+        <p style="margin:0;font-size:15.5px;line-height:1.65;color:#4B4D53;text-wrap:pretty">Chúng tôi giữ một nguyên tắc: ai cũng có sân để chơi, và ai cũng biết mình đang tiến bộ tới đâu.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:22px">
+          <span style="padding:8px 14px;border-radius:999px;background:#FDE7EE;color:#B00B45;font-size:13.5px;font-weight:600">Ghép sân theo trình độ</span>
+          <span style="padding:8px 14px;border-radius:999px;background:#FDE7EE;color:#B00B45;font-size:13.5px;font-weight:600">Rating minh bạch</span>
+          <span style="padding:8px 14px;border-radius:999px;background:#FDE7EE;color:#B00B45;font-size:13.5px;font-weight:600">Không phân biệt trình độ</span>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;grid-template-rows:120px 120px;gap:12px" id="album">
+        <div style="grid-row:span 2;border-radius:14px;overflow:hidden;background:#EFEAEC"><image-slot id="laca-g1" shape="rect" placeholder="Ảnh CLB"></image-slot></div>
+        <div style="border-radius:14px;overflow:hidden;background:#EFEAEC"><image-slot id="laca-g2" shape="rect" placeholder="Ảnh CLB"></image-slot></div>
+        <div style="border-radius:14px;overflow:hidden;background:#EFEAEC"><image-slot id="laca-g3" shape="rect" placeholder="Ảnh CLB"></image-slot></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="tham-gia" style="max-width:1280px;margin:clamp(48px,7vw,88px) auto 0;padding:0 clamp(16px,4vw,40px)">
+    <div style="position:relative;overflow:hidden;background:#14161B;border-radius:22px;padding:clamp(28px,5vw,56px);text-align:center">
+      <div style="position:absolute;inset:0;background:repeating-linear-gradient(135deg,rgba(255,255,255,0.06) 0 2px,transparent 2px 90px);pointer-events:none"></div>
+      <div style="position:relative;max-width:640px;margin:0 auto">
+        <h2 style="font-size:clamp(28px,4vw,44px);font-weight:900;letter-spacing:-1.5px;color:#FFFFFF;text-transform:uppercase;line-height:1.05">Ra sân cùng Laca Team</h2>
+        <p style="margin:16px 0 28px;font-size:16.5px;line-height:1.6;color:#F7CADA">Điền form quan tâm, ban điều hành sẽ liên hệ và xếp bạn vào buổi tập thử phù hợp trình độ. Không cần kinh nghiệm, chỉ cần đúng giờ.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center">
+          <a href="#" style="padding:15px 26px;border-radius:12px;background:#F1105B;color:#FFFFFF;font-weight:700;font-size:16px;min-height:52px;display:flex;align-items:center;box-shadow:0 3px 0 #B00944" style-hover="background:#D30C4E;color:#FFFFFF">Xin gia nhập CLB</a>
+          <a href="#" style="padding:15px 26px;border-radius:12px;background:transparent;color:#FFFFFF;font-weight:700;font-size:16px;min-height:52px;display:flex;align-items:center;border:1.5px solid rgba(255,255,255,0.4)" style-hover="border-color:#FF6EA0;color:#FF6EA0">Liên hệ ban điều hành</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer style="margin-top:clamp(48px,7vw,88px);border-top:1px solid #E7E3E3;background:#F5F2F2">
+    <div style="max-width:1280px;margin:0 auto;padding:clamp(28px,4vw,44px) clamp(16px,4vw,40px);display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:28px">
+      <div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <img src="./logo-mark.png" alt="Laca Team" style="height:28px;width:auto;display:block">
+          <img src="./logo-wordmark.png" alt="LACA TEAM" style="height:15px;width:auto;display:block">
+        </div>
+        <p style="margin:0;font-size:14px;line-height:1.6;color:#585A60;max-width:32ch">Câu lạc bộ Pickleball Laca Team · Hà Nội. Sinh hoạt tại sân Cầu Giấy và cụm sân Mỹ Đình.</p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="font-weight:700;font-size:14px;margin-bottom:4px">Khám phá</div>
+        <a href="#gioi-thieu" style="font-size:14px;color:#585A60" style-hover="color:#F1105B">Giới thiệu</a>
+        <a href="#thanh-vien" style="font-size:14px;color:#585A60" style-hover="color:#F1105B">Thành viên</a>
+        <a href="#bxh" style="font-size:14px;color:#585A60" style-hover="color:#F1105B">Bảng xếp hạng</a>
+        <a href="#su-kien" style="font-size:14px;color:#585A60" style-hover="color:#F1105B">Sự kiện</a>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="font-weight:700;font-size:14px;margin-bottom:4px">Thành viên</div>
+        <a href="#" style="font-size:14px;color:#585A60" style-hover="color:#F1105B">Đăng nhập</a>
+        <a href="#" style="font-size:14px;color:#585A60" style-hover="color:#F1105B">Nhập kết quả trận đấu</a>
+        <a href="#" style="font-size:14px;color:#585A60" style-hover="color:#F1105B">Hệ thống rating</a>
+        <a href="#" style="font-size:14px;color:#585A60" style-hover="color:#F1105B">Thể lệ giải đấu</a>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="font-weight:700;font-size:14px;margin-bottom:4px">Liên hệ</div>
+        <a href="#" style="font-size:14px;color:#585A60" style-hover="color:#F1105B">lacateam.info</a>
+        <a href="#" style="font-size:14px;color:#585A60" style-hover="color:#F1105B">Fanpage Facebook</a>
+        <a href="#" style="font-size:14px;color:#585A60" style-hover="color:#F1105B">Nhóm Zalo thành viên</a>
+      </div>
+    </div>
+    <div style="border-top:1px solid #E7E3E3">
+      <div style="max-width:1280px;margin:0 auto;padding:16px clamp(16px,4vw,40px);font-size:13px;color:#6E7076">© 2026 Laca Team. Bảng màu và nhận diện dựa trên logo chính thức của CLB.</div>
+    </div>
+  </footer>
+
+</div>
+
+</x-dc>
+</body>
+</html>

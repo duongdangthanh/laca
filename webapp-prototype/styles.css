@@ -1,0 +1,375 @@
+/* ===== Prototype-only chrome (Tailwind handles the rest via utility classes) ===== */
+
+.proto-banner {
+  position: relative;
+  z-index: 60;
+  background: #111827;
+  color: #f9fafb;
+  font-size: 12.5px;
+  text-align: center;
+  padding: 8px 42px;
+  line-height: 1.4;
+}
+.proto-banner strong {
+  color: #f9a8d4;
+}
+.proto-banner__close {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: 0;
+  color: #d1d5db;
+  cursor: pointer;
+  font-size: 13px;
+  padding: 4px 6px;
+}
+.proto-banner__close:hover {
+  color: #fff;
+}
+.proto-banner.is-hidden {
+  display: none;
+}
+
+/* ---------- Skeleton shimmer ---------- */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: #e5e7eb;
+}
+.skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.65), transparent);
+  animation: shimmer 1.3s infinite;
+}
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* ---------- Toast ---------- */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translate(-50%, 12px);
+  background: #14161b;
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: 0 12px 30px rgba(20, 22, 27, 0.3);
+  z-index: 80;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease;
+}
+.toast.is-visible {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+.toast.is-error {
+  background: #b42318;
+}
+.toast.is-success {
+  background: #15803d;
+}
+
+/* ---------- Lightbox ---------- */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  background: rgba(15, 15, 20, 0.92);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 24px;
+}
+.lightbox img {
+  max-width: min(90vw, 900px);
+  max-height: 75vh;
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  object-fit: contain;
+}
+.lightbox__caption {
+  color: #e5e7eb;
+  font-size: 14px;
+}
+.lightbox__close {
+  position: absolute;
+  top: 18px;
+  right: 22px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+}
+.lightbox__close:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+/* ---------- Member sub-nav (scrollable on mobile) ---------- */
+.member-tabs {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.member-tabs::-webkit-scrollbar {
+  display: none;
+}
+.member-tabs a {
+  flex: none;
+}
+
+/* ---------- Rating sparkline ---------- */
+.sparkline {
+  width: 100%;
+  height: 90px;
+  display: block;
+}
+
+/* ---------- Simple fade-in for route changes ---------- */
+.view-enter {
+  animation: viewFade 0.25s ease;
+}
+@keyframes viewFade {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ---------- Star rating input (used in a couple of demo spots) ---------- */
+.star-row {
+  display: inline-flex;
+  gap: 2px;
+  color: #f59e0b;
+}
+
+/* ---------- Buttons (Tailwind CDN doesn't support @apply, so plain CSS) ----------
+   Màu sắc & hiệu ứng "3D shadow" lấy đúng theo design export
+   (design/Laca Team App.dc.html): nút chính có viền đổ bóng cứng 0 2px 0,
+   bấm xuống thì bóng "lún" — min-height 44px để đạt chuẩn touch target. */
+.btn-primary,
+.btn-ghost,
+.btn-outline,
+.btn-danger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 10px 20px;
+  border-radius: 11px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    color 0.15s,
+    opacity 0.15s,
+    transform 0.1s,
+    box-shadow 0.1s;
+  white-space: nowrap;
+}
+.btn-primary {
+  background: #f1105b;
+  color: #fff;
+  border: 1px solid #f1105b;
+  box-shadow: 0 2px 0 #b00944;
+}
+.btn-primary:hover {
+  background: #d30c4e;
+  border-color: #d30c4e;
+}
+.btn-primary:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 0 #b00944;
+}
+.btn-primary:disabled,
+.btn-primary.is-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+.btn-ghost {
+  background: #fff;
+  color: #14161b;
+  border: 1.5px solid #dcd8d8;
+}
+.btn-ghost:hover {
+  border-color: #f1105b;
+  color: #c40d4b;
+}
+.btn-outline {
+  background: transparent;
+  color: #c40d4b;
+  border: 1.5px solid #f1105b;
+}
+.btn-outline:hover {
+  background: #fff5f8;
+}
+.btn-danger {
+  background: #fff;
+  color: #b42318;
+  border: 1.5px solid #e7c9c6;
+}
+.btn-danger:hover {
+  background: #fdebea;
+}
+
+/* ---------- Disclosure widgets used as dropdowns/mobile nav ---------- */
+.dropdown summary {
+  list-style: none;
+}
+.dropdown summary::-webkit-details-marker {
+  display: none;
+}
+.dropdown summary::marker {
+  content: '';
+}
+.dropdown[open] summary ~ div {
+  animation: viewFade 0.15s ease;
+}
+
+/* ---------- Simple tab underline ---------- */
+.tab-btn {
+  padding: 8px 4px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #6e7076;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+}
+.tab-btn.is-active {
+  color: #f1105b;
+  border-bottom-color: #f1105b;
+}
+
+/* ---------- Card ---------- */
+.card {
+  background: #fff;
+  border: 1px solid #e7e3e3;
+  border-radius: 16px;
+}
+.card:hover {
+  border-color: #c40d4b;
+}
+
+/* =====================================================================
+   Component patterns lấy trực tiếp từ design export
+   (design/Laca Team App.dc.html) — dùng chung cho badge thắng/thua,
+   avatar chữ cái đầu, ô thống kê, thanh tiến trình...
+   ===================================================================== */
+
+/* Badge thắng (T) / thua (B) hình vuông nhỏ, dùng trong lịch sử trận đấu,
+   phong độ 5 trận, bảng xếp hạng */
+.badge-tb {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  font-family: Archivo, system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 11px;
+  flex: none;
+}
+.badge-tb.is-win {
+  background: #14161b;
+  color: #fff;
+}
+.badge-tb.is-loss {
+  background: #e7e3e3;
+  color: #585a60;
+}
+
+/* Ô thống kê (rating hiện tại, thứ hạng, trình độ...) */
+.stat-tile {
+  background: #fff;
+  border: 1px solid #e7e3e3;
+  border-radius: 16px;
+  padding: 16px;
+}
+.stat-tile--dark {
+  background: #14161b;
+  color: #fff;
+  border-color: #14161b;
+}
+.stat-tile__label {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: #6e7076;
+}
+.stat-tile--dark .stat-tile__label {
+  color: #a5a6ac;
+}
+.stat-tile__value {
+  font-family: Archivo, system-ui, sans-serif;
+  font-weight: 900;
+  font-size: 28px;
+  letter-spacing: -0.5px;
+  margin-top: 4px;
+}
+
+/* Thanh tiến trình (tỉ lệ đăng ký sự kiện, mức tăng/giảm rating...) */
+.progress-track {
+  height: 6px;
+  border-radius: 99px;
+  background: #edeaea;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: #f1105b;
+}
+
+/* Chip lọc dạng viên thuốc (bộ lọc sự kiện, bảng xếp hạng...) */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 13.5px;
+  font-weight: 600;
+  border: 1.5px solid #dcd8d8;
+  background: #fff;
+  color: #3f4146;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.chip:hover {
+  border-color: #f1105b;
+  color: #c40d4b;
+}
+.chip.is-active {
+  background: #14161b;
+  border-color: #14161b;
+  color: #fff;
+}

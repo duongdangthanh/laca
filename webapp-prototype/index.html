@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Laca Team — Prototype</title>
+    <meta name="description" content="Prototype (mockup) cho Laca Team Web App — website công khai + khu vực thành viên." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Archivo:wght@600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Be Vietnam Pro', 'system-ui', 'sans-serif'],
+              display: ['Archivo', 'system-ui', 'sans-serif']
+            },
+            colors: {
+              /* Bảng màu chính thức lấy từ Laca Team design export (design/Laca Team App.dc.html) */
+              brand: {
+                50: '#FFF5F8',
+                100: '#FDE7EE',
+                200: '#F9BFD3',
+                300: '#FF9BBD',
+                400: '#FF6EA0',
+                500: '#F1105B',
+                600: '#D30C4E',
+                700: '#B00944',
+                800: '#8c0d45',
+                900: '#750f3c'
+              },
+              /* Trung tính (ink/text/border) — remap thang "slate" sẵn có sang đúng tông của design export */
+              slate: {
+                50: '#FAF8F8',
+                100: '#F1EFEF',
+                200: '#E7E3E3',
+                300: '#DCD8D8',
+                400: '#93949A',
+                500: '#6E7076',
+                600: '#4B4D53',
+                700: '#3F4146',
+                800: '#22252C',
+                900: '#14161B'
+              },
+              /* Trạng thái thành công / cảnh báo / lỗi theo đúng hex trong design export */
+              emerald: {
+                50: '#E7F6EC',
+                100: '#E7F6EC',
+                200: '#A9DCBB',
+                500: '#15803D',
+                600: '#15803D',
+                700: '#14532D'
+              },
+              amber: {
+                50: '#FFF3E6',
+                100: '#FFF3E6',
+                200: '#F3D8B4',
+                700: '#A9520A'
+              },
+              rose: {
+                50: '#FDEBEA',
+                100: '#FDEBEA',
+                200: '#E7C9C6',
+                500: '#B42318',
+                600: '#B42318'
+              }
+            }
+          }
+        }
+      }
+    </script>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="bg-slate-50 text-slate-900 font-sans antialiased">
+    <!-- Prototype banner -->
+    <div class="proto-banner">
+      🧪 Đây là bản <strong>prototype/mockup</strong> — toàn bộ dữ liệu là giả lập, không có API/backend thật.
+      <button type="button" class="proto-banner__close" data-action="dismiss-banner" aria-label="Đóng thông báo">✕</button>
+    </div>
+
+    <!-- Nav -->
+    <header id="nav"></header>
+
+    <!-- Main app -->
+    <main id="app" class="min-h-[60vh]"></main>
+
+    <!-- Footer -->
+    <footer id="footer"></footer>
+
+    <!-- Toast -->
+    <div id="toast" class="toast" hidden></div>
+
+    <!-- Lightbox -->
+    <div id="lightbox" class="lightbox" hidden>
+      <button class="lightbox__close" data-action="close-lightbox" aria-label="Đóng">✕</button>
+      <img id="lightboxImg" src="" alt="" />
+      <p id="lightboxCaption" class="lightbox__caption"></p>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

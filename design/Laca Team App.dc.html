@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script src="./image-slot.js"></script>
+<style>
+  html, body { margin: 0; padding: 0; }
+  body { background: #EEEBEB; color: #14161B; font-family: "Be Vietnam Pro", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  * { box-sizing: border-box; }
+  a { color: #C40D4B; text-decoration: none; }
+  a:hover { color: #14161B; }
+  h1, h2, h3, h4 { font-family: Archivo, system-ui, sans-serif; margin: 0; }
+  input, select, textarea, button { font-family: inherit; font-size: inherit; }
+  ::-webkit-scrollbar { height: 6px; width: 6px; }
+  ::-webkit-scrollbar-thumb { background: #CFCACA; border-radius: 99px; }
+</style>
+</helmet>
+
+<div style="min-height:100vh;display:flex;flex-direction:column">
+
+  <div style="position:sticky;top:0;z-index:80;background:#14161B;color:#FFFFFF;padding:10px clamp(12px,2vw,20px);display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+    <div style="display:flex;align-items:center;gap:8px;flex:none">
+      <img src="./logo-mark.png" alt="Laca Team" style="height:22px;width:auto;display:block" />
+      <span style="font-family:Archivo;font-weight:800;font-size:12px;letter-spacing:1.2px;color:#A5A6AC;text-transform:uppercase">Phase 1 · Web app</span>
+    </div>
+    <div style="flex:1;display:flex;gap:4px;overflow-x:auto">
+      <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="9">
+        <button type="button" onClick="{{ t.go }}" style="{{ t.style }}">{{ t.label }}</button>
+      </sc-for>
+    </div>
+    <div style="display:flex;gap:4px;background:#22252C;padding:3px;border-radius:9px;flex:none">
+      <button type="button" onClick="{{ setDesktop }}" style="{{ deskBtn }}">Desktop</button>
+      <button type="button" onClick="{{ setMobile }}" style="{{ mobBtn }}">Mobile 390</button>
+      <button type="button" onClick="{{ togglePrintAll }}" style="{{ printBtn }}">Tất cả màn (PDF)</button>
+    </div>
+  </div>
+
+  <div style="flex:1;padding:clamp(10px,2vw,26px) clamp(8px,2vw,26px);display:flex;justify-content:center">
+  <div style="{{ frameStyle }}">
+
+    <sc-if value="{{ isPublic }}" hint-placeholder-val="{{ true }}">
+      <header style="position:sticky;top:0;z-index:40;background:rgba(250,248,248,0.94);backdrop-filter:blur(10px);border-bottom:1px solid #E7E3E3">
+        <div style="max-width:1280px;margin:0 auto;padding:12px clamp(14px,3vw,32px);display:flex;align-items:center;gap:18px">
+          <div style="display:flex;align-items:center;gap:8px;flex:none">
+            <img src="./logo-mark.png" alt="Laca Team" style="height:26px;width:auto;display:block" />
+            <img src="./logo-wordmark.png" alt="LACA TEAM" style="height:15px;width:auto;display:block" />
+          </div>
+          <sc-if value="{{ notMobile }}" hint-placeholder-val="{{ true }}">
+          <nav style="flex:1;min-width:0;display:flex;gap:2px;overflow-x:auto">
+            <a href="#" style="padding:8px 11px;border-radius:8px;font-size:14px;font-weight:500;color:#3F4146;white-space:nowrap" style-hover="background:#F1EFEF;color:#C40D4B">Giới thiệu</a>
+            <a href="#" style="padding:8px 11px;border-radius:8px;font-size:14px;font-weight:500;color:#3F4146;white-space:nowrap" style-hover="background:#F1EFEF;color:#C40D4B">Thành viên</a>
+            <a href="#" style="padding:8px 11px;border-radius:8px;font-size:14px;font-weight:500;color:#3F4146;white-space:nowrap" style-hover="background:#F1EFEF;color:#C40D4B">Bảng xếp hạng</a>
+            <a href="#" style="padding:8px 11px;border-radius:8px;font-size:14px;font-weight:500;color:#3F4146;white-space:nowrap" style-hover="background:#F1EFEF;color:#C40D4B">Sự kiện</a>
+            <a href="#" style="padding:8px 11px;border-radius:8px;font-size:14px;font-weight:500;color:#3F4146;white-space:nowrap" style-hover="background:#F1EFEF;color:#C40D4B">Thư viện</a>
+          </nav>
+          <div style="display:flex;align-items:center;gap:8px;flex:none">
+            <a href="#" style="padding:10px 14px;border-radius:10px;font-size:14px;font-weight:600;color:#14161B;border:1.5px solid #DCD8D8;min-height:44px;display:flex;align-items:center" style-hover="border-color:#F1105B;color:#C40D4B">Đăng nhập</a>
+            <a href="#" style="padding:10px 16px;border-radius:10px;font-size:14px;font-weight:700;color:#FFFFFF;background:#F1105B;min-height:44px;display:flex;align-items:center;box-shadow:0 2px 0 #B00944" style-hover="background:#D30C4E;color:#FFFFFF">Tham gia</a>
+          </div>
+          </sc-if>
+          <sc-if value="{{ isMobile }}" hint-placeholder-val="{{ false }}">
+            <div style="flex:1;min-width:0"></div>
+            <a href="#" style="padding:10px 14px;border-radius:10px;font-size:14px;font-weight:700;color:#FFFFFF;background:#F1105B;min-height:44px;display:flex;align-items:center;flex:none;box-shadow:0 2px 0 #B00944">Tham gia</a>
+            <button type="button" onClick="{{ toggleMenu }}" aria-label="Mở menu" style="width:44px;height:44px;border-radius:11px;border:1.5px solid #DCD8D8;background:#FFFFFF;cursor:pointer;flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px">
+              <span style="width:18px;height:2px;background:#14161B;display:block"></span>
+              <span style="width:18px;height:2px;background:#14161B;display:block"></span>
+              <span style="width:18px;height:2px;background:#14161B;display:block"></span>
+            </button>
+          </sc-if>
+        </div>
+      </header>
+      <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
+        <div style="position:fixed;inset:0;z-index:70;background:rgba(20,22,27,0.5)">
+          <div style="position:absolute;top:0;right:0;bottom:0;width:290px;max-width:86%;background:#FFFFFF;padding:18px;display:flex;flex-direction:column;gap:6px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+              <img src="./logo-wordmark.png" alt="LACA TEAM" style="height:14px;width:auto" />
+              <button type="button" onClick="{{ toggleMenu }}" aria-label="Đóng menu" style="width:44px;height:44px;border-radius:11px;border:1.5px solid #DCD8D8;background:#FFFFFF;font-size:16px;cursor:pointer">✕</button>
+            </div>
+            <a href="#" style="padding:14px 12px;border-radius:11px;font-size:15.5px;font-weight:600;color:#14161B" style-hover="background:#F7F5F5">Giới thiệu</a>
+            <a href="#" style="padding:14px 12px;border-radius:11px;font-size:15.5px;font-weight:600;color:#14161B" style-hover="background:#F7F5F5">Thành viên</a>
+            <a href="#" style="padding:14px 12px;border-radius:11px;font-size:15.5px;font-weight:600;color:#14161B" style-hover="background:#F7F5F5">Bảng xếp hạng</a>
+            <a href="#" style="padding:14px 12px;border-radius:11px;font-size:15.5px;font-weight:600;color:#14161B" style-hover="background:#F7F5F5">Sự kiện</a>
+            <a href="#" style="padding:14px 12px;border-radius:11px;font-size:15.5px;font-weight:600;color:#14161B" style-hover="background:#F7F5F5">Kết quả thi đấu</a>
+            <a href="#" style="padding:14px 12px;border-radius:11px;font-size:15.5px;font-weight:600;color:#14161B" style-hover="background:#F7F5F5">Thư viện hình ảnh</a>
+            <div style="margin-top:auto;display:flex;flex-direction:column;gap:8px">
+              <a href="#" style="padding:14px;border-radius:12px;border:1.5px solid #DCD8D8;font-weight:700;font-size:15px;color:#14161B;text-align:center">Đăng nhập</a>
+              <a href="#" style="padding:14px;border-radius:12px;background:#F1105B;color:#FFFFFF;font-weight:700;font-size:15px;text-align:center;box-shadow:0 2px 0 #B00944">Xin gia nhập CLB</a>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+    </sc-if>
+
+    <sc-if value="{{ isMember }}" hint-placeholder-val="{{ true }}">
+      <header style="position:sticky;top:0;z-index:40;background:#FFFFFF;border-bottom:1px solid #E7E3E3">
+        <div style="max-width:1280px;margin:0 auto;padding:12px clamp(14px,3vw,32px);display:flex;align-items:center;gap:18px">
+          <div style="display:flex;align-items:center;gap:8px;flex:none">
+            <img src="./logo-mark.png" alt="Laca Team" style="height:26px;width:auto;display:block" />
+            <span style="font-family:Archivo;font-weight:800;font-size:12px;letter-spacing:1px;color:#93949A;text-transform:uppercase">Thành viên</span>
+          </div>
+          <sc-if value="{{ notMobile }}" hint-placeholder-val="{{ true }}">
+            <nav style="flex:1;min-width:0;display:flex;gap:2px;overflow-x:auto">
+              <sc-for list="{{ appNav }}" as="n" hint-placeholder-count="5">
+                <button type="button" onClick="{{ n.go }}" style="{{ n.style }}">{{ n.label }}</button>
+              </sc-for>
+            </nav>
+          </sc-if>
+          <div style="display:flex;align-items:center;gap:10px;flex:none">
+            <button type="button" onClick="{{ goNoti }}" style="position:relative;width:44px;height:44px;border-radius:11px;border:1.5px solid #DCD8D8;background:#FFFFFF;cursor:pointer;font-size:17px;line-height:1">🔔
+              <span style="position:absolute;top:6px;right:6px;min-width:17px;height:17px;padding:0 4px;border-radius:99px;background:#F1105B;color:#FFFFFF;font-size:10.5px;font-weight:700;display:flex;align-items:center;justify-content:center">3</span>
+            </button>
+<div style="width:38px;height:38px;border-radius:50%;background:#EFEAEC;color:#585A60;flex:none;display:flex;align-items:center;justify-content:center;font-family:Archivo;font-weight:800;font-size:13px;letter-spacing:0.5px">MA</div>
+          </div>
+        </div>
+      </header>
+    </sc-if>
+
+    <main style="{{ mainStyle }}">
+
+      <sc-if value="{{ isDash }}" hint-placeholder-val="{{ true }}">
+        <div style="max-width:1280px;margin:0 auto;padding:clamp(18px,3vw,32px) clamp(14px,3vw,32px) 96px">
+          <div style="display:flex;align-items:center;gap:14px;margin-bottom:22px">
+<div style="width:52px;height:52px;border-radius:50%;background:#EFEAEC;color:#585A60;flex:none;display:flex;align-items:center;justify-content:center;font-family:Archivo;font-weight:800;font-size:17px;letter-spacing:0.5px">MA</div>
+            <div>
+              <div style="font-size:13.5px;color:#6E7076">Chào buổi tối,</div>
+              <h1 style="font-size:clamp(22px,3vw,28px);font-weight:800;letter-spacing:-0.8px">Nguyễn Minh Anh</h1>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:14px">
+            <div style="background:#14161B;color:#FFFFFF;border-radius:16px;padding:16px">
+              <div style="font-size:12.5px;color:#A5A6AC;font-weight:500">Rating hiện tại</div>
+              <div style="font-family:Archivo;font-weight:900;font-size:30px;letter-spacing:-1px;margin-top:4px">1.796</div>
+              <div style="font-size:12.5px;color:#FF9BBD;font-weight:600;margin-top:2px">▲ 18 sau trận 16/08</div>
+            </div>
+            <div style="background:#FFFFFF;border:1px solid #E7E3E3;border-radius:16px;padding:16px">
+              <div style="font-size:12.5px;color:#6E7076;font-weight:500">Thứ hạng CLB</div>
+              <div style="font-family:Archivo;font-weight:900;font-size:30px;letter-spacing:-1px;margin-top:4px">#2</div>
+              <div style="font-size:12.5px;color:#6E7076;font-weight:600;margin-top:2px">— giữ hạng tuần này</div>
+            </div>
+            <div style="background:#FFFFFF;border:1px solid #E7E3E3;border-radius:16px;padding:16px">
+              <div style="font-size:12.5px;color:#6E7076;font-weight:500">Trình độ</div>
+              <div style="font-family:Archivo;font-weight:800;font-size:22px;letter-spacing:-0.5px;margin-top:8px">Nâng cao</div>
+              <div style="font-size:12.5px;color:#6E7076;font-weight:600;margin-top:2px">54 trận · 63% thắng</div>
+            </div>
+            <div style="background:#FFFFFF;border:1px solid #E7E3E3;border-radius:16px;padding:16px">
+              <div style="font-size:12.5px;color:#6E7076;font-weight:500">Phong độ 5 trận</div>
+              <div style="display:flex;gap:4px;margin-top:12px">
+                <span style="width:24px;height:24px;border-radius:6px;background:#14161B;color:#FFFFFF;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center">T</span>
+                <span style="width:24px;height:24px;border-radius:6px;background:#14161B;color:#FFFFFF;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center">T</span>
+                <span style="width:24px;height:24px;border-radius:6px;background:#E7E3E3;color:#585A60;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center">B</span>
+                <span style="width:24px;height:24px;border-radius:6px;background:#14161B;color:#FFFFFF;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center">T</span>
+                <span style="width:24px;height:24px;border-radius:6px;background:#14161B;color:#FFFFFF;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center">T</span>
+              </div>
+            </div>
+          </div>
+
+          <div style="background:#FFF5F8;border:1.5px solid #F9BFD3;border-radius:16px;padding:16px;display:flex;flex-wrap:wrap;align-items:center;gap:14px;margin-bottom:14px">
+            <div style="width:36px;height:36px;border-radius:10px;background:#F1105B;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-weight:800;flex:none">2</div>
+            <div style="flex:1;min-width:180px">
+              <div style="font-weight:700;font-size:15.5px">2 kết quả đang chờ bạn xác nhận</div>
+              <div style="font-size:13.5px;color:#4B4D53;margin-top:2px">Rating chưa được cập nhật cho tới khi bạn xác nhận.</div>
+            </div>
+            <button type="button" onClick="{{ goConfirm }}" style="padding:12px 18px;border-radius:11px;background:#F1105B;color:#FFFFFF;font-weight:700;font-size:14.5px;border:0;cursor:pointer;min-height:46px;box-shadow:0 2px 0 #B00944">Xem &amp; xác nhận</button>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px">
+
+            <section style="background:#FFFFFF;border:1px solid #E7E3E3;border-radius:16px;padding:18px">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px">
+                <h2 style="font-size:16.5px;font-weight:800">Sự kiện đã đăng ký</h2>
+                <button type="button" onClick="{{ goEvents }}" style="background:none;border:0;color:#C40D4B;font-weight:600;font-size:13.5px;cursor:pointer">Tất cả</button>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <div style="display:flex;gap:12px;padding:12px;border:1px solid #EDEAEA;border-radius:12px">
+                  <div style="width:44px;text-align:center;flex:none">
+                    <div style="font-family:Archivo;font-weight:900;font-size:19px;line-height:1">29</div>
+                    <div style="font-size:11.5px;color:#6E7076;font-weight:600">TH8</div>
+                  </div>
+                  <div style="flex:1;min-width:0">
+                    <div style="font-weight:700;font-size:14.5px">Mini Game Tháng 8</div>
+                    <div style="font-size:13px;color:#6E7076">19:00 · Sân Cầu Giấy · Đôi nam nữ</div>
+                  </div>
+                  <span style="align-self:center;background:#FDE7EE;color:#B00B45;padding:4px 9px;border-radius:7px;font-size:12px;font-weight:700;flex:none">Đã ĐK</span>
+                </div>
+                <div style="display:flex;gap:12px;padding:12px;border:1px solid #EDEAEA;border-radius:12px">
+                  <div style="width:44px;text-align:center;flex:none">
+                    <div style="font-family:Archivo;font-weight:900;font-size:19px;line-height:1">12</div>
+                    <div style="font-size:11.5px;color:#6E7076;font-weight:600">TH9</div>
+                  </div>
+                  <div style="flex:1;min-width:0">
+                    <div style="font-weight:700;font-size:14.5px">Laca Summer Championship 2026</div>
+                    <div style="font-size:13px;color:#6E7076">08:00 · Mỹ Đình · Đôi nam nữ</div>
+                  </div>
+                  <span style="align-self:center;background:#F2F0F0;color:#4B4D53;padding:4px 9px;border-radius:7px;font-size:12px;font-weight:700;flex:none">Chờ bốc thăm</span>
+                </div>
+              </div>
+            </section>
+
+            <section style="background:#FFFFFF;border:1px solid #E7E3E3;border-radius:16px;padding:18px">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px">
+                <h2 style="font-size:16.5px;font-weight:800">Tiến trình rating</h2>
+                <button type="button" onClick="{{ goRating }}" style="background:none;border:0;color:#C40D4B;font-weight:600;font-size:13.5px;cursor:pointer">Chi tiết</button>
+              </div>
+              <div style="font-size:13px;color:#6E7076;margin-bottom:10px">8 mốc gần nhất · từ 1.702 lên 1.796</div>
+              <svg viewBox="0 0 600 150" preserveAspectRatio="none" style="width:100%;height:120px;display:block" role="img" aria-label="Biểu đồ rating tăng từ 1.702 lên 1.796 trong 8 trận gần nhất">
+                <polyline points="{{ sparkPoints }}" fill="none" stroke="#F1105B" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round"></polyline>
+              </svg>
+              <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;font-size:12.5px;color:#6E7076">
+                <span>1.702</span><span>·</span><span>1.688</span><span>·</span><span>1.715</span><span>·</span><span>1.740</span><span>·</span><span>1.733</span><span>·</span><span>1.758</span><span>·</span><span>1.778</span><span>·</span><span style="color:#14161B;font-weight:700">1.796</span>
+              </div>
+            </section>
+
+            <section style="background:#FFFFFF;border:1px solid #E7E3E3;border-radius:16px;padding:18px">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px">
+                <h2 style="font-size:16.5px;font-weight:800">Trận gần đây</h2>
+                <button type="button" onClick="{{ goRating }}" style="background:none;border:0;color:#C40D4B;font-weight:600;font-size:13.5px;cursor:pointer">Lịch sử</button>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <sc-for list="{{ recent }}" as="m" hint-placeholder-count="3">
+                  <div style="display:flex;align-items:center;gap:12px;padding:12px;border:1px solid #EDEAEA;border-radius:12px">
+                    <span style="{{ m.badgeStyle }}">{{ m.badge }}</span>
+                    <div style="flex:1;min-width:0">
+                      <div style="font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ m.opponent }}</div>
+                      <div style="font-size:12.5px;color:#6E7076">{{ m.meta }}</div>
+                    </div>
+                    <div style="text-align:right;flex:none">
+                      <div style="font-family:Archivo;font-weight:800;font-size:14.5px">{{ m.score }}</div>
+                      <div style="{{ m.deltaStyle }}">{{ m.delta }}</div>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </section>
+
+            <section style="background:#FFFFFF;border:1px solid #E7E3E3;border-radius:16px;padding:18px">
+              <h2 style="font-size:16.5px;font-weight:800;margin-bottom:14px">Thành tích mới</h2>
+              <div style="display:flex;flex-direction:column;gap:12px">
+                <div style="display:flex;gap:12px;align-items:center">
+                  <div style="width:42px;height:42px;border-radius:12px;background:#FDE7EE;color:#B00B45;display:flex;align-items:center;justify-content:center;font-family:Archivo;font-weight:900;font-size:13px;flex:none">×3</div>
+                  <div><div style="font-weight:700;font-size:14.5px">Chuỗi 3 trận thắng</div><div style="font-size:12.5px;color:#6E7076">Đạt ngày 16/08</div></div>
+                </div>
+                <div style="display:flex;gap:12px;align-items:center">
+                  <div style="width:42px;height:42px;border-radius:12px;background:#F2F0F0;color:#4B4D53;display:flex;align-items:center;justify-content:center;font-family:Archivo;font-weight:900;font-size:13px;flex:none">50</div>
+                  <div><div style="font-weight:700;font-size:14.5px">50 trận đã thi đấu</div><div style="font-size:12.5px;color:#6E7076">Đạt ngày 02/08</div></div>
+                </div>
+                <div style="display:flex;gap:12px;align-items:center">
+                  <div style="width:42px;height:42px;border-radius:12px;background:#F2F0F0;color:#4B4D53;display:flex;align-items:center;justify-content:center;font-size:18px;flex:none">🥈</div>
+                  <div><div style="font-weight:700;font-size:14.5px">Á quân đôi nam nữ · Mini Game T7</div><div style="font-size:12.5px;color:#6E7076">Đạt ngày 26/07</div></div>
+                </div>
+              </div>
+            </section>
+
+          </div>
+
+          <sc-if value="{{ notMobile }}" hint-placeholder-val="{{ true }}">
+            <button type="button" onClick="{{ goSubmit }}" style="margin-top:16px;width:100%;padding:16px;border-radius:14px;background:#F1105B;color:#FFFFFF;font-weight:700;font-size:16px;border:0;cursor:pointer;box-shadow:0 3px 0 #B00944">Nhập kết quả trận đấu</button>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isEvents }}" hint-placeholder-val="{{ true }}">
+        <div style="max-width:1280px;margin:0 auto;padding:clamp(18px,3vw,32px) clamp(14px,3vw,32px) 96px">
+          <h1 style="font-size:clamp(26px,3.6vw,38px);font-weight:800;letter-spacing:-1.2px">Sự kiện</h1>
+          <p style="margin:8px 0 20px;font-size:15px;color:#4B4D53;max-width:56ch">Buổi tập, Mini Game nội bộ và giải đấu lớn của Laca Team. Thành viên đăng nhập có thể đăng ký trực tiếp tại đây.</p>
+
+          <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:16px">
+            <sc-for list="{{ eventTabs }}" as="t" hint-placeholder-count="4">
+              <button type="button" onClick="{{ t.go }}" style="{{ t.style }}">{{ t.label }}</button>
+            </sc-for>
+          </div>
+
+          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px">
+            <sc-for list="{{ typeChips }}" as="c" hint-placeholder-count="4">
+              <button type="button" onClick="{{ c.go }}" style="{{ c.style }}">{{ c.label }}</button>
+            </sc-for>
+          </div>
+
+          <sc-if value="{{ hasEvents }}" hint-placeholder-val="{{ true }}">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px">
+              <sc-for list="{{ eventList }}" as="e" hint-placeholder-count="4">
+                <article style="background:#FFFFFF;border:1px solid #E7E3E3;border-radius:16px;overflow:hidden;display:flex;flex-direction:column" style-hover="border-color:#F1105B;box-shadow:0 10px 26px rgba(20,22,27,0.08)">
+                  <div style="position:relative;height:150px;background:#EFEAEC;color:#93949A">
+                    <image-slot id="{{ e.slot }}" shape="rect" placeholder=""></image-slot>
+                    <span style="{{ e.tagStyle }}">{{ e.type }}</span>
+                  </div>
+                  <div style="padding:16px;display:flex;flex-direction:column;gap:10px;flex:1">
+                    <h3 style="font-size:17.5px;font-weight:800;letter-spacing:-0.4px;line-height:1.25">{{ e.name }}</h3>
+                    <div style="font-size:13.5px;color:#4B4D53;line-height:1.5">{{ e.when }}<br />{{ e.place }}</div>
+                    <div style="font-size:13px;color:#6E7076">{{ e.formats }}</div>
+                    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                      <span style="{{ e.statusStyle }}">{{ e.status }}</span>
+                      <span style="font-size:12.5px;color:#6E7076">{{ e.deadline }}</span>
+                    </div>
+                    <div style="height:6px;border-radius:99px;background:#EDEAEA;overflow:hidden">
+                      <div style="{{ e.barStyle }}"></div>
+                    </div>
+                    <button type="button" onClick="{{ goEvent }}" style="{{ e.ctaStyle }}">{{ e.cta }}</button>
+                  </div>
+                </article>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ noEvents }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#FFFFFF;border:1px dashed #DCD8D8;border-radius:16px;padding:48px 24px;text-align:center">
+              <div style="font-size:34px;margin-bottom:10px">🏓</div>
+              <h3 style="font-size:18px;font-weight:800;margin-bottom:6px">Chưa có sự kiện nào ở trạng thái này</h3>
+              <p style="margin:0 0 16px;font-size:14.5px;color:#6E7076">Lịch sinh hoạt thường được công bố vào đầu tuần. Bật thông báo để không bỏ lỡ.</p>
+              <button type="button" onClick="{{ resetEventTab }}" style="padding:12px 18px;border-radius:11px;border:1.5px solid #DCD8D8;background:#FFFFFF;font-weight:700;font-size:14.5px;cursor:pointer;min-height:46px">Xem tất cả sự kiện</button>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isEvent }}" hint-placeholder-val="{{ true }}">
+        <div style="padding-bottom:110px">
+          <div style="position:relative;height:clamp(190px,26vw,320px);background:#EFEAEC;color:#93949A">
+            <image-slot id="ev-hero" shape="rect" placeholder="Banner sự kiện"></image-slot>
+          </div>
+          <div style="max-width:1280px;margin:0 auto;padding:0 clamp(14px,3vw,32px)">
+            <div style="background:#FFFFFF;border:1px solid #E7E3E3;border-radius:18px;padding:clamp(18px,3vw,28px);margin-top:-46px;position:relative">
+              <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+                <span style="background:#14161B;color:#FF6EA0;padding:6px 11px;border-radius:8px;font-family:Archivo;font-weight:800;font-size:11.5px;letter-spacing:0.8px;text-transform:uppercase">Giải đấu lớn</span>
+                <span style="background:#FFF3E6;color:#A9520A;padding:6px 11px;border-radius:8px;font-size:12.5px;font-weight:700">Sắp hết chỗ · 44/48</span>
+              </div>
+              <h1 style="font-size:clamp(24px,3.4vw,36px);font-weight:800;letter-spacing:-1.2px;line-height:1.15">Laca Summer Championship 2026</h1>
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-top:18px">
+                <div><div style="font-size:12.5px;color:#6E7076;font-weight:600">Thời gian</div><div style="font-weight:700;font-size:14.5px;margin-top:2px">12–13/09/2026 · 08:00</div></div>
+                <div><div style="font-size:12.5px;color:#6E7076;font-weight:600">Địa điểm</div><div style="font-weight:700;font-size:14.5px;margin-top:2px">Cụm sân Mỹ Đình, sân 3–6</div></div>
+                <div><div style="font-size:12.5px;color:#6E7076;font-weight:600">Hạn đăng ký</div><div style="font-weight:700;font-size:14.5px;margin-top:2px">05/09 · còn 4 ngày</div></div>
+                <div><div style="font-size:12.5px;color:#6E7076;font-weight:600">Phí tham gia</div><div style="font-weight:700;font-size:14.5px;margin-top:2px">250.000đ / nội dung</div></div>
+              </div>
+            </div>
+
+            <div style="display:flex;gap:6px;overflow-x:auto;margin:20px 0 16px;border-bottom:1px solid #E7E3E3">
+              <sc-for list="{{ evTabs }}" as="t" hint-placeholder-count="5">
+                <button type="button" onClick="{{ t.go }}" style="{{ t.style }}">{{ t.label }}</button>
+              </sc-for>
+            </div>
+
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:16px;align-items:start">
+              <sc-if value="{{ evTabInfo }}" hint-placeholder-val="{{ true }}">
+                <section style="background:#FFFFFF;border:1px solid #E7E3E3;border-radius:16px;padding:20px">
+                  <h2 style="font-size:17px;font-weight:800;margin-bottom:10px">Về giải đấu</h2>
+                  <p style="margin:0 0 12px;font-size:14.5px;line-height:1.65;color:#4B4D53">Giải thường niên lớn nhất của Laca Team, mở cho toàn bộ thành viên đang sinh hoạt. Thi đấu vòng bảng buổi sáng, loại trực tiếp buổi chiều. Mỗi thành viên được đăng ký tối đa hai nội dung.</p>
+                  <h3 style="font-size:15px;font-weight:800;margin:16px 0 8px">Điều kiện tham gia</h3>
+                  <ul style="margin:0;padding-left:20px;font-size:14.5px;line-height:1.7;color:#4B4D53">
+                    <li>Là thành viên CLB tối thiểu 1 tháng</li>
+                    <li>Đã thi đấu ít nhất 5 trận có xác nhận</li>
+                    <li>Nội dung Nâng cao yêu cầu rating từ 1.650</li>
+                  </ul>
+                  <h3 style="font-size:15px;font-weight:800;margin:16px 0 8px">Lịch trình</h3>
+                  <div style="display:flex;flex-direction:column;gap:0">
+                    <div style="display:flex;gap:14px;padding:10px 0;border-bottom:1px solid #F1EFEF"><span style="width:62px;font-weight:700;font-size:13.5px;flex:none">08:00</span><span style="font-size:14px;color:#4B4D53">Check-in, bốc thăm chia bảng</span></div>
+                    <div style="display:flex;gap:14px;padding:10px 0;border-bottom:1px solid #F1EFEF"><span style="width:62px;font-weight:700;font-size:13.5px;flex:none">09:00</span><span style="font-size:14px;color:#4B4D53">Vòng bảng đơn nam &amp; đôi nam</span></div>
+                    <div style="display:flex;gap:14px;padding:10px 0;border-bottom:1px solid #F1EFEF"><span style="width:62px;font-weight:700;font-size:13.5px;flex:none">13:30</span><span style="font-size:14px;color:#4B4D53">Vòng bảng đôi nam nữ</span></div>
+                    <div style="display:flex;gap:14px;padding:10px 0"><span style="width:62px;font-weight:700;font-size:13.5px;flex:none">16:00</span><span style="font-size:14px;color:#4B4D53">Bán kết, chung kết, trao giải</span></div>
+                  </div>
+                </section>
+              </sc-if>
+
+              <sc-if value="{{ evTabFormats }}" hint-placeholder-val="{{ false }}">
+                <section style="background:#FFFFFF;border:1px solid #E7E3E3;border-radius:16px;padding:20px">
+                  <h2 style="font-size:17px;font-weight:800;margin-bottom:6px">Nội dung thi đấu</h2>
+                  <p style="margin:0 0 14px;font-size:13.5px;color:#6E7076">Chọn nội dung khi đăng ký. Nội dung không đủ điều kiện sẽ bị khoá kèm lý do.</p>
+                  <div style="display:flex;flex-direction:column;gap:10px">
+                    <sc-for list="{{ evFormats }}" as="f" hint-placeholder-count="4">
+                      <div style="{{ f.rowStyle }}">
+                        <div style="flex:1;min-width:0">
+                          <div style="font-weight:700;font-size:14.5px">{{ f.name }}</div>
+                          <div style="font-size:12.5px;color:#6E7076;margin-top:2px">{{ f.note }}</div>
+                        </div>
+                        <span style="{{ f.pillStyle }}">{{ f.pill }}</span>
+                      </div>
+                    </sc-for>
+                  </div>
+                </section>
+              </sc-if>
+
+              <sc-if value="{{ evTabPlayers }}" hint-placeholder-val="{{ false }}">
+                <section style="background:#FFFFFF;border:1px solid #E7E3E3;border-radius:16px;padding:20px">
+                  <h2 style="font-size:17px;font-weight:800;margin-bottom:14px">Đã đăng ký · 44 người</h2>
+                  <div style="display:flex;flex-direction:column;gap:2px">
+                    <sc-for list="{{ players }}" as="p" hint-placeholder-count="6">
+                      <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #F1EFEF">
+                        <div style="width:38px;height:38px;border-radius:50%;background:#EFEAEC;color:#585A60;flex:none;display:flex;align-items:center;justify-content:center;font-family:Archivo;font-weight:800;font-size:13px">{{ p.initials }}</div>
+                        <div style="flex:1;min-width:0">
+                          <div style="font-weight:600;font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ p.name }}</div>
+                          <div style="font-size:12.5px;color:#6E7076">{{ p.level }} · {{ p.format }}</div>
+                        </div>
+                        <span style="font-family:Archivo;font-weight:800;font-size:14px;flex:none">{{ p.rating }}</span>
+                      </div>
+                    </sc-for>
+                  </div>
+                  <div style="margin-top:14px;font-size:13.5px;color:#6E7076">Danh sách chờ: 3 người</div>
+                </section>
+              </sc-if>
+
+              <aside style="display:flex;flex-direction:column;gap:14px">
+                <div style="background:#FFFFFF;border:1px solid #E7E3E3;border-radius:16px;padding:18px">
+                  <div style="font-size:13px;color:#6E7076;font-weight:600">Trạng thái đăng ký của bạn</div>
+                  <div style="font-family:Archivo;font-weight:800;font-size:19px;margin:6px 0 4px">Đã đăng ký 1 nội dung</div>
+                  <div style="font-size:13.5px;color:#4B4D53">Đôi nam nữ · cùng Vũ Đức Long</div>
+                  <div style="display:flex;flex-direction:column;gap:8px;margin-top:14px">
+                    <button type="button" style="padding:13px;border-radius:11px;background:#F1105B;color:#FFFFFF;font-weight:700;font-size:14.5px;border:0;cursor:pointer;min-height:46px;box-shadow:0 2px 0 #B00944" style-hover="background:#D30C4E">Đăng ký thêm nội dung</button>
+                    <button type="button" style="padding:13px;border-radius:11px;background:#FFFFFF;color:#B42318;font-weight:700;font-size:14.5px;border:1.5px solid #E7C9C6;cursor:pointer;min-height:46px" style-hover="border-color:#B42318">Hủy đăng ký</button>
+                  </div>
+                </div>
+                <div style="background:#FFFFFF;border:1px solid #E7E3E3;border-radius:16px;padding:18px">
+                  <h3 style="font-size:15.5px;font-weight:800;margin-bottom:8px">Thể lệ rút gọn</h3>
+                  <p style="margin:0;font-size:14px;line-height:1.6;color:#4B4D53">Vòng bảng 1 game tới 15, loại trực tiếp 3 game tới 11, chung kết 3 game tới 15. Đổi sân khi một bên đạt 8 điểm ở game quyết định.</p>
+                </div>
+                <div style="background:#FFFFFF;border:1px solid #E7E3E3;border-radius:16px;padding:18px">
+                  <h3 style="font-size:15.5px;font-weight:800;margin-bottom:10px">Album mùa trước</h3>
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                    <div style="height:80px;border-radius:10px;overflow:hidden;background:#EFEAEC;color:#93949A"><image-slot id="ev-g1" shape="rect" placeholder=""></image-slot></div>
+                    <div style="height:80px;border-radius:10px;overflow:hidden;background:#EFEAEC;color:#93949A"><image-slot id="ev-g2" shape="rect" placeholder=""></image-slot></div>
+                    <div style="height:80px;border-radius:10px;overflow:hidden;background:#EFEAEC;color:#93949A"><image-slot id="ev-g3" shape="rect" placeholder=""></image-slot></div>
+                    <div style="height:80px;border-radius:10px;overflow:hidden;background:#EFEAEC;color:#93949A"><image-slot id="ev-g4" shape="rect" placeholder=""></image-slot></div>
+                  </div>
+                </div>
+              </aside>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isRanking }}" hint-placeholder-val="{{ true }}">
+        <div style="max-width:1280px;margin:0 auto;padding:clamp(18px,3vw,32px) clamp(14px,3vw,32px) 96px">
+          <h1 style="font-size:clamp(26px,3.6vw,38px);font-weight:800;letter-spacing:-1.2px">Bảng xếp hạng</h1>
+          <p style="margin:8px 0 20px;font-size:15px;color:#4B4D53;max-width:60ch">Rating cập nhật sau mỗi trận được cả hai đội xác nhận. Cần tối thiểu 10 trận trong 90 ngày để có thứ hạng chính thức.</p>
+
+          <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:18px">
+            <sc-for list="{{ rankChips }}" as="c" hint-placeholder-count="6">
+              <button type="button" onClick="{{ c.go }}" style="{{ c.style }}">{{ c.label }}</button>
+            </sc-for>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:18px">
+            <div style="background:#14161B;color:#FFFFFF;border-radius:16px;padding:18px;position:relative;overflow:hidden">
+              <div style="position:absolute;inset:0;background:repeating-linear-gradient(90deg,rgba(255,255,255,0.07) 0 2px,transparent 2px 60px);pointer-events:none"></div>
+              <div style="position:relative;display:flex;align-items:center;gap:12px">
+                <div style="width:54px;height:54px;border-radius:50%;background:#2A2D34;color:#FF9BBD;flex:none;display:flex;align-items:center;justify-content:center;font-family:Archivo;font-weight:800;font-size:18px;letter-spacing:0.5px">QH</div>
+                <div><div style="font-family:Archivo;font-weight:900;font-size:13px;color:#FF6EA0;letter-spacing:1px">HẠNG 1</div><div style="font-weight:700;font-size:15.5px;margin-top:2px">Trần Quốc Huy</div></div>
+              </div>
+              <div style="position:relative;display:flex;align-items:flex-end;gap:8px;margin-top:14px">
+                <span style="font-family:Archivo;font-weight:900;font-size:26px;letter-spacing:-1px">1.842</span>
+                <span style="font-size:12.5px;color:#A5A6AC;padding-bottom:4px">Nâng cao · 68 trận</span>
+              </div>
+            </div>
+            <div style="background:#FFFFFF;border:1px solid #E7E3E3;border-radius:16px;padding:18px">
+              <div style="display:flex;align-items:center;gap:12px">
+                <div style="width:48px;height:48px;border-radius:50%;background:#EFEAEC;color:#585A60;flex:none;display:flex;align-items:center;justify-content:center;font-family:Archivo;font-weight:800;font-size:16px;letter-spacing:0.5px">MA</div>
+                <div><div style="font-family:Archivo;font-weight:900;font-size:13px;color:#6E7076;letter-spacing:1px">HẠNG 2</div><div style="font-weight:700;font-size:15px;margin-top:2px">Nguyễn Minh Anh</div></div>
+              </div>
+              <div style="display:flex;align-items:flex-end;gap:8px;margin-top:12px"><span style="font-family:Archivo;font-weight:900;font-size:24px;letter-spacing:-1px">1.796</span><span style="font-size:12.5px;color:#6E7076;padding-bottom:4px">54 trận</span></div>
+            </div>
+            <div style="background:#FFFFFF;border:1px solid #E7E3E3;border-radius:16px;padding:18px">
+              <div style="display:flex;align-items:center;gap:12px">
+                <div style="width:48px;height:48px;border-radius:50%;background:#EFEAEC;color:#585A60;flex:none;display:flex;align-items:center;justify-content:center;font-family:Archivo;font-weight:800;font-size:16px;letter-spacing:0.5px">NL</div>
+                <div><div style="font-family:Archivo;font-weight:900;font-size:13px;color:#6E7076;letter-spacing:1px">HẠNG 3</div><div style="font-weight:700;font-size:15px;margin-top:2px">Đặng Ngọc Linh</div></div>
+              </div>
+              <div style="display:flex;align-items:flex-end;gap:8px;margin-top:12px"><span style="font-family:Archivo;font-weight:900;font-size:24px;letter-spacing:-1px">1.771</span><span style="font-size:12.5px;color:#6E7076;padding-bottom:4px">61 trận</span></div>
+            </div>
+          </div>
+
+          <div style="background:#FFFFFF;border:1px solid #E7E3E3;border-radius:16px;overflow:hidden">
+            <sc-for list="{{ rankRows }}" as="r" hint-placeholder-count="8">
+              <div style="display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid #F1EFEF">
+                <div style="width:30px;font-family:Archivo;font-weight:800;font-size:17px;color:#585A60;text-align:center;flex:none">{{ r.rank }}</div>
+                <div style="width:42px;height:42px;border-radius:50%;background:#EFEAEC;color:#585A60;flex:none;display:flex;align-items:center;justify-content:center;font-family:Archivo;font-weight:800;font-size:14px">{{ r.initials }}</div>
+                <div style="flex:1;min-width:0">
+                  <div style="font-weight:700;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.name }}</div>
+                  <div style="font-size:12.5px;color:#6E7076">{{ r.level }} · {{ r.matches }} trận</div>
+                </div>
+                <div style="display:flex;gap:3px;flex:none">
+                  <sc-for list="{{ r.form }}" as="g" hint-placeholder-count="4">
+                    <span style="{{ g.style }}">{{ g.label }}</span>
+                  </sc-for>
+                </div>
+                <div style="text-align:right;flex:none;width:76px">
+                  <div style="font-family:Archivo;font-weight:800;font-size:17px;letter-spacing:-0.5px">{{ r.rating }}</div>
+                  <div style="{{ r.moveStyle }}">{{ r.move }}</div>
+                </div>
+              </div>
+            </sc-for>
+            <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:#FAF8F8">
+              <div style="width:30px;text-align:center;color:#93949A;font-weight:700;flex:none">—</div>
+              <div style="width:42px;height:42px;border-radius:50%;background:#EFEAEC;flex:none"></div>
+              <div style="flex:1;min-width:0">
+                <div style="font-weight:700;font-size:15px">Hoàng Thị Mai Chi</div>
+                <div style="font-size:12.5px;color:#6E7076">Mới bắt đầu · 4 trận</div>
+              </div>
+              <span style="background:#F2F0F0;color:#4B4D53;padding:5px 10px;border-radius:7px;font-size:12px;font-weight:700">Chưa đủ trận để xếp hạng</span>
+            </div>
+          </div>
+
+          <div style="display:flex;justify-content:center;gap:6px;margin-top:18px">
+            <button type="button" style="min-width:44px;min-height:44px;border-radius:10px;border:1.5px solid #DCD8D8;background:#FFFFFF;font-weight:700;cursor:pointer">‹</button>
+            <button type="button" style="min-width:44px;min-height:44px;border-radius:10px;border:0;background:#14161B;color:#FFFFFF;font-weight:700;cursor:pointer">1</button>
+            <button type="button" style="min-width:44px;min-height:44px;border-radius:10px;border:1.5px solid #DCD8D8;background:#FFFFFF;font-weight:700;cursor:pointer">2</button>
+            <button type="button" style="min-width:44px;min-height:44px;border-radius:10px;border:1.5px solid #DCD8D8;background:#FFFFFF;font-weight:700;cursor:pointer">3</button>
+            <button type="button" style="min-width:44px;min-height:44px;border-radius:10px;border:1.5px solid #DCD8D8;background:#FFFFFF;font-weight:700;cursor:pointer">›</button>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isProfile }}" hint-placeholder-val="{{ true }}">
+        <div style="padding-bottom:96px">
+          <div style="position:relative;height:clamp(150px,20vw,230px);background:#14161B;overflow:hidden">
+            <div style="position:absolute;inset:0;background:repeating-linear-gradient(115deg,rgba(255,255,255,0.06) 0 2px,transparent 2px 70px)"></div>
+            <div style="position:absolute;inset:0;opacity:0.55"><image-slot id="pf-cover" shape="rect" placeholder=""></image-slot></div>
+          </div>
+          <div style="max-width:1280px;margin:0 auto;padding:0 clamp(14px,3vw,32px)">
+            <div style="display:flex;flex-wrap:wrap;align-items:flex-end;gap:18px;margin-top:-52px;position:relative">
+              <div style="width:112px;height:112px;border-radius:26px;overflow:hidden;border:4px solid #FAF8F8;background:#EFEAEC;flex:none;color:#93949A">
+                <image-slot id="pf-av" shape="rect" placeholder=""></image-slot>
+              </div>
+              <div style="flex:1;min-width:220px;padding-bottom:6px">
+                <h1 style="font-size:clamp(24px,3.2vw,34px);font-weight:900;letter-spacing:-1px;text-transform:uppercase">Nguyễn Minh Anh</h1>
+                <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px">
+                  <span style="background:#14161B;color:#FF6EA0;padding:5px 11px;border-radius:8px;font-size:12.5px;font-weight:700">Nâng cao</span>
+                  <span style="background:#FDE7EE;color:#B00B45;padding:5px 11px;border-radius:8px;font-size:12.5px;font-weight:700">Hạng #2 CLB</span>
+                  <span style="background:#F2F0F0;color:#4B4D53;padding:5px 11px;border-radius:8px;font-size:12.5px;font-weight:600">Gia nhập 03/2024</span>
+                  <span style="background:#F2F0F0;color:#4B4D53;padding:5px 11px;border-radius:8px;font-size:12.5px;font-weight:600">Tay phải</span>
+                </div>
+              </div>
+              <div style="display:flex;gap:8px;padding-bottom:6px">
+                <button type="button" style="padding:12px 18px;border-radius:11px;background:#F1105B;color:#FFFFFF;font-weight:700;font-size:14.5px;border:0;cursor:pointer;min-height:46px;box-shadow:0 2px 0 #B00944">Mời thi đấu</button>
+              </div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-top:22px">
+              <div style="background:#FFFFFF;border:1px solid #E7E3E3;border-radius:14px;padding:14px"><div style="font-size:12.5px;color:#6E7076;font-weight:600">Rating</div><div style="font-family:Archivo;font-weight:900;font-size:24px;margin-top:4px">1.796</div></div>
+              <div style="background:#FFFFFF;border:1px solid #E7E3E3;border-radius:14px;padding:14px"><div style="font-size:12.5px;color:#6E7076;font-weight:600">Thắng / Thua</div><div style="font-family:Archivo;font-weight:900;font-size:24px;margin-top:4px">34–20</div></div>
+              <div style="background:#FFFFFF;border:1px solid #E7E3E3;border-radius:14px;padding:14px"><div style="font-size:12.5px;color:#6E7076;font-weight:600">Tỷ lệ thắng</div><div style="font-family:Archivo;font-weight:900;font-size:24px;margin-top:4px">63%</div></div>
+              <div style="background:#FFFFFF;border:1px solid #E7E3E3;border-radius:14px;padding:14px"><div style="font-size:12.5px;color:#6E7076;font-weight:600">Sự kiện</div><div style="font-family:Archivo;font-weight:900;font-size:24px;margin-top:4px">19</div></div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:16px;margin-top:16px;align-items:start">
+              <section style="background:#FFFFFF;border:1px solid #E7E3E3;border-radius:16px;padding:20px">
+                <h2 style="font-size:17px;font-weight:800;margin-bottom:10px">Giới thiệu</h2>
+                <p style="margin:0 0 16px;font-size:14.5px;line-height:1.65;color:#4B4D53">Bắt đầu chơi Pickleball từ 2023, mạnh về giao bóng xoáy và phối hợp đôi nam nữ. Thường có mặt ở buổi tập tối thứ ba và thứ sáu.</p>
+                <h3 style="font-size:14.5px;font-weight:800;margin-bottom:8px">Nội dung thường thi đấu</h3>
+                <div style="display:flex;flex-wrap:wrap;gap:8px">
+                  <span style="background:#F2F0F0;color:#3F4146;padding:7px 12px;border-radius:99px;font-size:13px;font-weight:600">Đôi nam nữ · 31 trận</span>
+                  <span style="background:#F2F0F0;color:#3F4146;padding:7px 12px;border-radius:99px;font-size:13px;font-weight:600">Đôi nữ · 15 trận</span>
+                  <span style="background:#F2F0F0;color:#3F4146;padding:7px 12px;border-radius:99px;font-size:13px;font-weight:600">Đơn · 8 trận</span>
+                </div>
+              </section>
+
+              <section style="background:#FFFFFF;border:1px solid #E7E3E3;border-radius:16px;padding:20px">
+                <h2 style="font-size:17px;font-weight:800;margin-bottom:4px">Biểu đồ rating</h2>
+                <div style="font-size:13px;color:#6E7076;margin-bottom:10px">Thành viên đã cho phép công khai</div>
+                <svg viewBox="0 0 600 150" preserveAspectRatio="none" style="width:100%;height:130px;display:block" role="img" aria-label="Rating tăng từ 1.702 lên 1.796 qua 8 mốc">
+                  <polyline points="{{ sparkPoints }}" fill="none" stroke="#F1105B" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round"></polyline>
+                </svg>
+                <div style="margin-top:10px;font-size:13px;color:#6E7076">Thấp nhất 1.688 · Cao nhất 1.796 · Trung bình 90 ngày: 1.744</div>
+              </section>
+
+              <section style="background:#FFFFFF;border:1px solid #E7E3E3;border-radius:16px;padding:20px">
+                <h2 style="font-size:17px;font-weight:800;margin-bottom:14px">Thành tích</h2>
+                <div style="display:flex;flex-direction:column;gap:12px">
+                  <div style="display:flex;gap:12px;align-items:center"><div style="width:40px;height:40px;border-radius:11px;background:#FDE7EE;display:flex;align-items:center;justify-content:center;font-size:18px;flex:none">🥇</div><div><div style="font-weight:700;font-size:14.5px">Vô địch đôi nữ</div><div style="font-size:12.5px;color:#6E7076">Laca Winter Cup 2025 · 12/2025</div></div></div>
+                  <div style="display:flex;gap:12px;align-items:center"><div style="width:40px;height:40px;border-radius:11px;background:#F2F0F0;display:flex;align-items:center;justify-content:center;font-size:18px;flex:none">🥈</div><div><div style="font-weight:700;font-size:14.5px">Á quân đôi nam nữ</div><div style="font-size:12.5px;color:#6E7076">Mini Game Tháng 7 · 26/07/2026</div></div></div>
+                  <div style="display:flex;gap:12px;align-items:center"><div style="width:40px;height:40px;border-radius:11px;background:#F2F0F0;display:flex;align-items:center;justify-content:center;font-size:18px;flex:none">🥉</div><div><div style="font-weight:700;font-size:14.5px">Hạng ba đơn nữ</div><div style="font-size:12.5px;color:#6E7076">Laca Summer Championship 2025</div></div></div>
+                </div>
+              </section>
+
+              <section style="background:#FFFFFF;border:1px solid #E7E3E3;border-radius:16px;padding:20px">
+                <h2 style="font-size:17px;font-weight:800;margin-bottom:14px">Trận gần đây</h2>
+                <div style="display:flex;flex-direction:column;gap:10px">
+                  <sc-for list="{{ recent }}" as="m" hint-placeholder-count="3">
+                    <div style="display:flex;align-items:center;gap:12px;padding:12px;border:1px solid #EDEAEA;border-radius:12px">
+                      <span style="{{ m.badgeStyle }}">{{ m.badge }}</span>
+                      <div style="flex:1;min-width:0">
+                        <div style="font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ m.opponent }}</div>
+                        <div style="font-size:12.5px;color:#6E7076">{{ m.meta }}</div>
+                      </div>
+                      <div style="font-family:Archivo;font-weight:800;font-size:14.5px;flex:none">{{ m.score }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+              </section>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isSubmit }}" hint-placeholder-val="{{ true }}">
+        <div style="max-width:760px;margin:0 auto;padding:clamp(16px,3vw,28px) clamp(14px,3vw,28px) 130px">
+          <sc-if value="{{ submitted }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#FFFFFF;border:1px solid #E7E3E3;border-radius:18px;padding:32px 24px;text-align:center">
+              <div style="width:56px;height:56px;border-radius:50%;background:#E7F6EC;color:#15803D;display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 14px">✓</div>
+              <h1 style="font-size:22px;font-weight:800;margin-bottom:8px">Đã gửi cho đối thủ xác nhận</h1>
+              <p style="margin:0 auto 18px;font-size:14.5px;color:#4B4D53;max-width:44ch">Trận đấu đang ở trạng thái <strong>Chờ xác nhận</strong>. Rating sẽ được cập nhật ngay khi đội B xác nhận kết quả.</p>
+              <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center">
+                <button type="button" onClick="{{ resetWizard }}" style="padding:13px 18px;border-radius:11px;background:#F1105B;color:#FFFFFF;font-weight:700;border:0;cursor:pointer;min-height:46px;box-shadow:0 2px 0 #B00944">Nhập trận khác</button>
+                <button type="button" onClick="{{ goDash }}" style="padding:13px 18px;border-radius:11px;background:#FFFFFF;border:1.5px solid #DCD8D8;font-weight:700;cursor:pointer;min-height:46px">Về tổng quan</button>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ notSubmitted }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px">
+              <h1 style="font-size:clamp(20px,2.6vw,26px);font-weight:800;letter-spacing:-0.8px">Nhập kết quả trận đấu</h1>
+              <span style="font-size:13px;color:#6E7076;font-weight:600;flex:none">{{ stepLabel }}</span>
+            </div>
+            <div style="display:flex;gap:6px;margin:14px 0 20px">
+              <sc-for list="{{ stepBars }}" as="s" hint-placeholder-count="5">
+                <div style="{{ s.style }}"></div>
+              </sc-for>
+            </div>
+
+            <sc-if value="{{ step1 }}" hint-placeholder-val="{{ true }}">
+              <h2 style="font-size:17px;font-weight:800;margin-bottom:4px">Trận này thuộc đâu?</h2>
+              <p style="margin:0 0 14px;font-size:14px;color:#6E7076">Trận thuộc sự kiện sẽ được tính vào kết quả của sự kiện đó.</p>
+              <div style="display:flex;flex-direction:column;gap:12px">
+                <button type="button" onClick="{{ pickSourceFree }}" style="{{ srcFreeStyle }}">
+                  <div style="font-weight:700;font-size:15.5px">Trận tập luyện độc lập</div>
+                  <div style="font-size:13.5px;color:#6E7076;margin-top:3px">Trận giao lưu ngoài lịch sự kiện. Vẫn tính rating.</div>
+                </button>
+                <button type="button" onClick="{{ pickSourceEvent }}" style="{{ srcEventStyle }}">
+                  <div style="font-weight:700;font-size:15.5px">Trận thuộc sự kiện</div>
+                  <div style="font-size:13.5px;color:#6E7076;margin-top:3px">Chọn từ các sự kiện bạn đã tham gia.</div>
+                </button>
+              </div>
+              <sc-if value="{{ sourceIsEvent }}" hint-placeholder-val="{{ false }}">
+                <div style="margin-top:14px">
+                  <label style="display:block;font-size:13.5px;font-weight:600;margin-bottom:6px">Sự kiện</label>
+                  <select style="width:100%;min-height:50px;padding:0 14px;border-radius:12px;border:1.5px solid #DCD8D8;background:#FFFFFF;font-size:15px">
+                    <option>Laca Friday Night · 21/08</option>
+                    <option>Mini Game Tháng 8 · 29/08</option>
+                    <option>Buổi tập chiến thuật đôi nam nữ · 22/08</option>
+                  </select>
+                </div>
+              </sc-if>
+            </sc-if>
+
+            <sc-if value="{{ step2 }}" hint-placeholder-val="{{ false }}">
+              <h2 style="font-size:17px;font-weight:800;margin-bottom:4px">Thể thức thi đấu</h2>
+              <p style="margin:0 0 14px;font-size:14px;color:#6E7076">Số thành viên mỗi đội sẽ linh hoạt theo thể thức bạn chọn.</p>
+              <div style="display:flex;flex-wrap:wrap;gap:10px">
+                <sc-for list="{{ formatChips }}" as="f" hint-placeholder-count="7">
+                  <button type="button" onClick="{{ f.go }}" style="{{ f.style }}">{{ f.label }}</button>
+                </sc-for>
+              </div>
+              <div style="margin-top:16px;background:#FFF5F8;border:1px solid #F9BFD3;border-radius:12px;padding:14px;font-size:13.5px;color:#4B4D53">{{ formatHint }}</div>
+            </sc-if>
+
+            <sc-if value="{{ step3 }}" hint-placeholder-val="{{ false }}">
+              <h2 style="font-size:17px;font-weight:800;margin-bottom:4px">Thành viên hai đội</h2>
+              <p style="margin:0 0 14px;font-size:14px;color:#6E7076">Bạn được thêm sẵn vào Đội A. Một người không thể xuất hiện ở cả hai đội.</p>
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px">
+                <div style="background:#FFFFFF;border:1.5px solid #14161B;border-radius:14px;padding:14px">
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+                    <span style="font-family:Archivo;font-weight:900;font-size:14px;letter-spacing:0.6px">ĐỘI A</span>
+                    <span style="font-size:12.5px;color:#6E7076;font-weight:600">{{ teamACount }}</span>
+                  </div>
+                  <div style="display:flex;flex-direction:column;gap:8px">
+                    <sc-for list="{{ teamA }}" as="p" hint-placeholder-count="2">
+                      <div style="display:flex;align-items:center;gap:10px;padding:9px 10px;background:#F7F5F5;border-radius:10px">
+                        <div style="width:32px;height:32px;border-radius:50%;background:#E4DFE1;flex:none"></div>
+                        <span style="flex:1;min-width:0;font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ p.name }}</span>
+                        <button type="button" onClick="{{ p.remove }}" style="width:30px;height:30px;border-radius:8px;border:0;background:#EDEAEA;color:#585A60;cursor:pointer;flex:none">✕</button>
+                      </div>
+                    </sc-for>
+                    <sc-if value="{{ teamAEmpty }}" hint-placeholder-val="{{ false }}">
+                      <div style="padding:14px;border:1px dashed #DCD8D8;border-radius:10px;font-size:13.5px;color:#6E7076;text-align:center">Chưa có thành viên</div>
+                    </sc-if>
+                  </div>
+                </div>
+                <div style="background:#FFFFFF;border:1.5px solid #E7E3E3;border-radius:14px;padding:14px">
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+                    <span style="font-family:Archivo;font-weight:900;font-size:14px;letter-spacing:0.6px">ĐỘI B</span>
+                    <span style="font-size:12.5px;color:#6E7076;font-weight:600">{{ teamBCount }}</span>
+                  </div>
+                  <div style="display:flex;flex-direction:column;gap:8px">
+                    <sc-for list="{{ teamB }}" as="p" hint-placeholder-count="2">
+                      <div style="display:flex;align-items:center;gap:10px;padding:9px 10px;background:#F7F5F5;border-radius:10px">
+                        <div style="width:32px;height:32px;border-radius:50%;background:#E4DFE1;flex:none"></div>
+                        <span style="flex:1;min-width:0;font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ p.name }}</span>
+                        <button type="button" onClick="{{ p.remove }}" style="width:30px;height:30px;border-radius:8px;border:0;background:#EDEAEA;color:#585A60;cursor:pointer;flex:none">✕</button>
+                      </div>
+                    </sc-for>
+                    <sc-if value="{{ teamBEmpty }}" hint-placeholder-val="{{ true }}">
+                      <div style="padding:14px;border:1px dashed #DCD8D8;border-radius:10px;font-size:13.5px;color:#6E7076;text-align:center">Chọn đối thủ từ danh sách dưới</div>
+                    </sc-if>
+                  </div>
+                </div>
+              </div>
+
+              <div style="margin-top:16px">
+                <input type="text" value="{{ query }}" onChange="{{ onQuery }}" placeholder="Tìm thành viên theo tên…" style="width:100%;min-height:50px;padding:0 14px;border-radius:12px;border:1.5px solid #DCD8D8;background:#FFFFFF;font-size:15px" style-focus="border-color:#F1105B;outline:none" />
+                <div style="margin-top:10px;background:#FFFFFF;border:1px solid #E7E3E3;border-radius:14px;overflow:hidden">
+                  <sc-for list="{{ pickList }}" as="p" hint-placeholder-count="5">
+                    <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;border-bottom:1px solid #F1EFEF">
+                      <div style="width:36px;height:36px;border-radius:50%;background:#EFEAEC;flex:none"></div>
+                      <div style="flex:1;min-width:0">
+                        <div style="font-weight:600;font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ p.name }}</div>
+                        <div style="font-size:12.5px;color:#6E7076">{{ p.level }} · {{ p.rating }}</div>
+                      </div>
+                      <div style="display:flex;gap:6px;flex:none">
+                        <button type="button" onClick="{{ p.addA }}" style="{{ p.aStyle }}">A</button>
+                        <button type="button" onClick="{{ p.addB }}" style="{{ p.bStyle }}">B</button>
+                      </div>
+                    </div>
+                  </sc-for>
+                  <sc-if value="{{ pickEmpty }}" hint-placeholder-val="{{ false }}">
+                    <div style="padding:26px 16px;text-align:center;font-size:14px;color:#6E7076">Không tìm thấy thành viên nào khớp “{{ query }}”.</div>
+                  </sc-if>
+                </div>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ step4 }}" hint-placeholder-val="{{ false }}">
+              <h2 style="font-size:17px;font-weight:800;margin-bottom:4px">Điểm từng game</h2>
+              <p style="margin:0 0 14px;font-size:14px;color:#6E7076">Nhập điểm cuối mỗi game. Game phải có một bên thắng, không được hoà.</p>
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <sc-for list="{{ gameRows }}" as="g" hint-placeholder-count="3">
+                  <div style="{{ g.rowStyle }}">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+                      <span style="font-family:Archivo;font-weight:800;font-size:13.5px;letter-spacing:0.5px">GAME {{ g.num }}</span>
+                      <button type="button" onClick="{{ g.remove }}" style="background:none;border:0;color:#B42318;font-size:13px;font-weight:600;cursor:pointer;min-height:32px">Xóa game</button>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:10px">
+                      <div style="flex:1;min-width:0">
+                        <div style="font-size:12.5px;color:#6E7076;font-weight:600;margin-bottom:6px">Đội A</div>
+                        <div style="display:flex;align-items:center;gap:6px">
+                          <button type="button" onClick="{{ g.decA }}" style="width:44px;height:48px;border-radius:11px;border:1.5px solid #DCD8D8;background:#FFFFFF;font-size:19px;font-weight:700;cursor:pointer;flex:none">−</button>
+                          <div style="{{ g.aBoxStyle }}">{{ g.a }}</div>
+                          <button type="button" onClick="{{ g.incA }}" style="width:44px;height:48px;border-radius:11px;border:1.5px solid #DCD8D8;background:#FFFFFF;font-size:19px;font-weight:700;cursor:pointer;flex:none">+</button>
+                        </div>
+                      </div>
+                      <div style="flex:1;min-width:0">
+                        <div style="font-size:12.5px;color:#6E7076;font-weight:600;margin-bottom:6px">Đội B</div>
+                        <div style="display:flex;align-items:center;gap:6px">
+                          <button type="button" onClick="{{ g.decB }}" style="width:44px;height:48px;border-radius:11px;border:1.5px solid #DCD8D8;background:#FFFFFF;font-size:19px;font-weight:700;cursor:pointer;flex:none">−</button>
+                          <div style="{{ g.bBoxStyle }}">{{ g.b }}</div>
+                          <button type="button" onClick="{{ g.incB }}" style="width:44px;height:48px;border-radius:11px;border:1.5px solid #DCD8D8;background:#FFFFFF;font-size:19px;font-weight:700;cursor:pointer;flex:none">+</button>
+                        </div>
+                      </div>
+                    </div>
+                    <div style="{{ g.msgStyle }}">{{ g.msg }}</div>
+                  </div>
+                </sc-for>
+              </div>
+              <button type="button" onClick="{{ addGame }}" style="margin-top:12px;width:100%;padding:14px;border-radius:12px;border:1.5px dashed #DCD8D8;background:#FFFFFF;font-weight:700;font-size:14.5px;cursor:pointer;min-height:50px" style-hover="border-color:#F1105B;color:#C40D4B">+ Thêm game</button>
+            </sc-if>
+
+            <sc-if value="{{ step5 }}" hint-placeholder-val="{{ false }}">
+              <h2 style="font-size:17px;font-weight:800;margin-bottom:14px">Kiểm tra lại</h2>
+              <div style="background:#14161B;color:#FFFFFF;border-radius:16px;padding:18px">
+                <div style="display:flex;justify-content:space-between;font-size:12.5px;color:#A5A6AC;margin-bottom:14px">
+                  <span>{{ reviewFormat }}</span>
+                  <span>{{ reviewSource }}</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid rgba(255,255,255,0.12)">
+                  <span style="{{ reviewABadge }}">{{ reviewALabel }}</span>
+                  <div style="flex:1;min-width:0;font-weight:700;font-size:15px">{{ reviewATeam }}</div>
+                  <div style="font-family:Archivo;font-weight:900;font-size:19px;letter-spacing:1px">{{ reviewAScores }}</div>
+                </div>
+                <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid rgba(255,255,255,0.12)">
+                  <span style="{{ reviewBBadge }}">{{ reviewBLabel }}</span>
+                  <div style="flex:1;min-width:0;font-weight:700;font-size:15px;color:#DEDFE2">{{ reviewBTeam }}</div>
+                  <div style="font-family:Archivo;font-weight:900;font-size:19px;letter-spacing:1px;color:#A5A6AC">{{ reviewBScores }}</div>
+                </div>
+                <div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.12);font-size:13px;color:#FF9BBD;font-weight:600">{{ reviewWinner }}</div>
+              </div>
+              <div style="margin-top:14px;background:#FFF3E6;border:1px solid #F3D8B4;border-radius:12px;padding:14px;font-size:13.5px;color:#7A4A08;line-height:1.55">Sau khi gửi, kết quả sẽ được khoá và chuyển cho Đội B xác nhận. Bạn không thể tự sửa; nếu sai hãy nhờ đội B phản đối hoặc liên hệ ban điều hành.</div>
+            </sc-if>
+          </sc-if>
+        </div>
+
+        <sc-if value="{{ notSubmitted }}" hint-placeholder-val="{{ true }}">
+          <div style="position:sticky;bottom:0;background:rgba(255,255,255,0.96);backdrop-filter:blur(8px);border-top:1px solid #E7E3E3;padding:12px clamp(14px,3vw,28px)">
+            <div style="max-width:760px;margin:0 auto;display:flex;align-items:center;gap:10px">
+              <button type="button" onClick="{{ back }}" style="{{ backStyle }}">Quay lại</button>
+              <button type="button" style="padding:14px 12px;border-radius:12px;border:0;background:none;color:#6E7076;font-weight:600;font-size:14px;cursor:pointer;min-height:50px;flex:none">Lưu nháp</button>
+              <button type="button" onClick="{{ next }}" style="{{ nextStyle }}">{{ nextLabel }}</button>
+            </div>
+            <div style="{{ blockMsgStyle }}">{{ blockMsg }}</div>
+          </div>
+        </sc-if>
+      </sc-if>
+
+      <sc-if value="{{ isConfirm }}" hint-placeholder-val="{{ true }}">
+        <div style="max-width:760px;margin:0 auto;padding:clamp(16px,3vw,28px) clamp(14px,3vw,28px) 96px">
+          <h1 style="font-size:clamp(20px,2.6vw,26px);font-weight:800;letter-spacing:-0.8px">Kết quả chờ bạn xác nhận</h1>
+          <p style="margin:8px 0 18px;font-size:14.5px;color:#4B4D53">Kiểm tra người chơi và tỷ số trước khi xác nhận. Rating chỉ được cập nhật sau khi bạn đồng ý.</p>
+
+          <sc-if value="{{ confirmDone }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#E7F6EC;border:1.5px solid #A9DCBB;border-radius:14px;padding:16px;display:flex;gap:12px;align-items:flex-start;margin-bottom:16px">
+              <span style="width:26px;height:26px;border-radius:50%;background:#15803D;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-size:15px;flex:none">✓</span>
+              <div><div style="font-weight:700;font-size:15px;color:#14532D">Đã xác nhận kết quả</div><div style="font-size:13.5px;color:#256B41;margin-top:2px">Rating của bạn: 1.796 → <strong>1.814</strong> (+18). Trận đã được ghi vào lịch sử.</div></div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ disputeDone }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#FFF3E6;border:1.5px solid #F3D8B4;border-radius:14px;padding:16px;display:flex;gap:12px;align-items:flex-start;margin-bottom:16px">
+              <span style="width:26px;height:26px;border-radius:50%;background:#A9520A;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-size:15px;flex:none">!</span>
+              <div><div style="font-weight:700;font-size:15px;color:#7A4A08">Đã gửi phản đối tới ban điều hành</div><div style="font-size:13.5px;color:#7A4A08;margin-top:2px">Trận chuyển sang trạng thái <strong>Có tranh chấp</strong>. Rating của cả hai đội chưa thay đổi cho tới khi admin xử lý.</div></div>
+            </div>
+          </sc-if>
+
+          <div style="background:#FFFFFF;border:1px solid #E7E3E3;border-radius:16px;overflow:hidden">
+            <div style="padding:16px;border-bottom:1px solid #F1EFEF;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between">
+              <div>
+                <div style="font-weight:700;font-size:15px">Đôi nam nữ · Laca Friday Night</div>
+                <div style="font-size:13px;color:#6E7076;margin-top:2px">Người nhập: Trần Quốc Huy · gửi 21:14 ngày 16/08</div>
+              </div>
+              <span style="{{ matchStatusStyle }}">{{ matchStatus }}</span>
+            </div>
+
+            <div style="padding:16px">
+              <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #F1EFEF">
+                <span style="width:26px;height:26px;border-radius:7px;background:#14161B;color:#FFFFFF;font-family:Archivo;font-weight:900;font-size:12px;display:flex;align-items:center;justify-content:center;flex:none">T</span>
+                <div style="flex:1;min-width:0">
+                  <div style="font-weight:700;font-size:14.5px">Nguyễn Minh Anh &amp; Vũ Đức Long</div>
+                  <div style="font-size:12.5px;color:#6E7076">Đội A · có bạn</div>
+                </div>
+                <div style="display:flex;gap:10px;font-family:Archivo;font-weight:900;font-size:19px"><span>11</span><span>9</span><span>11</span></div>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px;padding:12px 0">
+                <span style="width:26px;height:26px;border-radius:7px;background:#EDEAEA;color:#585A60;font-family:Archivo;font-weight:900;font-size:12px;display:flex;align-items:center;justify-content:center;flex:none">B</span>
+                <div style="flex:1;min-width:0">
+                  <div style="font-weight:600;font-size:14.5px">Đặng Ngọc Linh &amp; Trần Quốc Huy</div>
+                  <div style="font-size:12.5px;color:#6E7076">Đội B</div>
+                </div>
+                <div style="display:flex;gap:10px;font-family:Archivo;font-weight:900;font-size:19px;color:#6E7076"><span>9</span><span>11</span><span>7</span></div>
+              </div>
+              <div style="margin-top:8px;padding:12px;background:#FAF8F8;border-radius:11px;font-size:13.5px;color:#4B4D53">Kết quả dự kiến: <strong>Đội A thắng 2–1</strong> · rating của bạn dự kiến <strong>+18</strong> (1.796 → 1.814)</div>
+            </div>
+          </div>
+
+          <sc-if value="{{ actionable }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;flex-direction:column;gap:10px;margin-top:16px">
+              <button type="button" onClick="{{ openConfirm }}" style="padding:15px;border-radius:12px;background:#F1105B;color:#FFFFFF;font-weight:700;font-size:15.5px;border:0;cursor:pointer;min-height:52px;box-shadow:0 3px 0 #B00944" style-hover="background:#D30C4E">Xác nhận kết quả</button>
+              <button type="button" onClick="{{ openDispute }}" style="padding:15px;border-radius:12px;background:#FFFFFF;color:#B42318;font-weight:700;font-size:15.5px;border:1.5px solid #E7C9C6;cursor:pointer;min-height:52px" style-hover="border-color:#B42318">Kết quả chưa chính xác</button>
+            </div>
+          </sc-if>
+
+          <div style="margin-top:22px">
+            <h2 style="font-size:16px;font-weight:800;margin-bottom:10px">Các trận khác đang chờ</h2>
+            <div style="background:#FFFFFF;border:1px solid #E7E3E3;border-radius:14px;padding:14px;display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+              <div style="flex:1;min-width:180px">
+                <div style="font-weight:700;font-size:14.5px">Đôi nữ · trận tập luyện 14/08</div>
+                <div style="font-size:13px;color:#6E7076;margin-top:2px">Người nhập: Phạm Thu Trang · còn 46 giờ để xác nhận</div>
+              </div>
+              <span style="background:#FFF3E6;color:#A9520A;padding:5px 10px;border-radius:7px;font-size:12px;font-weight:700">Chờ xác nhận</span>
+            </div>
+          </div>
+        </div>
+
+        <sc-if value="{{ confirmModal }}" hint-placeholder-val="{{ false }}">
+          <div style="position:fixed;inset:0;z-index:90;background:rgba(20,22,27,0.55);display:flex;align-items:flex-end;justify-content:center;padding:16px">
+            <div style="background:#FFFFFF;border-radius:18px;padding:22px;width:100%;max-width:460px">
+              <h3 style="font-size:19px;font-weight:800;margin-bottom:8px">Xác nhận kết quả này?</h3>
+              <p style="margin:0 0 18px;font-size:14.5px;color:#4B4D53;line-height:1.6">Đội A thắng 2–1. Sau khi xác nhận, rating của cả bốn người chơi sẽ được cập nhật và không thể chỉnh sửa.</p>
+              <div style="display:flex;gap:10px">
+                <button type="button" onClick="{{ closeModals }}" style="flex:1;padding:14px;border-radius:12px;border:1.5px solid #DCD8D8;background:#FFFFFF;font-weight:700;cursor:pointer;min-height:50px">Quay lại</button>
+                <button type="button" onClick="{{ doConfirm }}" style="flex:1;padding:14px;border-radius:12px;border:0;background:#F1105B;color:#FFFFFF;font-weight:700;cursor:pointer;min-height:50px;box-shadow:0 2px 0 #B00944">Xác nhận</button>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ disputeOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="position:fixed;inset:0;z-index:90;background:rgba(20,22,27,0.55);display:flex;align-items:flex-end;justify-content:center;padding:16px">
+            <div style="background:#FFFFFF;border-radius:18px;padding:22px;width:100%;max-width:460px;max-height:88vh;overflow-y:auto">
+              <h3 style="font-size:19px;font-weight:800;margin-bottom:6px">Kết quả chưa chính xác ở đâu?</h3>
+              <p style="margin:0 0 14px;font-size:14px;color:#6E7076">Ban điều hành sẽ xem xét trong 24 giờ. Rating chưa thay đổi cho tới khi có kết luận.</p>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <sc-for list="{{ disputeReasons }}" as="r" hint-placeholder-count="4">
+                  <button type="button" onClick="{{ r.go }}" style="{{ r.style }}">{{ r.label }}</button>
+                </sc-for>
+              </div>
+              <label style="display:block;font-size:13.5px;font-weight:600;margin:14px 0 6px">Mô tả thêm (không bắt buộc)</label>
+              <textarea rows="3" placeholder="Ví dụ: game 2 tỷ số là 11–8, không phải 11–9." style="width:100%;padding:12px 14px;border-radius:12px;border:1.5px solid #DCD8D8;font-size:14.5px;resize:vertical" style-focus="border-color:#F1105B;outline:none"></textarea>
+              <div style="{{ disputeErrStyle }}">Hãy chọn một lý do trước khi gửi.</div>
+              <div style="display:flex;gap:10px;margin-top:14px">
+                <button type="button" onClick="{{ closeModals }}" style="flex:1;padding:14px;border-radius:12px;border:1.5px solid #DCD8D8;background:#FFFFFF;font-weight:700;cursor:pointer;min-height:50px">Hủy</button>
+                <button type="button" onClick="{{ doDispute }}" style="flex:1;padding:14px;border-radius:12px;border:0;background:#B42318;color:#FFFFFF;font-weight:700;cursor:pointer;min-height:50px">Gửi phản đối</button>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+      </sc-if>
+
+      <sc-if value="{{ isRating }}" hint-placeholder-val="{{ true }}">
+        <div style="max-width:900px;margin:0 auto;padding:clamp(18px,3vw,32px) clamp(14px,3vw,32px) 96px">
+          <h1 style="font-size:clamp(22px,3vw,30px);font-weight:800;letter-spacing:-1px">Rating &amp; thứ hạng</h1>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin:18px 0 16px">
+            <div style="background:#14161B;color:#FFFFFF;border-radius:14px;padding:16px"><div style="font-size:12.5px;color:#A5A6AC;font-weight:600">Rating</div><div style="font-family:Archivo;font-weight:900;font-size:28px;margin-top:4px">1.796</div></div>
+            <div style="background:#FFFFFF;border:1px solid #E7E3E3;border-radius:14px;padding:16px"><div style="font-size:12.5px;color:#6E7076;font-weight:600">Trình độ</div><div style="font-family:Archivo;font-weight:800;font-size:20px;margin-top:8px">Nâng cao</div></div>
+            <div style="background:#FFFFFF;border:1px solid #E7E3E3;border-radius:14px;padding:16px"><div style="font-size:12.5px;color:#6E7076;font-weight:600">Thứ hạng</div><div style="font-family:Archivo;font-weight:900;font-size:28px;margin-top:4px">#2</div></div>
+            <div style="background:#FFFFFF;border:1px solid #E7E3E3;border-radius:14px;padding:16px"><div style="font-size:12.5px;color:#6E7076;font-weight:600">90 ngày</div><div style="font-family:Archivo;font-weight:900;font-size:28px;margin-top:4px;color:#15803D">+94</div></div>
+          </div>
+
+          <section style="background:#FFFFFF;border:1px solid #E7E3E3;border-radius:16px;padding:20px">
+            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px">
+              <sc-for list="{{ rangeChips }}" as="c" hint-placeholder-count="4">
+                <button type="button" onClick="{{ c.go }}" style="{{ c.style }}">{{ c.label }}</button>
+              </sc-for>
+            </div>
+            <svg viewBox="0 0 600 180" preserveAspectRatio="none" style="width:100%;height:180px;display:block" role="img" aria-label="Biểu đồ rating 8 mốc gần nhất, tăng từ 1.702 lên 1.796">
+              <line x1="0" y1="150" x2="600" y2="150" stroke="#EDEAEA" stroke-width="2"></line>
+              <line x1="0" y1="90" x2="600" y2="90" stroke="#EDEAEA" stroke-width="2"></line>
+              <line x1="0" y1="30" x2="600" y2="30" stroke="#EDEAEA" stroke-width="2"></line>
+              <polyline points="{{ chartPoints }}" fill="none" stroke="#F1105B" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round"></polyline>
+            </svg>
+            <div style="display:flex;justify-content:space-between;font-size:12.5px;color:#6E7076;margin-top:8px">
+              <span>18/06</span><span>16/07</span><span>16/08</span>
+            </div>
+            <div style="margin-top:12px;padding:12px;background:#FAF8F8;border-radius:11px;font-size:13.5px;color:#4B4D53">Dạng văn bản: 1.702 → 1.688 → 1.715 → 1.740 → 1.733 → 1.758 → 1.778 → 1.796.</div>
+          </section>
+
+          <h2 style="font-size:17px;font-weight:800;margin:22px 0 12px">Lịch sử thay đổi rating</h2>
+          <div style="background:#FFFFFF;border:1px solid #E7E3E3;border-radius:16px;overflow:hidden">
+            <sc-for list="{{ ratingTx }}" as="t" hint-placeholder-count="6">
+              <div style="padding:14px 16px;border-bottom:1px solid #F1EFEF;display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+                <span style="{{ t.badgeStyle }}">{{ t.badge }}</span>
+                <div style="flex:1;min-width:170px">
+                  <div style="font-weight:600;font-size:14.5px">{{ t.opponent }}</div>
+                  <div style="font-size:12.5px;color:#6E7076;margin-top:2px">{{ t.meta }}</div>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;font-size:13.5px;flex:none">
+                  <span style="color:#6E7076">{{ t.before }}</span>
+                  <span style="{{ t.deltaStyle }}">{{ t.delta }}</span>
+                  <span style="font-family:Archivo;font-weight:800;font-size:15px">{{ t.after }}</span>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="margin-top:16px;background:#FFF5F8;border:1px solid #F9BFD3;border-radius:14px;padding:16px">
+            <h3 style="font-size:15.5px;font-weight:800;margin-bottom:6px">Rating và trình độ hoạt động thế nào?</h3>
+            <p style="margin:0;font-size:14px;line-height:1.65;color:#4B4D53">Mỗi người bắt đầu ở 1.500. Thắng thì cộng điểm, thua thì trừ; thắng đối thủ mạnh hơn được cộng nhiều hơn. Trình độ được suy ra từ rating: Mới bắt đầu (&lt;1.400), Phong trào (1.400–1.599), Trung cấp (1.600–1.749), Nâng cao (từ 1.750).</p>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isNoti }}" hint-placeholder-val="{{ true }}">
+        <div style="max-width:760px;margin:0 auto;padding:clamp(18px,3vw,32px) clamp(14px,3vw,32px) 96px">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px">
+            <h1 style="font-size:clamp(22px,3vw,30px);font-weight:800;letter-spacing:-1px">Thông báo</h1>
+            <button type="button" style="background:none;border:0;color:#C40D4B;font-weight:600;font-size:14px;cursor:pointer;min-height:44px">Đánh dấu đã đọc</button>
+          </div>
+          <div style="background:#FFFFFF;border:1px solid #E7E3E3;border-radius:16px;overflow:hidden">
+            <sc-for list="{{ notis }}" as="n" hint-placeholder-count="6">
+              <div style="{{ n.rowStyle }}">
+                <div style="{{ n.iconStyle }}">{{ n.icon }}</div>
+                <div style="flex:1;min-width:0">
+                  <div style="{{ n.titleStyle }}">{{ n.title }}</div>
+                  <div style="font-size:13.5px;color:#4B4D53;margin-top:2px;line-height:1.5">{{ n.body }}</div>
+                  <div style="font-size:12.5px;color:#93949A;margin-top:4px">{{ n.time }}</div>
+                </div>
+                <sc-if value="{{ n.unread }}" hint-placeholder-val="{{ true }}">
+                  <span style="width:9px;height:9px;border-radius:50%;background:#F1105B;flex:none;margin-top:6px"></span>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+    </main>
+
+    <sc-if value="{{ showBottomNav }}" hint-placeholder-val="{{ false }}">
+      <div style="position:sticky;bottom:0;z-index:60;background:rgba(255,255,255,0.97);backdrop-filter:blur(10px);border-top:1px solid #E7E3E3;display:flex;padding:6px 4px 8px">
+        <sc-for list="{{ bottomNav }}" as="b" hint-placeholder-count="5">
+          <button type="button" onClick="{{ b.go }}" style="{{ b.style }}">
+            <span style="font-size:19px;line-height:1">{{ b.icon }}</span>
+            <span style="font-size:10.5px;font-weight:600">{{ b.label }}</span>
+          </button>
+        </sc-for>
+      </div>
+    </sc-if>
+
+  </div>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:940}}">
+const PINK = '#F1105B', INK = '#14161B';
+
+const MEMBERS = [
+  { id: 1, name: 'Trần Quốc Huy', level: 'Nâng cao', rating: '1.842' },
+  { id: 2, name: 'Đặng Ngọc Linh', level: 'Trung cấp', rating: '1.771' },
+  { id: 3, name: 'Vũ Đức Long', level: 'Trung cấp', rating: '1.688' },
+  { id: 4, name: 'Lê Hoàng Nam', level: 'Nâng cao', rating: '1.712' },
+  { id: 5, name: 'Phạm Thu Trang', level: 'Trung cấp', rating: '1.654' },
+  { id: 6, name: 'Hoàng Thị Mai Chi', level: 'Mới bắt đầu', rating: '1.402' },
+  { id: 7, name: 'Bùi Thanh Tùng', level: 'Phong trào', rating: '1.531' },
+  { id: 8, name: 'Nguyễn Khánh Duy', level: 'Trung cấp', rating: '1.640' }
+];
+
+const EVENTS = [
+  { id: 'e1', type: 'Giải đấu lớn', kind: 'tour', name: 'Laca Summer Championship 2026', when: '12–13/09/2026 · 08:00', place: 'Cụm sân Mỹ Đình', formats: 'Đơn nam, đôi nam, đôi nam nữ', status: 'Sắp hết chỗ · 44/48', state: 'open', deadline: 'Hạn ĐK 05/09', pct: 92, cta: 'Đăng ký thi đấu', slot: 'evl-1' },
+  { id: 'e2', type: 'Mini Game', kind: 'mini', name: 'Mini Game Tháng 8', when: '29/08/2026 · 19:00', place: 'Sân Cầu Giấy', formats: 'Đôi nam nữ, đồng đội 3v3', status: 'Đang mở đăng ký · 18/32', state: 'open', deadline: 'Hạn ĐK 27/08', pct: 56, cta: 'Đăng ký tham gia', slot: 'evl-2' },
+  { id: 'e3', type: 'Tập luyện', kind: 'train', name: 'Buổi tập chiến thuật đôi nam nữ', when: '22/08/2026 · 19:30', place: 'Sân Cầu Giấy', formats: 'Trình độ Phong trào → Trung cấp', status: 'Danh sách chờ · 16/16', state: 'open', deadline: '3 người đang chờ', pct: 100, cta: 'Vào danh sách chờ', slot: 'evl-3' },
+  { id: 'e4', type: 'Tập luyện', kind: 'train', name: 'Laca Friday Night', when: '21/08/2026 · 19:30', place: 'Sân Cầu Giấy', formats: 'Đôi tự do, xoay vòng', status: 'Đang diễn ra', state: 'live', deadline: 'Đã chốt danh sách', pct: 100, cta: 'Xem sân đang đấu', slot: 'evl-4' },
+  { id: 'e5', type: 'Mini Game', kind: 'mini', name: 'Giao lưu Laca Team & Friends', when: '02/08/2026 · 08:00', place: 'Sân Thanh Xuân', formats: 'Đồng đội 4v4', status: 'Đã hoàn thành', state: 'done', deadline: '24 người tham gia', pct: 100, cta: 'Xem kết quả', slot: 'evl-5' },
+  { id: 'e6', type: 'Giải đấu lớn', kind: 'tour', name: 'Laca Winter Cup 2025', when: '13–14/12/2025', place: 'Cụm sân Mỹ Đình', formats: '5 nội dung', status: 'Đã hoàn thành', state: 'done', deadline: '52 người tham gia', pct: 100, cta: 'Xem kết quả', slot: 'evl-6' }
+];
+
+const FORMATS = ['Đánh đơn', 'Đôi nam', 'Đôi nữ', 'Đôi nam nữ', 'Đồng đội 3v3', 'Đồng đội 4v4', 'Đồng đội 6v6'];
+const SERIES = [1702, 1688, 1715, 1740, 1733, 1758, 1778, 1796];
+
+class Component extends DCLogic {
+  state = {
+    screen: 'dashboard', mobile: false, menuOpen: false, printAll: false,
+    step: 1, source: null, format: 'Đôi nam nữ',
+    teamA: [{ id: 0, name: 'Bạn (Nguyễn Minh Anh)' }], teamB: [],
+    games: [[11, 9], [9, 11], [11, 7]],
+    query: '', submitted: false, showBlock: false,
+    confirmModal: false, disputeOpen: false, disputeReason: null, disputeErr: false,
+    confirmDone: false, disputeDone: false,
+    eventTab: 'Tất cả', typeFilter: 'Tất cả loại', evTab: 'info', rankChip: 'Tất cả', range: '3 tháng'
+  };
+
+  set = (patch) => this.setState(patch);
+  go = (screen) => () => this.setState({ screen: screen });
+
+  chip(active, extra) {
+    return 'padding:10px 15px;border-radius:99px;font-size:13.5px;font-weight:600;cursor:pointer;white-space:nowrap;min-height:44px;flex:none;' +
+      (active ? 'background:' + INK + ';color:#FFFFFF;border:1.5px solid ' + INK + ';' : 'background:#FFFFFF;color:#3F4146;border:1.5px solid #DCD8D8;') + (extra || '');
+  }
+  tabBtn(active) {
+    return 'padding:8px 13px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;border:0;' +
+      (active ? 'background:' + PINK + ';color:#FFFFFF;' : 'background:transparent;color:#A5A6AC;');
+  }
+  navBtn(active) {
+    return 'padding:9px 12px;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;border:0;white-space:nowrap;' +
+      (active ? 'background:#FDE7EE;color:#B00B45;' : 'background:transparent;color:#3F4146;');
+  }
+  underTab(active) {
+    return 'padding:12px 14px;border:0;background:none;cursor:pointer;font-size:14.5px;font-weight:600;white-space:nowrap;min-height:46px;' +
+      (active ? 'color:' + INK + ';box-shadow:inset 0 -3px 0 ' + PINK + ';' : 'color:#6E7076;');
+  }
+  formBadge(win) {
+    return 'width:20px;height:20px;border-radius:5px;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;' +
+      (win ? 'background:' + INK + ';color:#FFFFFF;' : 'background:#E7E3E3;color:#585A60;');
+  }
+  points(vals, h, top, bottom) {
+    const min = Math.min.apply(null, vals), max = Math.max.apply(null, vals), span = (max - min) || 1;
+    return vals.map((v, i) => {
+      const x = (600 / (vals.length - 1)) * i;
+      const y = bottom - ((v - min) / span) * (bottom - top);
+      return x.toFixed(1) + ',' + y.toFixed(1);
+    }).join(' ');
+  }
+
+  wizardBlocker() {
+    const s = this.state;
+    if (s.step === 1 && !s.source) return 'Chọn nguồn trận đấu để tiếp tục.';
+    if (s.step === 3) {
+      if (!s.teamA.length || !s.teamB.length) return 'Mỗi đội cần ít nhất một thành viên.';
+    }
+    if (s.step === 4) {
+      const bad = s.games.some(g => g[0] === g[1]);
+      if (bad) return 'Có game đang hoà điểm. Sửa lại trước khi tiếp tục.';
+      if (!s.games.length) return 'Cần ít nhất một game.';
+    }
+    return null;
+  }
+
+  renderVals() {
+    const s = this.state;
+    const screens = [
+      ['dashboard', 'Dashboard'], ['events', 'Sự kiện'], ['event', 'Chi tiết SK'], ['ranking', 'Bảng xếp hạng'],
+      ['profile', 'Hồ sơ công khai'], ['submit', 'Nhập kết quả'], ['confirm', 'Xác nhận KQ'], ['rating', 'Rating'], ['noti', 'Thông báo']
+    ];
+    const all = s.printAll;
+    const publicScreens = ['events', 'event', 'ranking', 'profile'];
+    const memberScreens = ['dashboard', 'submit', 'confirm', 'rating', 'noti'];
+
+    const games = s.games.map((g, i) => {
+      const a = g[0], b = g[1], tie = a === b;
+      const box = (v, other) => 'flex:1;min-width:0;height:48px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-family:Archivo;font-weight:900;font-size:22px;' +
+        (v === other ? 'background:#FDEBEA;color:#B42318;border:1.5px solid #E7C9C6;' : (v > other ? 'background:' + INK + ';color:#FFFFFF;' : 'background:#F7F5F5;color:#585A60;'));
+      const bump = (side, d) => () => this.setState(st => {
+        const gg = st.games.map(x => x.slice());
+        gg[i][side] = Math.max(0, gg[i][side] + d);
+        return { games: gg };
+      });
+      return {
+        num: i + 1, a: a, b: b,
+        rowStyle: 'background:#FFFFFF;border:1.5px solid ' + (tie ? '#E7C9C6' : '#E7E3E3') + ';border-radius:14px;padding:14px',
+        aBoxStyle: box(a, b), bBoxStyle: box(b, a),
+        incA: bump(0, 1), decA: bump(0, -1), incB: bump(1, 1), decB: bump(1, -1),
+        remove: () => this.setState(st => ({ games: st.games.filter((_, k) => k !== i) })),
+        msg: tie ? 'Hai đội không thể cùng điểm trong một game.' : '',
+        msgStyle: tie ? 'margin-top:10px;font-size:13px;color:#B42318;font-weight:600' : 'display:none'
+      };
+    });
+
+    const winsA = s.games.filter(g => g[0] > g[1]).length;
+    const winsB = s.games.filter(g => g[1] > g[0]).length;
+    const taken = s.teamA.concat(s.teamB).map(p => p.name);
+    const q = s.query.trim().toLowerCase();
+    const pick = MEMBERS.filter(m => !taken.includes(m.name)).filter(m => !q || m.name.toLowerCase().includes(q));
+
+    const filteredEvents = EVENTS.filter(e => {
+      const byTab = s.eventTab === 'Tất cả' || (s.eventTab === 'Đang mở đăng ký' && e.state === 'open') ||
+        (s.eventTab === 'Đang diễn ra' && e.state === 'live') || (s.eventTab === 'Đã kết thúc' && e.state === 'done');
+      const byType = s.typeFilter === 'Tất cả loại' || e.type === s.typeFilter;
+      return byTab && byType;
+    });
+
+    const tagStyle = (kind) => 'position:absolute;top:10px;left:10px;padding:6px 10px;border-radius:8px;font-family:Archivo;font-weight:800;font-size:11px;letter-spacing:0.7px;text-transform:uppercase;' +
+      (kind === 'tour' ? 'background:' + INK + ';color:#FF6EA0;' : kind === 'mini' ? 'background:' + PINK + ';color:#FFFFFF;' : 'background:#FFFFFF;color:' + INK + ';border:1.5px solid ' + INK + ';');
+
+    const statusStyle = (st) => 'padding:5px 10px;border-radius:7px;font-size:12.5px;font-weight:700;' +
+      (st === 'open' ? 'background:#FDE7EE;color:#B00B45;' : st === 'live' ? 'background:#E7F6EC;color:#15803D;' : 'background:#F2F0F0;color:#4B4D53;');
+
+    const ranks = [
+      { rank: 4, name: 'Lê Hoàng Nam', level: 'Nâng cao', matches: 52, rating: '1.712', move: '▲ 1 bậc', up: 1, form: [1, 1, 0, 1], initials: 'HN' },
+      { rank: 5, name: 'Phạm Thu Trang', level: 'Trung cấp', matches: 39, rating: '1.654', move: '▲ 4 bậc', up: 1, form: [1, 1, 1, 1], initials: 'TT' },
+      { rank: 6, name: 'Vũ Đức Long', level: 'Trung cấp', matches: 47, rating: '1.688', move: '▼ 1 bậc', up: -1, form: [1, 0, 1, 0], initials: 'ĐL' },
+      { rank: 7, name: 'Nguyễn Khánh Duy', level: 'Trung cấp', matches: 33, rating: '1.640', move: '— giữ hạng', up: 0, form: [0, 1, 1, 0], initials: 'KD' },
+      { rank: 8, name: 'Bùi Thanh Tùng', level: 'Phong trào', matches: 28, rating: '1.531', move: '▲ 2 bậc', up: 1, form: [1, 1, 0, 1], initials: 'TT' }
+    ];
+
+    const tx = [
+      { w: 1, opponent: 'Thắng · Đặng Ngọc Linh & Trần Quốc Huy', meta: 'Đôi nam nữ · Laca Friday Night · 16/08', before: '1.778', delta: '+18', after: '1.796' },
+      { w: 1, opponent: 'Thắng · Nguyễn Khánh Duy & Phạm Thu Trang', meta: 'Đôi nam nữ · trận tập luyện · 12/08', before: '1.758', delta: '+20', after: '1.778' },
+      { w: 0, opponent: 'Thua · Lê Hoàng Nam', meta: 'Đánh đơn · trận tập luyện · 09/08', before: '1.733', delta: '−25', after: '1.758' },
+      { w: 1, opponent: 'Thắng · Bùi Thanh Tùng & Hoàng Thị Mai Chi', meta: 'Đồng đội 3v3 · Giao lưu Laca & Friends · 02/08', before: '1.740', delta: '+25', after: '1.733' },
+      { w: 1, opponent: 'Thắng · Phạm Thu Trang', meta: 'Đôi nữ · Mini Game Tháng 7 · 26/07', before: '1.715', delta: '+25', after: '1.740' },
+      { w: 0, opponent: 'Thua · Đặng Ngọc Linh', meta: 'Đơn nữ · Mini Game Tháng 7 · 26/07', before: '1.702', delta: '−14', after: '1.688' }
+    ];
+
+    const notiData = [
+      { icon: '⏳', unread: true, title: 'Trần Quốc Huy đã nhập kết quả cần bạn xác nhận', body: 'Đôi nam nữ · Laca Friday Night · Đội A thắng 2–1', time: '2 giờ trước' },
+      { icon: '📅', unread: true, title: 'Mini Game Tháng 8 mở đăng ký', body: 'Còn 14 chỗ · hạn đăng ký 27/08', time: '5 giờ trước' },
+      { icon: '📈', unread: true, title: 'Rating của bạn tăng 20 điểm', body: '1.758 → 1.778 sau trận ngày 12/08', time: 'Hôm qua' },
+      { icon: '✅', unread: false, title: 'Đăng ký thành công Laca Summer Championship 2026', body: 'Nội dung đôi nam nữ · cùng Vũ Đức Long', time: '3 ngày trước' },
+      { icon: '⚖️', unread: false, title: 'Tranh chấp đã được giải quyết', body: 'Ban điều hành giữ nguyên tỷ số 11–9 game 2', time: '5 ngày trước' },
+      { icon: '🏅', unread: false, title: 'Thành tích mới: Chuỗi 3 trận thắng', body: 'Xem tại mục Thành tích của tôi', time: '6 ngày trước' }
+    ];
+
+    const stepNames = ['Nguồn trận', 'Thể thức', 'Đội hình', 'Điểm số', 'Kiểm tra'];
+    const blocker = this.wizardBlocker();
+
+    return {
+      tabs: screens.map(([id, label]) => ({ label: label, go: this.go(id), style: this.tabBtn(s.screen === id) })),
+      setDesktop: () => this.set({ mobile: false, menuOpen: false }), setMobile: () => this.set({ mobile: true, menuOpen: false }),
+      deskBtn: this.tabBtn(!s.mobile && !all), mobBtn: this.tabBtn(s.mobile && !all),
+      printBtn: this.tabBtn(all), togglePrintAll: () => this.setState(st => ({ printAll: !st.printAll, mobile: false, menuOpen: false })),
+      frameStyle: s.mobile
+        ? 'width:390px;max-width:100%;min-height:780px;background:#FAF8F8;border-radius:22px;border:1px solid #DCD8D8;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 18px 50px rgba(20,22,27,0.16)'
+        : 'width:100%;max-width:1440px;background:#FAF8F8;border-radius:16px;border:1px solid #DCD8D8;overflow:hidden;display:flex;flex-direction:column;min-height:70vh;box-shadow:0 12px 40px rgba(20,22,27,0.10)',
+      mainStyle: 'flex:1',
+      isPublic: all || publicScreens.includes(s.screen),
+      isMember: all ? false : memberScreens.includes(s.screen),
+      notMobile: !s.mobile, isMobile: s.mobile,
+      menuOpen: s.menuOpen, toggleMenu: () => this.setState(st => ({ menuOpen: !st.menuOpen })),
+      showBottomNav: !all && s.mobile && memberScreens.includes(s.screen),
+      appNav: [['dashboard', 'Tổng quan'], ['events', 'Sự kiện của tôi'], ['rating', 'Rating & trận đấu'], ['confirm', 'Chờ xác nhận'], ['noti', 'Thông báo']]
+        .map(([id, label]) => ({ label: label, go: this.go(id), style: this.navBtn(s.screen === id) })),
+      bottomNav: [['dashboard', 'Tổng quan', '🏠'], ['events', 'Sự kiện', '📅'], ['submit', 'Nhập KQ', '➕'], ['rating', 'Rating', '📈'], ['noti', 'Thông báo', '🔔']]
+        .map(([id, label, icon]) => ({
+          label: label, icon: icon, go: this.go(id),
+          style: 'flex:1;min-height:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:0;background:none;cursor:pointer;border-radius:12px;' +
+            (s.screen === id ? 'color:' + PINK + ';font-weight:700;' : 'color:#6E7076;')
+        })),
+
+      isDash: all || s.screen === 'dashboard', isEvents: all || s.screen === 'events', isEvent: all || s.screen === 'event',
+      isRanking: all || s.screen === 'ranking', isProfile: all || s.screen === 'profile', isSubmit: all || s.screen === 'submit',
+      isConfirm: all || s.screen === 'confirm', isRating: all || s.screen === 'rating', isNoti: all || s.screen === 'noti',
+      goDash: this.go('dashboard'), goEvents: this.go('events'), goEvent: this.go('event'),
+      goRating: this.go('rating'), goConfirm: this.go('confirm'), goSubmit: this.go('submit'), goNoti: this.go('noti'),
+
+      sparkPoints: this.points(SERIES, 150, 15, 135),
+      chartPoints: this.points(SERIES, 180, 20, 150),
+
+      recent: [
+        { badge: 'T', win: true, opponent: 'Đ. Ngọc Linh & T. Quốc Huy', meta: 'Đôi nam nữ · 16/08', score: '2–1', delta: '+18' },
+        { badge: 'T', win: true, opponent: 'N. Khánh Duy & P. Thu Trang', meta: 'Đôi nam nữ · 12/08', score: '2–0', delta: '+20' },
+        { badge: 'B', win: false, opponent: 'Lê Hoàng Nam', meta: 'Đánh đơn · 09/08', score: '0–2', delta: '−25' }
+      ].map(m => ({
+        badge: m.badge, opponent: m.opponent, meta: m.meta, score: m.score, delta: m.delta,
+        badgeStyle: 'width:26px;height:26px;border-radius:7px;font-family:Archivo;font-weight:900;font-size:12px;display:flex;align-items:center;justify-content:center;flex:none;' +
+          (m.win ? 'background:' + INK + ';color:#FFFFFF;' : 'background:#EDEAEA;color:#585A60;'),
+        deltaStyle: 'font-size:12.5px;font-weight:700;' + (m.win ? 'color:#15803D' : 'color:#B42318')
+      })),
+
+      eventTabs: ['Tất cả', 'Đang mở đăng ký', 'Đang diễn ra', 'Đã kết thúc'].map(t => ({
+        label: t, go: () => this.set({ eventTab: t }), style: this.tabBtn(s.eventTab === t).replace('padding:8px 13px', 'padding:10px 15px').replace('font-size:13px', 'font-size:13.5px') +
+          (s.eventTab === t ? '' : 'background:#FFFFFF;color:#3F4146;border:1.5px solid #DCD8D8;') + 'border-radius:99px;min-height:44px;'
+      })),
+      typeChips: ['Tất cả loại', 'Tập luyện', 'Mini Game', 'Giải đấu lớn'].map(t => ({
+        label: t, go: () => this.set({ typeFilter: t }), style: this.chip(s.typeFilter === t)
+      })),
+      eventList: filteredEvents.map(e => ({
+        slot: e.slot, name: e.name, type: e.type, when: e.when, place: e.place, formats: e.formats,
+        status: e.status, deadline: e.deadline, cta: e.cta,
+        tagStyle: tagStyle(e.kind), statusStyle: statusStyle(e.state),
+        barStyle: 'width:' + e.pct + '%;height:100%;background:' + (e.state === 'done' ? '#93949A' : e.pct >= 100 ? '#93949A' : e.pct > 85 ? PINK : INK),
+        ctaStyle: 'margin-top:auto;padding:13px 16px;border-radius:11px;font-weight:700;font-size:14.5px;cursor:pointer;min-height:46px;' +
+          (e.state === 'done' || e.pct >= 100 ? 'background:#FFFFFF;color:' + INK + ';border:1.5px solid #DCD8D8;' : 'background:' + PINK + ';color:#FFFFFF;border:0;box-shadow:0 2px 0 #B00944;')
+      })),
+      hasEvents: filteredEvents.length > 0, noEvents: filteredEvents.length === 0,
+      resetEventTab: () => this.set({ eventTab: 'Tất cả', typeFilter: 'Tất cả loại' }),
+
+      evTabs: [['info', 'Thông tin & lịch trình'], ['formats', 'Nội dung thi đấu'], ['players', 'Người tham gia']]
+        .map(([id, label]) => ({ label: label, go: () => this.set({ evTab: id }), style: this.underTab(s.evTab === id) })),
+      evTabInfo: s.evTab === 'info', evTabFormats: s.evTab === 'formats', evTabPlayers: s.evTab === 'players',
+      evFormats: [
+        { name: 'Đôi nam nữ', note: 'Đã đăng ký cùng Vũ Đức Long', pill: 'Đã đăng ký', ok: 1 },
+        { name: 'Đơn nữ', note: '12/16 suất · mở cho rating từ 1.600', pill: 'Còn suất', ok: 1 },
+        { name: 'Đôi nữ', note: '8/8 suất · vào danh sách chờ', pill: 'Danh sách chờ', ok: 0 },
+        { name: 'Đơn nam', note: 'Không phù hợp giới tính đăng ký', pill: 'Không đủ điều kiện', ok: -1 }
+      ].map(f => ({
+        name: f.name, note: f.note, pill: f.pill,
+        rowStyle: 'display:flex;align-items:center;gap:12px;padding:13px;border-radius:12px;border:1px solid ' + (f.ok === 1 ? '#EDEAEA' : '#EDEAEA') + ';' + (f.ok === -1 ? 'opacity:0.6;' : ''),
+        pillStyle: 'padding:5px 10px;border-radius:7px;font-size:12px;font-weight:700;flex:none;' +
+          (f.pill === 'Đã đăng ký' ? 'background:#FDE7EE;color:#B00B45;' : f.ok === 1 ? 'background:#E7F6EC;color:#15803D;' : f.ok === 0 ? 'background:#FFF3E6;color:#A9520A;' : 'background:#F2F0F0;color:#6E7076;')
+      })),
+      players: MEMBERS.slice(0, 6).map((m, i) => ({
+        initials: m.name.split(' ').slice(-2).map(w => w[0]).join(''), name: m.name, level: m.level, rating: m.rating,
+        format: ['Đôi nam nữ', 'Đơn nữ', 'Đôi nam', 'Đơn nam', 'Đôi nữ', 'Đơn nữ'][i]
+      })),
+
+      rankChips: ['Tất cả', 'Nam', 'Nữ', 'Đánh đơn', 'Đánh đôi', '90 ngày'].map(c => ({
+        label: c, go: () => this.set({ rankChip: c }), style: this.chip(s.rankChip === c)
+      })),
+      rankRows: ranks.map(r => ({
+        rank: r.rank, name: r.name, level: r.level, matches: r.matches, rating: r.rating, move: r.move, initials: r.initials,
+        form: r.form.map(w => ({ label: w ? 'T' : 'B', style: this.formBadge(w) })),
+        moveStyle: 'font-size:12px;font-weight:600;' + (r.up > 0 ? 'color:#15803D' : r.up < 0 ? 'color:#B42318' : 'color:#6E7076')
+      })),
+
+      stepLabel: 'Bước ' + s.step + '/5 · ' + stepNames[s.step - 1],
+      stepBars: [1, 2, 3, 4, 5].map(n => ({
+        style: 'flex:1;height:6px;border-radius:99px;background:' + (n <= s.step ? PINK : '#E7E3E3')
+      })),
+      step1: s.step === 1, step2: s.step === 2, step3: s.step === 3, step4: s.step === 4, step5: s.step === 5,
+      submitted: s.submitted, notSubmitted: !s.submitted,
+      pickSourceFree: () => this.set({ source: 'free' }), pickSourceEvent: () => this.set({ source: 'event' }),
+      sourceIsEvent: s.source === 'event',
+      srcFreeStyle: 'text-align:left;padding:16px;border-radius:14px;cursor:pointer;background:#FFFFFF;border:2px solid ' + (s.source === 'free' ? PINK : '#E7E3E3'),
+      srcEventStyle: 'text-align:left;padding:16px;border-radius:14px;cursor:pointer;background:#FFFFFF;border:2px solid ' + (s.source === 'event' ? PINK : '#E7E3E3'),
+      formatChips: FORMATS.map(f => ({ label: f, go: () => this.set({ format: f }), style: this.chip(s.format === f) })),
+      formatHint: s.format === 'Đánh đơn' ? 'Mỗi đội một người. Bạn đang ở Đội A.'
+        : s.format.indexOf('Đồng đội') === 0 ? 'Thể thức đồng đội: thêm bao nhiêu thành viên mỗi đội cũng được, danh sách không giới hạn cứng.'
+        : 'Mỗi đội hai người. Có thể đổi người sang đội khác trước khi gửi.',
+
+      teamA: s.teamA.map((p, i) => ({ name: p.name, remove: () => this.setState(st => ({ teamA: st.teamA.filter((_, k) => k !== i) })) })),
+      teamB: s.teamB.map((p, i) => ({ name: p.name, remove: () => this.setState(st => ({ teamB: st.teamB.filter((_, k) => k !== i) })) })),
+      teamACount: s.teamA.length + ' thành viên', teamBCount: s.teamB.length + ' thành viên',
+      teamAEmpty: s.teamA.length === 0, teamBEmpty: s.teamB.length === 0,
+      query: s.query, onQuery: (e) => this.set({ query: e.target.value }),
+      pickList: pick.map(m => ({
+        name: m.name, level: m.level, rating: m.rating,
+        addA: () => this.setState(st => ({ teamA: st.teamA.concat([{ id: m.id, name: m.name }]) })),
+        addB: () => this.setState(st => ({ teamB: st.teamB.concat([{ id: m.id, name: m.name }]) })),
+        aStyle: 'width:40px;height:40px;border-radius:10px;border:1.5px solid ' + INK + ';background:#FFFFFF;color:' + INK + ';font-weight:800;cursor:pointer',
+        bStyle: 'width:40px;height:40px;border-radius:10px;border:1.5px solid #DCD8D8;background:#FFFFFF;color:#3F4146;font-weight:800;cursor:pointer'
+      })),
+      pickEmpty: pick.length === 0,
+
+      gameRows: games, addGame: () => this.setState(st => ({ games: st.games.concat([[11, 0]]) })),
+      reviewFormat: s.format, reviewSource: s.source === 'event' ? 'Laca Friday Night · 21/08' : 'Trận tập luyện độc lập',
+      reviewATeam: s.teamA.map(p => p.name).join(' & ') || 'Đội A chưa có thành viên',
+      reviewBTeam: s.teamB.map(p => p.name).join(' & ') || 'Đội B chưa có thành viên',
+      reviewAScores: s.games.map(g => g[0]).join('  '), reviewBScores: s.games.map(g => g[1]).join('  '),
+      reviewALabel: winsA > winsB ? 'T' : 'B', reviewBLabel: winsB > winsA ? 'T' : 'B',
+      reviewABadge: 'width:26px;height:26px;border-radius:7px;font-family:Archivo;font-weight:900;font-size:12px;display:flex;align-items:center;justify-content:center;flex:none;' +
+        (winsA > winsB ? 'background:' + PINK + ';color:#FFFFFF;' : 'background:rgba(255,255,255,0.14);color:#DEDFE2;'),
+      reviewBBadge: 'width:26px;height:26px;border-radius:7px;font-family:Archivo;font-weight:900;font-size:12px;display:flex;align-items:center;justify-content:center;flex:none;' +
+        (winsB > winsA ? 'background:' + PINK + ';color:#FFFFFF;' : 'background:rgba(255,255,255,0.14);color:#DEDFE2;'),
+      reviewWinner: (winsA > winsB ? 'Đội A thắng ' + winsA + '–' + winsB : winsB > winsA ? 'Đội B thắng ' + winsB + '–' + winsA : 'Chưa xác định đội thắng') + ' · rating cập nhật sau khi đối thủ xác nhận',
+
+      nextLabel: s.step === 5 ? 'Gửi cho đối thủ xác nhận' : 'Tiếp tục',
+      nextStyle: 'flex:1;padding:15px;border-radius:12px;border:0;font-weight:700;font-size:15.5px;cursor:pointer;min-height:52px;' +
+        (blocker ? 'background:#EDEAEA;color:#93949A;' : 'background:' + PINK + ';color:#FFFFFF;box-shadow:0 3px 0 #B00944;'),
+      backStyle: 'padding:15px 18px;border-radius:12px;border:1.5px solid #DCD8D8;background:#FFFFFF;font-weight:700;font-size:15px;cursor:pointer;min-height:52px;flex:none;' + (s.step === 1 ? 'opacity:0.45;' : ''),
+      blockMsg: blocker || '', blockMsgStyle: (blocker && s.showBlock) ? 'max-width:760px;margin:8px auto 0;font-size:13px;color:#B42318;font-weight:600' : 'display:none',
+      next: () => {
+        if (this.wizardBlocker()) { this.set({ showBlock: true }); return; }
+        if (s.step === 5) { this.set({ submitted: true }); return; }
+        this.set({ step: s.step + 1, showBlock: false });
+      },
+      back: () => this.set({ step: Math.max(1, s.step - 1), showBlock: false }),
+      resetWizard: () => this.set({ submitted: false, step: 1, source: null, teamB: [], games: [[11, 9], [9, 11], [11, 7]] }),
+
+      confirmModal: s.confirmModal, disputeOpen: s.disputeOpen,
+      confirmDone: s.confirmDone, disputeDone: s.disputeDone,
+      actionable: !s.confirmDone && !s.disputeDone,
+      matchStatus: s.confirmDone ? 'Đã xác nhận' : s.disputeDone ? 'Có tranh chấp' : 'Chờ xác nhận',
+      matchStatusStyle: 'padding:5px 10px;border-radius:7px;font-size:12px;font-weight:700;flex:none;' +
+        (s.confirmDone ? 'background:#E7F6EC;color:#15803D;' : s.disputeDone ? 'background:#FDEBEA;color:#B42318;' : 'background:#FFF3E6;color:#A9520A;'),
+      openConfirm: () => this.set({ confirmModal: true }), openDispute: () => this.set({ disputeOpen: true }),
+      closeModals: () => this.set({ confirmModal: false, disputeOpen: false, disputeErr: false }),
+      doConfirm: () => this.set({ confirmModal: false, confirmDone: true }),
+      doDispute: () => { if (!s.disputeReason) { this.set({ disputeErr: true }); return; } this.set({ disputeOpen: false, disputeDone: true }); },
+      disputeReasons: ['Tỷ số không đúng', 'Sai thành viên trong đội', 'Trận này không diễn ra', 'Sai thể thức hoặc sự kiện'].map(r => ({
+        label: r, go: () => this.set({ disputeReason: r, disputeErr: false }),
+        style: 'text-align:left;padding:14px;border-radius:12px;cursor:pointer;font-size:14.5px;font-weight:600;min-height:50px;background:#FFFFFF;border:2px solid ' + (s.disputeReason === r ? PINK : '#E7E3E3')
+      })),
+      disputeErrStyle: s.disputeErr ? 'margin-top:10px;font-size:13px;color:#B42318;font-weight:600' : 'display:none',
+
+      rangeChips: ['30 ngày', '3 tháng', '6 tháng', 'Tất cả'].map(c => ({
+        label: c, go: () => this.set({ range: c }), style: this.chip(s.range === c)
+      })),
+      ratingTx: tx.map(t => ({
+        opponent: t.opponent, meta: t.meta, before: t.before, after: t.after, delta: t.delta, badge: t.w ? 'T' : 'B',
+        badgeStyle: 'width:26px;height:26px;border-radius:7px;font-family:Archivo;font-weight:900;font-size:12px;display:flex;align-items:center;justify-content:center;flex:none;' +
+          (t.w ? 'background:' + INK + ';color:#FFFFFF;' : 'background:#EDEAEA;color:#585A60;'),
+        deltaStyle: 'font-weight:700;' + (t.w ? 'color:#15803D' : 'color:#B42318')
+      })),
+
+      notis: notiData.map(n => ({
+        icon: n.icon, title: n.title, body: n.body, time: n.time, unread: n.unread,
+        rowStyle: 'display:flex;gap:12px;padding:14px 16px;border-bottom:1px solid #F1EFEF;' + (n.unread ? 'background:#FFF9FB;' : ''),
+        iconStyle: 'width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:17px;flex:none;' + (n.unread ? 'background:#FDE7EE;' : 'background:#F2F0F0;'),
+        titleStyle: 'font-size:14.5px;line-height:1.4;' + (n.unread ? 'font-weight:700;' : 'font-weight:600;color:#3F4146;')
+      }))
+    };
+  }
+}
+
+</script>
+</body>
+</html>
