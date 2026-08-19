@@ -104,13 +104,8 @@ function escapeHtml(str) {
 }
 
 // ===== Tournament data model (Điều lệ LACA TEAM CHAMPIONSHIP — SEASON 4) =====
-
-// Bảng A: Đội A·B·C·D — Bảng B: Đội E·F·G·H (mục V.1)
-const BOARD_TEAMS = {
-  A: ['A', 'B', 'C', 'D'],
-  B: ['E', 'F', 'G', 'H']
-}
-const BOARDS = ['A', 'B']
+// BOARD_TEAMS / BOARDS / TEAMS / SEED_TIERS / REGISTERED... nằm ở seed-data.js
+// (nạp trước file này trong index.html) — dùng chung với trang "Lễ bốc thăm".
 
 // Xoay cặp mục VII — áp dụng đồng nhất cho cả 8 đội theo lượt vòng bảng của đội đó.
 const ROTATION = [
@@ -253,57 +248,9 @@ const ROSTER = {
   H: { M1: '', M2: '', M3: '', W1: '', W2: '', W3: '' }
 }
 
-// ===== Nhóm hạt giống (RIÊNG TƯ — không hiển thị trực tiếp lên web) =====
-// Chỉ dùng cho công cụ bốc thăm chia đội bên dưới (mục IV). Mỗi giới 5 tier;
-// tier có 08 người là tier dùng chung, được chia đều 4–4 cho 2 nhóm đội khi
-// bốc thăm. Cập nhật trực tiếp các mảng này khi danh sách hạt giống thay đổi.
-const SEED_TIERS = {
-  nu: {
-    T1: ['Tiên', 'Mai Trân', 'Toại Thuỷ', 'Diệu'],
-    T2: ['Hoàng Phúc', 'Mai Nguyễn', 'Vạn Duyên', 'Ánh Lê'],
-    T3: [
-      'Nana HR',
-      'Utky Hiền',
-      'Minh Anh',
-      'Phạm Thoa',
-      'Mai Thu',
-      'Thảo Hiếu',
-      'Trang Lê',
-      'Minh Thảo'
-    ],
-    T4: ['Ngọc', 'Thanh Tâm', 'Thảo', 'Khanh'],
-    T5: ['Ly Xynk', 'Thiên Hà', 'Hoa Vũ', 'Trúc Quyên']
-  },
-  nam: {
-    T1: ['Minh Pandora', 'Khoa', 'Hùng', 'Đình Tiến'],
-    T2: ['Tùng Nè', 'Quang Khánh', 'Huy Lưu', 'Tiến Hoàng'],
-    T3: [
-      'Thanh Mập',
-      'Lukita',
-      'Thuận Sovo',
-      'Khầy Trường',
-      'Hiếu Trương',
-      'Thuy Dang',
-      'Châu Đỗ',
-      'Quân Trần'
-    ],
-    T4: ['Mạnh Ngô', 'Khánh Diệp', 'Chen', 'Khắc Trà'],
-    T5: ['Phương Nam', 'Quang V', 'Xuân Trường', 'Mr Mountain']
-  }
-}
-const TIER_ORDER = ['T1', 'T2', 'T3', 'T4', 'T5']
-
-function flattenTiers(tiers) {
-  return TIER_ORDER.flatMap(t => tiers[t])
-}
-
-// ===== Danh sách đã đăng ký (hiển thị công khai — không lộ tier/hạt giống) =====
-// Chỉ mang tính hiển thị/tham khảo; thứ tự liệt kê không phải mã số hay đội.
-const REGISTERED = {
-  nu: flattenTiers(SEED_TIERS.nu),
-  nam: flattenTiers(SEED_TIERS.nam)
-}
-const REGISTERED_LIMIT = 24
+// ===== Nhóm hạt giống & danh sách đăng ký =====
+// SEED_TIERS / TIER_ORDER / flattenTiers / REGISTERED / REGISTERED_LIMIT nằm
+// ở seed-data.js (dùng chung với trang "Lễ bốc thăm" — mục IV).
 
 function renderRegisteredList(listId, countId, names) {
   const listEl = document.getElementById(listId)
@@ -747,177 +694,15 @@ function refreshAllDerived() {
   refreshKnockoutDerived()
 }
 
-// ===== Công cụ bốc thăm chia đội (mục IV) =====
-const TEAMS = [...BOARD_TEAMS.A, ...BOARD_TEAMS.B]
-// Nhóm đội theo mục IV.2 — khác với Bảng A/B (mục V.1) ở trên.
-const NHOM_TEAMS = { 1: ['A', 'C', 'E', 'G'], 2: ['B', 'D', 'F', 'H'] }
-
-function shuffle(list) {
-  const a = list.slice()
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
-    ;[a[i], a[j]] = [a[j], a[i]]
-  }
-  return a
-}
-
-// Chia đều 1 tier cho các đội của 1 nhóm đội — mỗi đội bốc đúng 01 người.
-function dealTier(people, teams) {
-  const shuffled = shuffle(people)
-  const map = {}
-  teams.forEach((team, i) => {
-    map[team] = shuffled[i]
-  })
-  return map
-}
-
-// Phân nhóm tier theo mục IV.2. Nữ dùng sơ đồ đảo với nam để HM-2 và HW-2
-// không bao giờ được xếp vào cùng một đội.
-const TIER_GROUPS = {
-  nam: { 1: ['T1', 'T5'], 2: ['T2', 'T4'] },
-  nu: { 1: ['T2', 'T4'], 2: ['T1', 'T5'] }
-}
-
-// Bốc thăm 1 giới theo cơ chế mục IV: tier 08 người chia đều 4–4 cho 2 nhóm
-// đội; mỗi tier 04 người được chia theo cấu hình riêng của nam/nữ ở trên.
-function drawGender(tiers, tierGroups) {
-  const sharedKey = TIER_ORDER.find(t => tiers[t].length === 8)
-  const sharedShuffled = shuffle(tiers[sharedKey])
-  const sharedByGroup = {
-    1: sharedShuffled.slice(0, 4),
-    2: sharedShuffled.slice(4, 8)
-  }
-
-  const perTeam = {}
-  ;[1, 2].forEach(groupNo => {
-    const teams = NHOM_TEAMS[groupNo]
-    const dealt = [
-      ...tierGroups[groupNo].map(key => dealTier(tiers[key], teams)),
-      dealTier(sharedByGroup[groupNo], teams)
-    ]
-    // Xáo lại thứ tự 3 người/đội trước khi gán M1-M3/W1-W3 — vị trí không
-    // còn phản ánh tier nữa, đúng yêu cầu giữ bí mật hạt giống.
-    teams.forEach(team => {
-      perTeam[team] = shuffle(dealt.map(d => d[team]))
-    })
-  })
-  return perTeam
-}
-
-function drawTeams() {
-  const namByTeam = drawGender(SEED_TIERS.nam, TIER_GROUPS.nam)
-  const nuByTeam = drawGender(SEED_TIERS.nu, TIER_GROUPS.nu)
-  const result = {}
-  TEAMS.forEach(team => {
-    result[team] = {
-      M1: namByTeam[team][0],
-      M2: namByTeam[team][1],
-      M3: namByTeam[team][2],
-      W1: nuByTeam[team][0],
-      W2: nuByTeam[team][1],
-      W3: nuByTeam[team][2]
-    }
-  })
-  return result
-}
-
+// ===== Bốc thăm chia đội (mục IV) =====
+// Trình chiếu trực tiếp (10 giỏ hạt giống, hiệu ứng full-screen) đã chuyển
+// sang trang riêng boc-tham.html — dùng chung dữ liệu/thuật toán ở
+// seed-data.js, không lặp lại công cụ ở đây nữa. Nếu cần bốc kết quả và áp
+// luôn vào roster của trang này (ví dụ để test lịch thi đấu), gọi trực tiếp
+// từ console: applyDrawResult(drawTeams()) rồi BOARDS.forEach(renderBoardSchedule).
 function applyDrawResult(result) {
   TEAMS.forEach(team => Object.assign(roster[team], result[team]))
 }
-
-function wait(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms))
-}
-
-// Hiệu ứng "quay số" trước khi chốt — mỗi ô tên nhảy ngẫu nhiên một lúc rồi
-// dừng lại theo kết quả thật, hiện từng đội một (cuốn từ trái qua phải).
-// Chỉ là hiệu ứng hình ảnh, không ảnh hưởng tới kết quả bốc thăm.
-async function playDrawReveal(result) {
-  const container = document.getElementById('drawResult')
-  if (!container) return
-
-  container.innerHTML = TEAMS.map(
-    team => `<div class="draw-team" data-team="${team}">
-        <div class="draw-team__head">
-          <span class="group__badge">${team}</span>
-          <h4>Đội ${team}</h4>
-        </div>
-        <ul class="draw-team__list">
-          ${[0, 1, 2, 3, 4, 5].map(i => `<li class="draw-team__slot" data-slot="${i}">···</li>`).join('')}
-        </ul>
-      </div>`
-  ).join('')
-
-  const pool = [...REGISTERED.nam, ...REGISTERED.nu]
-  const slots = container.querySelectorAll('.draw-team__slot')
-  const flicker = setInterval(() => {
-    slots.forEach(slot => {
-      slot.textContent = pool[Math.floor(Math.random() * pool.length)]
-    })
-  }, 65)
-  await wait(2000)
-  clearInterval(flicker)
-
-  await Promise.all(
-    TEAMS.map((team, i) =>
-      wait(i * 500).then(() => {
-        const card = container.querySelector(`[data-team="${team}"]`)
-        if (!card) return
-        const names = shuffle(Object.values(result[team]))
-        card.querySelectorAll('.draw-team__slot').forEach((el, si) => {
-          el.textContent = names[si]
-        })
-        card.classList.add('is-settled')
-      })
-    )
-  )
-}
-
-;(function () {
-  const drawBtn = document.getElementById('drawBtn')
-  const viewScheduleBtn = document.getElementById('viewScheduleExampleBtn')
-  const drawStatusEl = document.getElementById('drawStatus')
-  if (!drawBtn) return
-
-  if (viewScheduleBtn) {
-    viewScheduleBtn.addEventListener('click', () => {
-      document
-        .getElementById('schedule')
-        ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    })
-  }
-
-  drawBtn.addEventListener('click', async () => {
-    if (
-      Object.keys(scores).length > 0 &&
-      !confirm(
-        'Đã có tỷ số được ghi nhận cho một số trận. Bốc thăm lại sẽ đổi tên VĐV theo từng mã đội (tỷ số không bị xóa) — tiếp tục?'
-      )
-    )
-      return
-
-    drawBtn.disabled = true
-    drawBtn.classList.add('is-running')
-    if (viewScheduleBtn) viewScheduleBtn.hidden = true
-    if (drawStatusEl) drawStatusEl.textContent = '🎲 Đang quay số...'
-
-    const drawResult = drawTeams()
-    applyDrawResult(drawResult)
-    await playDrawReveal(drawResult)
-    BOARDS.forEach(renderBoardSchedule)
-    renderKnockout()
-    refreshAllDerived()
-
-    drawBtn.disabled = false
-    drawBtn.classList.remove('is-running')
-
-    if (drawStatusEl) {
-      drawStatusEl.textContent =
-        '✓ Đã xếp xong 08 đội và tự động lên lịch 12 trận lớn · 36 trận con.'
-    }
-    if (viewScheduleBtn) viewScheduleBtn.hidden = false
-  })
-})()
 
 // ===== Danh sách hạt giống công khai =====
 function seedTierTableHTML(genderLabel, tiers) {

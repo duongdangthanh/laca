@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lễ Bốc Thăm Chia Đội · LACA TEAM CHAMPIONSHIP SEASON 4</title>
+    <meta
+      name="description"
+      content="Trình chiếu trực quan lễ bốc thăm chia 8 đội theo 5 nhóm hạt giống mỗi giới — LACA TEAM CHAMPIONSHIP SEASON 4."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Archivo:wght@600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="boc-tham.css" />
+  </head>
+  <body class="bt-body">
+    <!-- Ambient background (giống trang chính) -->
+    <div class="bg-fx" aria-hidden="true">
+      <div class="glow glow--1"></div>
+      <div class="glow glow--2"></div>
+      <div class="grain"></div>
+    </div>
+
+    <header class="bt-topbar">
+      <a href="index.html" class="bt-topbar__back">← Về trang giải đấu</a>
+      <div class="bt-topbar__brand">
+        <img src="assets/logo-small.png" alt="Laca Team" />
+        <span>LACA TEAM CHAMPIONSHIP · SEASON 4</span>
+      </div>
+      <div class="bt-topbar__spacer" aria-hidden="true"></div>
+    </header>
+
+    <main class="bt-stage" id="stage">
+      <!-- ===== Màn giới thiệu ===== -->
+      <section class="bt-intro" id="introScreen">
+        <p class="bt-intro__kicker">🎬 Trình chiếu trực tiếp</p>
+        <h1 class="bt-intro__title">LỄ BỐC THĂM<br />CHIA ĐỘI</h1>
+        <p class="bt-intro__desc">
+          24 VĐV nam và 24 VĐV nữ được chia thành
+          <strong>5 giỏ hạt giống</strong> mỗi giới (Tier 1 → Tier 5, trình độ
+          giảm dần). Mỗi đội trong 08 đội (A–H) bốc đúng 01 người từ mỗi giỏ —
+          bảo đảm tương quan trình độ cân bằng giữa các đội, đúng cơ chế tại
+          mục
+          <a href="index.html#draw">IV. Cách thức bốc thăm</a>.
+        </p>
+        <button class="bt-btn bt-btn--primary bt-btn--lg" id="startBtn" type="button">
+          🎲 Bắt đầu bốc thăm
+        </button>
+        <p class="bt-intro__note">
+          Thứ tự trình chiếu: Vận động viên Nam → Vận động viên Nữ → Kết quả
+          đầy đủ 08 đội.
+        </p>
+      </section>
+
+      <!-- ===== Màn bốc thăm ===== -->
+      <section class="bt-draw" id="drawScreen" hidden>
+        <div class="bt-draw__head">
+          <span class="bt-draw__phase" id="phaseLabel">Đang bốc thăm</span>
+          <h2 class="bt-draw__step" id="stepLabel">Chuẩn bị…</h2>
+        </div>
+
+        <div class="bt-baskets" id="basketRow"></div>
+
+        <div class="bt-boards" id="teamBoards"></div>
+      </section>
+
+      <!-- ===== Banner kết quả ===== -->
+      <div class="bt-done" id="doneBanner" hidden>
+        <div class="bt-done__inner">
+          <button
+            class="bt-done__close"
+            id="closeDoneBtn"
+            type="button"
+            aria-label="Đóng, xem bảng kết quả"
+          >
+            ✕
+          </button>
+          <p class="bt-done__kicker">✓ Đã hoàn tất</p>
+          <h2>08 đội đã được chia xong!</h2>
+          <p>
+            Kết quả chỉ hiển thị để trình chiếu — Ban tổ chức vẫn cần nhập tay
+            danh sách chính thức vào hệ thống quản lý sau buổi lễ.
+          </p>
+          <div class="bt-done__actions">
+            <button class="bt-btn bt-btn--primary" id="restartBtn" type="button">
+              🔁 Bốc thăm lại
+            </button>
+            <a class="bt-btn bt-btn--ghost" href="index.html#schedule"
+              >→ Xem lịch thi đấu</a
+            >
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <div class="bt-confetti" id="confetti" aria-hidden="true"></div>
+
+    <script src="seed-data.js"></script>
+    <script src="boc-tham.js"></script>
+  </body>
+</html>
