@@ -44,7 +44,8 @@ const SEED_TIERS = {
       'Thuận Sovo',
       'Thuy Dang',
       'Châu Đỗ',
-      'Quân Trần'
+      'Quân Trần',
+      'Hiếu Trương'
     ],
     T4: ['Mạnh Ngô', 'Khầy Trường', 'Chen', 'Khắc Trà'],
     T5: ['Phương Nam', 'Quang V', 'Xuân Trường', 'Mr Mountain']
