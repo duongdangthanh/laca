@@ -55,7 +55,7 @@ timer = setInterval(tick, 1000)
 
 // --- Scroll reveal ---
 const revealTargets = document.querySelectorAll(
-  '.sec-head, .pillar, .fcard, .rules-note, .venue__info, .venue__map, .stat, .guide-flow__step, .guide-card, .gender-block, .roster-col, .bigmatch, .timeline li, .prize, .ref-table-wrap, .draw-tool'
+  '.sec-head, .pillar, .fcard, .rules-note, .venue__info, .venue__map, .stat, .guide-flow__step, .guide-card, .gender-block, .bigmatch, .timeline li, .prize, .ref-table-wrap'
 )
 revealTargets.forEach(el => el.classList.add('reveal'))
 const io = new IntersectionObserver(
@@ -104,8 +104,8 @@ function escapeHtml(str) {
 }
 
 // ===== Tournament data model (Điều lệ LACA TEAM CHAMPIONSHIP — SEASON 4) =====
-// BOARD_TEAMS / BOARDS / TEAMS / SEED_TIERS / REGISTERED... nằm ở seed-data.js
-// (nạp trước file này trong index.html) — dùng chung với trang "Lễ bốc thăm".
+// BOARD_TEAMS / BOARDS / TEAMS nằm ở seed-data.js (nạp trước file này trong
+// index.html).
 
 // Xoay cặp mục VII — áp dụng đồng nhất cho cả 8 đội theo lượt vòng bảng của đội đó.
 const ROTATION = [
@@ -235,52 +235,38 @@ const KO_DEFS = {
 }
 
 // ===== Danh sách chính thức (mục III) =====
-// Không có đăng ký online — Ban tổ chức điền tên trực tiếp vào đây khi có
-// danh sách chốt. Để trống thì lịch thi đấu sẽ hiển thị mã số, ví dụ "A-M1".
+// Đội 1–4 = Bảng A (mã A–D) · Đội 5–8 = Bảng B (mã E–H) — đúng danh sách đội
+// chính thức đã chốt (không phải kết quả của công cụ bốc thăm ngẫu nhiên).
+// Cập nhật trực tiếp tại đây nếu có thay đổi nhân sự.
 const ROSTER = {
-  A: { M1: '', M2: '', M3: '', W1: '', W2: '', W3: '' },
-  B: { M1: '', M2: '', M3: '', W1: '', W2: '', W3: '' },
-  C: { M1: '', M2: '', M3: '', W1: '', W2: '', W3: '' },
-  D: { M1: '', M2: '', M3: '', W1: '', W2: '', W3: '' },
-  E: { M1: '', M2: '', M3: '', W1: '', W2: '', W3: '' },
-  F: { M1: '', M2: '', M3: '', W1: '', W2: '', W3: '' },
-  G: { M1: '', M2: '', M3: '', W1: '', W2: '', W3: '' },
-  H: { M1: '', M2: '', M3: '', W1: '', W2: '', W3: '' }
+  A: { M1: 'Hùng', M2: 'Thuy Dang', M3: 'Quang V', W1: 'Mai Nguyễn', W2: 'Trang Lê', W3: 'Thanh Tâm' },
+  B: { M1: 'Quốc Ân', M2: 'Châu Đỗ', M3: 'Chen', W1: 'Mai Trân', W2: 'Thảo Hiếu', W3: 'Hoa Vũ' },
+  C: { M1: 'Khoa', M2: 'Tiến Hoàng', M3: 'Xuân Trường', W1: 'Tyna Trương', W2: 'Hoàng Phúc', W3: 'Ngọc' },
+  D: { M1: 'Huy Lưu', M2: 'Quân Trần', M3: 'Mạnh Ngô', W1: 'Diệp Ann', W2: 'Mai Thu', W3: 'Lyxynk' },
+  E: { M1: 'Đình Tiến', M2: 'Thanh Mập', M3: 'Sơn Núi', W1: 'Vạn Duyên', W2: 'Phạm Thoa', W3: 'Thao Flyer' },
+  F: { M1: 'Quang Khánh', M2: 'Lukita', M3: 'Khắc Trà', W1: 'Diệu', W2: 'Minh Anh', W3: 'Trúc Quyên' },
+  G: { M1: 'Minh Pandora', M2: 'Thuận Sovo', M3: 'Phương Nam', W1: 'Ánh Lê', W2: 'Ukly Hiền', W3: 'Khanh' },
+  H: { M1: 'Tùng Nè', M2: 'Hiếu Trương', M3: 'Khầy Trường', W1: 'Toại Thủy', W2: 'Minh Thảo', W3: 'Thiên Hà' }
 }
 
-// ===== Nhóm hạt giống & danh sách đăng ký =====
-// SEED_TIERS / TIER_ORDER / flattenTiers / REGISTERED / REGISTERED_LIMIT nằm
-// ở seed-data.js (dùng chung với trang "Lễ bốc thăm" — mục IV).
-
-function renderRegisteredList(listId, countId, names) {
-  const listEl = document.getElementById(listId)
-  const countEl = document.getElementById(countId)
-  if (listEl) {
-    listEl.innerHTML = names
-      .map(
-        (name, i) => `<li>
-          <span class="pair__no">${String(i + 1).padStart(2, '0')}</span>
-          <span class="roster__name">${escapeHtml(name)}</span>
-        </li>`
-      )
-      .join('')
-  }
-  if (countEl) {
-    countEl.textContent = `${names.length}/${REGISTERED_LIMIT}`
-    countEl.classList.toggle('is-full', names.length >= REGISTERED_LIMIT)
-  }
+// ===== Danh sách đội =====
+function teamCardHTML(team) {
+  const nam = ['M1', 'M2', 'M3'].map(r => memberName(team, r)).join(', ')
+  const nu = ['W1', 'W2', 'W3'].map(r => memberName(team, r)).join(', ')
+  return `<div class="schedule-group is-visible team-card">
+      <div class="team-card__code">Đội ${team}</div>
+      <div class="team-card__roster">
+        <div><span class="team-card__label">Nam</span> ${escapeHtml(nam)}</div>
+        <div><span class="team-card__label">Nữ</span> ${escapeHtml(nu)}</div>
+      </div>
+    </div>`
 }
 
-renderRegisteredList(
-  'registeredFemaleList',
-  'registeredFemaleCount',
-  REGISTERED.nu
-)
-renderRegisteredList(
-  'registeredMaleList',
-  'registeredMaleCount',
-  REGISTERED.nam
-)
+function renderTeamRoster() {
+  const el = document.getElementById('teamRosterGrid')
+  if (!el) return
+  el.innerHTML = TEAMS.map(teamCardHTML).join('')
+}
 
 // ===== Persisted state (chỉ lưu tỷ số — không lưu đăng ký) =====
 const SCORE_KEY = 'laca_s4_scores_v1'
@@ -633,6 +619,63 @@ function boardTieNoteEl(board) {
   return document.getElementById(board === 'A' ? 'tieNoteA' : 'tieNoteB')
 }
 
+// Tổng quan lịch thi đấu trận lớn (chưa đi vào chi tiết trận con) — mỗi thẻ
+// là 1 trận lớn: lượt, giờ, sân, và đội hình 2 đội đối đầu.
+function teamRosterLine(team) {
+  const nam = ['M1', 'M2', 'M3'].map(r => memberName(team, r)).join(', ')
+  const nu = ['W1', 'W2', 'W3'].map(r => memberName(team, r)).join(', ')
+  return `Nam: ${escapeHtml(nam)} · Nữ: ${escapeHtml(nu)}`
+}
+
+function timeRangeLabel(round) {
+  const rt = ROUND_TIME[round - 1]
+  const start = rt.ab.split(' – ')[0]
+  const end = rt.c.split(' – ')[1]
+  return `${start}–${end}`
+}
+
+function overviewMatchCardHTML(m) {
+  return `<div class="schedule-group is-visible bigmatch bigmatch--overview">
+      <div class="bigmatch__head">
+        <span class="bigmatch__code">Lượt ${m.round} · ${timeRangeLabel(m.round)} · Sân ${m.courts.join(' & ')}</span>
+        <h4>Đội ${m.home} <span class="bigmatch__vs">vs</span> Đội ${m.away}</h4>
+      </div>
+      <div class="overview-teams">
+        <div class="overview-team">
+          <div class="overview-team__code">Đội ${m.home}</div>
+          <div class="overview-team__roster">${teamRosterLine(m.home)}</div>
+        </div>
+        <div class="overview-team overview-team--right">
+          <div class="overview-team__code">Đội ${m.away}</div>
+          <div class="overview-team__roster">${teamRosterLine(m.away)}</div>
+        </div>
+      </div>
+    </div>`
+}
+
+function renderBigMatchOverview() {
+  const container = document.getElementById('bigMatchOverview')
+  if (!container) return
+  const rounds = [1, 2, 3]
+  container.innerHTML = BOARDS.map(board => {
+    const matches = buildBoardBigMatches(board)
+    return `<div class="overview-board">
+        <h4 class="overview-board__title">Bảng ${board}</h4>
+        ${rounds
+          .map(round => {
+            const roundMatches = matches.filter(m => m.round === round)
+            return `<div class="bigmatch-round">
+                <h5 class="bigmatch-round__title">Lượt ${round}</h5>
+                <div class="bigmatch-round__grid">
+                  ${roundMatches.map(overviewMatchCardHTML).join('')}
+                </div>
+              </div>`
+          })
+          .join('')}
+      </div>`
+  }).join('')
+}
+
 function renderBoardSchedule(board) {
   const container = boardScheduleEl(board)
   if (!container) return
@@ -694,47 +737,6 @@ function refreshAllDerived() {
   refreshKnockoutDerived()
 }
 
-// ===== Bốc thăm chia đội (mục IV) =====
-// Trình chiếu trực tiếp (10 giỏ hạt giống, hiệu ứng full-screen) đã chuyển
-// sang trang riêng boc-tham.html — dùng chung dữ liệu/thuật toán ở
-// seed-data.js, không lặp lại công cụ ở đây nữa. Nếu cần bốc kết quả và áp
-// luôn vào roster của trang này (ví dụ để test lịch thi đấu), gọi trực tiếp
-// từ console: applyDrawResult(drawTeams()) rồi BOARDS.forEach(renderBoardSchedule).
-function applyDrawResult(result) {
-  TEAMS.forEach(team => Object.assign(roster[team], result[team]))
-}
-
-// ===== Danh sách hạt giống công khai =====
-function seedTierTableHTML(genderLabel, tiers) {
-  const total = TIER_ORDER.reduce((sum, t) => sum + tiers[t].length, 0)
-  const rows = TIER_ORDER.map(
-    (key, i) => `<tr>
-        <td>Tier ${i + 1}</td>
-        <td>${tiers[key].length}</td>
-        <td style="text-align: left">${tiers[key].map(escapeHtml).join(', ')}</td>
-      </tr>`
-  ).join('')
-  return `<div class="ref-table-wrap">
-      <table class="ref-table ref-table--compact">
-        <caption class="ref-table__caption">Nhóm hạt giống ${genderLabel} (${total} VĐV)</caption>
-        <thead>
-          <tr><th>Tier</th><th>Số VĐV</th><th>Thành viên</th></tr>
-        </thead>
-        <tbody>${rows}</tbody>
-      </table>
-    </div>`
-}
-
-function renderSeedPreview() {
-  const el = document.getElementById('seedPreviewTables')
-  if (!el) return
-  el.innerHTML =
-    seedTierTableHTML('Nam', SEED_TIERS.nam) +
-    seedTierTableHTML('Nữ', SEED_TIERS.nu)
-}
-
-renderSeedPreview()
-
 // ===== Event wiring =====
 document.addEventListener('input', e => {
   const input = e.target
@@ -772,6 +774,8 @@ document.addEventListener('input', e => {
 })
 
 // ===== Init =====
+renderTeamRoster()
+renderBigMatchOverview()
 BOARDS.forEach(renderBoardSchedule)
 renderKnockout()
 refreshAllDerived()
