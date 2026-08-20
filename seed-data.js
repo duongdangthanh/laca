@@ -17,7 +17,7 @@ const TEAMS = [...BOARD_TEAMS.A, ...BOARD_TEAMS.B]
 // là danh sách gốc trước khi Ban tổ chức chốt danh sách đăng ký chính thức.
 const SEED_TIERS = {
   nu: {
-    T1: ['Diệp Ann', 'Mai Trân', 'Toại Thuỷ', 'Diệu'],
+    T1: ['Diệp Ann', 'Mai Trân', 'Toại Thuỷ', 'Loan Nguyễn'],
     T2: ['Tyna Trương', 'Mai Nguyễn', 'Vạn Duyên', 'Ánh Lê'],
     T3: [
       'Hoàng Phúc',

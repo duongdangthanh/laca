@@ -239,14 +239,70 @@ const KO_DEFS = {
 // chính thức đã chốt (không phải kết quả của công cụ bốc thăm ngẫu nhiên).
 // Cập nhật trực tiếp tại đây nếu có thay đổi nhân sự.
 const ROSTER = {
-  A: { M1: 'Hùng', M2: 'Thuy Dang', M3: 'Quang V', W1: 'Mai Nguyễn', W2: 'Trang Lê', W3: 'Thanh Tâm' },
-  B: { M1: 'Quốc Ân', M2: 'Châu Đỗ', M3: 'Chen', W1: 'Mai Trân', W2: 'Thảo Hiếu', W3: 'Hoa Vũ' },
-  C: { M1: 'Khoa', M2: 'Tiến Hoàng', M3: 'Xuân Trường', W1: 'Tyna Trương', W2: 'Hoàng Phúc', W3: 'Ngọc' },
-  D: { M1: 'Huy Lưu', M2: 'Quân Trần', M3: 'Mạnh Ngô', W1: 'Diệp Ann', W2: 'Mai Thu', W3: 'Lyxynk' },
-  E: { M1: 'Đình Tiến', M2: 'Thanh Mập', M3: 'Sơn Núi', W1: 'Vạn Duyên', W2: 'Phạm Thoa', W3: 'Thao Flyer' },
-  F: { M1: 'Quang Khánh', M2: 'Lukita', M3: 'Khắc Trà', W1: 'Diệu', W2: 'Minh Anh', W3: 'Trúc Quyên' },
-  G: { M1: 'Minh Pandora', M2: 'Thuận Sovo', M3: 'Phương Nam', W1: 'Ánh Lê', W2: 'Ukly Hiền', W3: 'Khanh' },
-  H: { M1: 'Tùng Nè', M2: 'Hiếu Trương', M3: 'Khầy Trường', W1: 'Toại Thủy', W2: 'Minh Thảo', W3: 'Thiên Hà' }
+  A: {
+    M1: 'Hùng',
+    M2: 'Thuy Dang',
+    M3: 'Quang V',
+    W1: 'Mai Nguyễn',
+    W2: 'Trang Lê',
+    W3: 'Thanh Tâm'
+  },
+  B: {
+    M1: 'Quốc Ân',
+    M2: 'Châu Đỗ',
+    M3: 'Chen',
+    W1: 'Mai Trân',
+    W2: 'Thảo Hiếu',
+    W3: 'Hoa Vũ'
+  },
+  C: {
+    M1: 'Khoa',
+    M2: 'Tiến Hoàng',
+    M3: 'Xuân Trường',
+    W1: 'Tyna Trương',
+    W2: 'Hoàng Phúc',
+    W3: 'Ngọc'
+  },
+  D: {
+    M1: 'Huy Lưu',
+    M2: 'Quân Trần',
+    M3: 'Mạnh Ngô',
+    W1: 'Diệp Ann',
+    W2: 'Mai Thu',
+    W3: 'Lyxynk'
+  },
+  E: {
+    M1: 'Đình Tiến',
+    M2: 'Thanh Mập',
+    M3: 'Sơn Núi',
+    W1: 'Vạn Duyên',
+    W2: 'Phạm Thoa',
+    W3: 'Thao Flyer'
+  },
+  F: {
+    M1: 'Quang Khánh',
+    M2: 'Lukita',
+    M3: 'Khắc Trà',
+    W1: 'Loan Nguyễn',
+    W2: 'Minh Anh',
+    W3: 'Trúc Quyên'
+  },
+  G: {
+    M1: 'Minh Pandora',
+    M2: 'Thuận Sovo',
+    M3: 'Phương Nam',
+    W1: 'Ánh Lê',
+    W2: 'Ukly Hiền',
+    W3: 'Khanh'
+  },
+  H: {
+    M1: 'Tùng Nè',
+    M2: 'Hiếu Trương',
+    M3: 'Khầy Trường',
+    W1: 'Toại Thủy',
+    W2: 'Minh Thảo',
+    W3: 'Thiên Hà'
+  }
 }
 
 // ===== Danh sách đội =====
