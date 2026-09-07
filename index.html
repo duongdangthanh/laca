@@ -8,7 +8,7 @@
     </title>
     <meta
       name="description"
-      content="LACA TEAM CHAMPIONSHIP SEASON 4 — 08 đội, 48 VĐV (24 nam · 24 nữ) thi đấu đồng đội nam nữ, vòng bảng kết hợp vòng loại trực tiếp. Thứ Bảy 12.09.2026 tại KingKong Pickleball Court, Đà Nẵng."
+      content="LACA TEAM CHAMPIONSHIP SEASON 4 — 08 đội, 48 VĐV (24 nam · 24 nữ) thi đấu đồng đội nam nữ, vòng bảng kết hợp vòng loại trực tiếp. Thứ Bảy 12.09.2026 tại Sân Trang Hoàng, 86 Duy Tân, Đà Nẵng."
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -101,7 +101,7 @@
 
         <div class="hero__meta">
           <span>📅 Thứ Bảy, 12.09.2026 · 08h15–13h30 (khai cuộc 09h00)</span>
-          <span>📍 KingKong Pickleball Court, 589 Hoàng Diệu, TP. Đà Nẵng</span>
+          <span>📍 Sân Trang Hoàng, 86 Duy Tân, TP. Đà Nẵng</span>
           <span>🎾 08 sân · Đôi nam – Đôi nữ – Đôi nam nữ</span>
         </div>
 
@@ -120,7 +120,7 @@
       </div>
       <div class="stat">
         <span class="stat__num" data-count="8">8</span>
-        <span class="stat__lbl">Đội (A–H)</span>
+        <span class="stat__lbl">Đội (1–8)</span>
       </div>
       <div class="stat">
         <span class="stat__num" data-count="15">15</span>
@@ -149,7 +149,7 @@
           vòng tròn 1 lượt và vòng loại trực tiếp (bán kết – chung kết), toàn bộ
           diễn ra trong 01 ngày trên
           <strong>08 sân</strong>
-          của KingKong Pickleball Court.
+          của Sân Trang Hoàng.
         </p>
       </div>
       <div class="pillars">
@@ -363,13 +363,17 @@
     <section class="section" id="registered">
       <div class="sec-head">
         <span class="kicker">03 · Danh sách đội</span>
-        <h2>08 đội chính thức (A–H)</h2>
-        <p>
-          Mỗi đội 06 người (03 nam · 03 nữ). Xem lịch thi đấu từng đội tại mục
-          <a href="#schedule">Vòng bảng</a>.
-        </p>
+        <h2>08 đội chính thức</h2>
+        <p>Mỗi đội 06 người (03 nam · 03 nữ).</p>
       </div>
       <div class="team-roster-grid" id="teamRosterGrid"></div>
+
+      <div class="sec-head sec-head--sub">
+        <h3>Lịch thi đấu theo đội</h3>
+        <p>Chọn đội để xem đúng 3 trận vòng bảng và đội hình từng trận con.</p>
+      </div>
+      <div class="team-switch" id="teamSwitch" role="tablist" aria-label="Chọn đội"></div>
+      <div class="team-detail" id="teamDetail"></div>
     </section>
 
     <!-- GUIDE -->
@@ -637,9 +641,16 @@
       </div>
       <div id="bigMatchOverview"></div>
 
-      <!-- Tạm ẩn: chi tiết trận con (nhập tỷ số) + bảng xếp hạng — mở lại khi
-           có danh sách đăng ký chính thức. Xoá thuộc tính "hidden" để hiện lại. -->
-      <div id="subMatchDetail" hidden>
+      <div class="sec-head sec-head--sub">
+        <h3>Lịch thi đấu theo sân</h3>
+        <p>
+          Toàn bộ trận con (vòng bảng + vòng loại trực tiếp) diễn ra trên từng
+          sân, xếp theo giờ — tiện theo dõi một sân xuyên suốt cả ngày.
+        </p>
+      </div>
+      <div class="court-grid" id="courtSchedule"></div>
+
+      <div id="subMatchDetail">
         <div class="gender-block">
           <div class="gender-block__head">
             <span class="gender-block__icon" aria-hidden="true">A</span>
@@ -843,7 +854,7 @@
     <section class="section section--alt" id="venue">
       <div class="sec-head">
         <span class="kicker">09 · Địa điểm</span>
-        <h2>KingKong Pickleball Court</h2>
+        <h2>Sân Trang Hoàng</h2>
         <p>
           Hệ thống 8 sân thi đấu tiêu chuẩn — toàn bộ giải diễn ra trong 01 ngày
           duy nhất.
@@ -854,7 +865,7 @@
           <ul>
             <li>
               <strong>📍 Địa điểm:</strong>
-              KingKong Pickleball Court — 589 Hoàng Diệu, TP. Đà Nẵng
+              Sân Trang Hoàng — 86 Duy Tân, TP. Đà Nẵng
             </li>
             <li>
               <strong>🗓️ Thời gian:</strong>
@@ -871,7 +882,7 @@
           </ul>
           <a
             class="btn btn--ghost"
-            href="https://www.google.com/maps/search/KingKong+Pickleball+Court+589+Hoang+Dieu+Da+Nang"
+            href="https://www.google.com/maps/search/San+Trang+Hoang+86+Duy+Tan+Da+Nang"
             target="_blank"
             rel="noopener"
           >
@@ -958,8 +969,8 @@
           <a href="#guide">Hướng dẫn thi đấu</a>
           và
           <a href="#timeline">lịch trong ngày</a>
-          trước giờ khai cuộc. Hẹn gặp cả nhà Thứ Bảy 12.09.2026 tại KingKong
-          Pickleball Court!
+          trước giờ khai cuộc. Hẹn gặp cả nhà Thứ Bảy 12.09.2026 tại Sân Trang
+          Hoàng!
         </p>
         <div class="hero__actions">
           <a href="#schedule" class="btn btn--primary">Xem lịch vòng bảng</a>
@@ -979,7 +990,7 @@
       </div>
       <div class="footer__meta">
         <span>08 đội · 48 VĐV · Vòng bảng + Vòng loại trực tiếp</span>
-        <span>12.09.2026 · KingKong Pickleball Court, Đà Nẵng</span>
+        <span>12.09.2026 · Sân Trang Hoàng, Đà Nẵng</span>
         <span>© 2026 Laca Team. Made for the team.</span>
       </div>
     </footer>

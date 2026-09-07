@@ -107,7 +107,19 @@ function escapeHtml(str) {
 // BOARD_TEAMS / BOARDS / TEAMS nằm ở seed-data.js (nạp trước file này trong
 // index.html).
 
-// Xoay cặp mục VII — áp dụng đồng nhất cho cả 8 đội theo lượt vòng bảng của đội đó.
+// Mã nội bộ A–H → số thứ tự chính thức Đội 1–8 dùng trên phiếu đăng ký (mục
+// III: Đội 1–4 = Bảng A, Đội 5–8 = Bảng B) — mọi nhãn hiển thị ra trang đều
+// đi qua teamLabel() để luôn khớp với số đội thật, không lộ mã chữ cái A–H.
+const TEAM_NUMBER = Object.fromEntries(TEAMS.map((t, i) => [t, i + 1]))
+function teamLabel(team) {
+  return `Đội ${TEAM_NUMBER[team] || team}`
+}
+
+// Xoay cặp mục VII — mỗi đội tự chọn thứ tự ghép cặp riêng theo phiếu đăng ký
+// đội thi đấu đã nộp (xem MATCH_LINEUPS, đã có đủ dữ liệu thật cho cả 8 đội).
+// Bảng này không còn được dùng làm đội hình thi đấu — chỉ giữ lại làm giá trị
+// dự phòng an toàn trong teamLineup() nếu sau này có đội mới chưa kịp có
+// MATCH_LINEUPS riêng.
 const ROTATION = [
   { nam: ['M1', 'M2'], nu: ['W1', 'W2'], mix: ['M3', 'W3'] }, // Trận vòng bảng 1
   { nam: ['M1', 'M3'], nu: ['W1', 'W3'], mix: ['M2', 'W2'] }, // Trận vòng bảng 2
@@ -141,6 +153,7 @@ const SUB_LABELS = {
   nu: 'Trận 2 · Đôi nữ',
   mix: 'Trận 3 · Đôi nam nữ'
 }
+const SUB_KIND_LABEL = { nam: 'Đôi nam', nu: 'Đôi nữ', mix: 'Đôi nam nữ' }
 
 // Vòng tròn 1 lượt, 4 đội [t0,t1,t2,t3]: R1 t0-t1 & t2-t3, R2 t0-t2 & t1-t3,
 // R3 t0-t3 & t1-t2 — đúng sơ đồ đối đầu mục V.2 / lịch chi tiết mục XI.
@@ -177,8 +190,13 @@ function buildBoardBigMatches(board) {
   return matches
 }
 
+function teamLineup(team, round) {
+  return (MATCH_LINEUPS[team] && MATCH_LINEUPS[team][round - 1]) || ROTATION[round - 1]
+}
+
 function buildSubDefs(match) {
-  const r = ROTATION[match.round - 1]
+  const home = teamLineup(match.home, match.round)
+  const away = teamLineup(match.away, match.round)
   const rt = ROUND_TIME[match.round - 1]
   const courts = match.courts
   return [
@@ -188,7 +206,8 @@ function buildSubDefs(match) {
       label: SUB_LABELS.nam,
       time: rt.ab,
       court: courts[0],
-      roles: r.nam
+      homeRoles: home.nam,
+      awayRoles: away.nam
     },
     {
       idx: 2,
@@ -196,7 +215,8 @@ function buildSubDefs(match) {
       label: SUB_LABELS.nu,
       time: rt.ab,
       court: courts[1],
-      roles: r.nu
+      homeRoles: home.nu,
+      awayRoles: away.nu
     },
     {
       idx: 3,
@@ -204,7 +224,8 @@ function buildSubDefs(match) {
       label: SUB_LABELS.mix,
       time: rt.c,
       court: courts[0],
-      roles: r.mix
+      homeRoles: home.mix,
+      awayRoles: away.mix
     }
   ]
 }
@@ -242,19 +263,82 @@ const ROSTER = {
   A: { M1: 'Hùng', M2: 'Thuy Dang', M3: 'Quang V', W1: 'Mai Nguyễn', W2: 'Trang Lê', W3: 'Thanh Tâm' },
   B: { M1: 'Quốc Ân', M2: 'Châu Đỗ', M3: 'Chen', W1: 'Mai Trân', W2: 'Thảo Hiếu', W3: 'Hoa Vũ' },
   C: { M1: 'Khoa', M2: 'Tiến Hoàng', M3: 'Xuân Trường', W1: 'Tyna Trương', W2: 'Hoàng Phúc', W3: 'Ngọc' },
-  D: { M1: 'Huy Lưu', M2: 'Quân Trần', M3: 'Mạnh Ngô', W1: 'Diệp Ann', W2: 'Mai Thu', W3: 'Lyxynk' },
-  E: { M1: 'Đình Tiến', M2: 'Thanh Mập', M3: 'Sơn Núi', W1: 'Vạn Duyên', W2: 'Phạm Thoa', W3: 'Thao Flyer' },
-  F: { M1: 'Quang Khánh', M2: 'Lukita', M3: 'Khắc Trà', W1: 'Diệu', W2: 'Minh Anh', W3: 'Trúc Quyên' },
+  // Đội 4 — đổi người: M2 Quân Trần → Tuấn, W1 Diệp Ann → Beo (cần xác nhận
+  // lại họ tên đầy đủ khi có).
+  D: { M1: 'Huy Lưu', M2: 'Tuấn', M3: 'Mạnh Ngô', W1: 'Beo', W2: 'Mai Thu', W3: 'Lyxynk' },
+  // Đội 5 — đổi người so với danh sách gốc: W2 Phạm Thoa → Nana Phan, M3 Sơn
+  // Núi → Sơn Nguyễn, W3 "Thao Flyer" → "Thảo Flyer" (sửa chính tả), theo
+  // phiếu đăng ký đội thi đấu đã chốt.
+  E: { M1: 'Đình Tiến', M2: 'Thanh Mập', M3: 'Sơn Nguyễn', W1: 'Vạn Duyên', W2: 'Nana Phan', W3: 'Thảo Flyer' },
+  // Đội 6 — đổi người: M2 Lukita → Đình Thông, W1 Diệu → Như Nguyễn.
+  F: { M1: 'Quang Khánh', M2: 'Đình Thông', M3: 'Khắc Trà', W1: 'Như Nguyễn', W2: 'Minh Anh', W3: 'Trúc Quyên' },
   G: { M1: 'Minh Pandora', M2: 'Thuận Sovo', M3: 'Phương Nam', W1: 'Ánh Lê', W2: 'Ukly Hiền', W3: 'Khanh' },
-  H: { M1: 'Tùng Nè', M2: 'Hiếu Trương', M3: 'Khầy Trường', W1: 'Toại Thủy', W2: 'Minh Thảo', W3: 'Thiên Hà' }
+  // Đội 8 — đổi người: W2 Minh Thảo → Tuyết Mie.
+  H: { M1: 'Tùng Nè', M2: 'Hiếu Trương', M3: 'Khầy Trường', W1: 'Toại Thủy', W2: 'Tuyết Mie', W3: 'Thiên Hà' }
+}
+
+// ===== Đội hình từng trận vòng bảng (phiếu đăng ký đội thi đấu) =====
+// Mỗi đội tự chọn cặp thi đấu cho 3 trận lớn của mình (Lượt 1/2/3, theo đúng
+// thứ tự đối thủ ở buildBoardBigMatches) — không dùng chung 1 bảng xoay cố
+// định cho cả 8 đội. Ràng buộc đã đối chiếu với từng phiếu (mục VII):
+//   · Mỗi VĐV thi đấu đúng 1 trận con trong 1 trận lớn.
+//   · Mỗi cặp VĐV chỉ ghép cùng nhau đúng 1 lần trong tổng số 3 trận lớn.
+// Cả 8 đội đã có phiếu chính thức.
+const MATCH_LINEUPS = {
+  // Bảng A
+  A: [
+    { nam: ['M1', 'M3'], nu: ['W2', 'W3'], mix: ['M2', 'W1'] }, // Lượt 1 · gặp B
+    { nam: ['M2', 'M3'], nu: ['W1', 'W2'], mix: ['M1', 'W3'] }, // Lượt 2 · gặp C
+    { nam: ['M1', 'M2'], nu: ['W1', 'W3'], mix: ['M3', 'W2'] } // Lượt 3 · gặp D
+  ],
+  B: [
+    { nam: ['M1', 'M2'], nu: ['W1', 'W3'], mix: ['M3', 'W2'] }, // Lượt 1 · gặp A
+    { nam: ['M2', 'M3'], nu: ['W1', 'W2'], mix: ['M1', 'W3'] }, // Lượt 2 · gặp D
+    { nam: ['M1', 'M3'], nu: ['W2', 'W3'], mix: ['M2', 'W1'] } // Lượt 3 · gặp C — suy ra bằng loại trừ, cần xác nhận lại
+  ],
+  C: [
+    { nam: ['M1', 'M2'], nu: ['W2', 'W3'], mix: ['M3', 'W1'] }, // Lượt 1 · gặp D
+    { nam: ['M1', 'M3'], nu: ['W1', 'W3'], mix: ['M2', 'W2'] }, // Lượt 2 · gặp A
+    { nam: ['M2', 'M3'], nu: ['W1', 'W2'], mix: ['M1', 'W3'] } // Lượt 3 · gặp B
+  ],
+  D: [
+    { nam: ['M2', 'M3'], nu: ['W2', 'W3'], mix: ['M1', 'W1'] }, // Lượt 1 · gặp C
+    { nam: ['M1', 'M2'], nu: ['W1', 'W2'], mix: ['M3', 'W3'] }, // Lượt 2 · gặp B
+    { nam: ['M1', 'M3'], nu: ['W1', 'W3'], mix: ['M2', 'W2'] } // Lượt 3 · gặp A
+  ],
+  // Bảng B
+  E: [
+    { nam: ['M1', 'M3'], nu: ['W1', 'W2'], mix: ['M2', 'W3'] }, // Lượt 1 · gặp F
+    { nam: ['M2', 'M3'], nu: ['W1', 'W3'], mix: ['M1', 'W2'] }, // Lượt 2 · gặp G
+    { nam: ['M1', 'M2'], nu: ['W2', 'W3'], mix: ['M3', 'W1'] } // Lượt 3 · gặp H
+  ],
+  F: [
+    { nam: ['M1', 'M3'], nu: ['W1', 'W3'], mix: ['M2', 'W2'] }, // Lượt 1 · gặp E
+    { nam: ['M2', 'M3'], nu: ['W2', 'W3'], mix: ['M1', 'W1'] }, // Lượt 2 · gặp H
+    { nam: ['M1', 'M2'], nu: ['W1', 'W2'], mix: ['M3', 'W3'] } // Lượt 3 · gặp G
+  ],
+  G: [
+    { nam: ['M1', 'M2'], nu: ['W1', 'W2'], mix: ['M3', 'W3'] }, // Lượt 1 · gặp H
+    { nam: ['M1', 'M3'], nu: ['W1', 'W3'], mix: ['M2', 'W2'] }, // Lượt 2 · gặp E
+    { nam: ['M2', 'M3'], nu: ['W2', 'W3'], mix: ['M1', 'W1'] } // Lượt 3 · gặp F
+  ],
+  H: [
+    { nam: ['M1', 'M2'], nu: ['W1', 'W3'], mix: ['M3', 'W2'] }, // Lượt 1 · gặp G
+    { nam: ['M2', 'M3'], nu: ['W1', 'W2'], mix: ['M1', 'W3'] }, // Lượt 2 · gặp F
+    { nam: ['M1', 'M3'], nu: ['W2', 'W3'], mix: ['M2', 'W1'] } // Lượt 3 · gặp E
+  ]
 }
 
 // ===== Danh sách đội =====
+function teamBoard(team) {
+  return BOARDS.find(b => BOARD_TEAMS[b].includes(team))
+}
+
 function teamCardHTML(team) {
   const nam = ['M1', 'M2', 'M3'].map(r => memberName(team, r)).join(', ')
   const nu = ['W1', 'W2', 'W3'].map(r => memberName(team, r)).join(', ')
   return `<div class="schedule-group is-visible team-card">
-      <div class="team-card__code">Đội ${team}</div>
+      <div class="team-card__code">${teamLabel(team)}</div>
       <div class="team-card__roster">
         <div><span class="team-card__label">Nam</span> ${escapeHtml(nam)}</div>
         <div><span class="team-card__label">Nữ</span> ${escapeHtml(nu)}</div>
@@ -266,6 +350,172 @@ function renderTeamRoster() {
   const el = document.getElementById('teamRosterGrid')
   if (!el) return
   el.innerHTML = TEAMS.map(teamCardHTML).join('')
+}
+
+// ===== Lịch thi đấu theo đội (mục III + VII) — 8 nút chọn đội, mỗi đội hiện
+// đúng 3 trận lớn vòng bảng của mình theo góc nhìn "đội nhà", cùng phong cách
+// hiển thị với phiếu đăng ký đội thi đấu gốc. =====
+let activeTeam = TEAMS[0]
+
+function renderTeamSwitch() {
+  const el = document.getElementById('teamSwitch')
+  if (!el) return
+  el.innerHTML = TEAMS.map(
+    t =>
+      `<button type="button" class="team-switch__btn${t === activeTeam ? ' is-active' : ''}" data-team="${t}">${teamLabel(t)}</button>`
+  ).join('')
+  el.querySelectorAll('.team-switch__btn').forEach(btn => {
+    btn.addEventListener('click', () => selectTeam(btn.dataset.team))
+  })
+}
+
+function selectTeam(team) {
+  activeTeam = team
+  document.querySelectorAll('#teamSwitch .team-switch__btn').forEach(b => {
+    b.classList.toggle('is-active', b.dataset.team === team)
+  })
+  renderTeamDetail(team)
+}
+
+function teamDetailHTML(team) {
+  const board = teamBoard(team)
+  const rosterHTML =
+    ['M1', 'M2', 'M3']
+      .map(
+        (r, i) =>
+          `<div class="team-detail__slot"><span class="team-detail__role">NAM ${i + 1}</span><span class="team-detail__name">${escapeHtml(memberName(team, r))}</span></div>`
+      )
+      .join('') +
+    ['W1', 'W2', 'W3']
+      .map(
+        (r, i) =>
+          `<div class="team-detail__slot"><span class="team-detail__role">NỮ ${i + 1}</span><span class="team-detail__name">${escapeHtml(memberName(team, r))}</span></div>`
+      )
+      .join('')
+
+  const matches = buildBoardBigMatches(board)
+    .filter(m => m.home === team || m.away === team)
+    .sort((a, b) => a.round - b.round)
+
+  const matchesHTML = matches
+    .map(m => {
+      const vm = buildGroupMatchVM(m)
+      const isHome = m.home === team
+      const opponent = isHome ? vm.away : vm.home
+      const rt = ROUND_TIME[m.round - 1]
+      const subsHTML = vm.subs
+        .map(s => {
+          const own = isHome ? s.homePair : s.awayPair
+          const opp = isHome ? s.awayPair : s.homePair
+          return `<div class="team-detail__sub">
+              <div class="team-detail__sub-top">
+                <span class="team-detail__kind">${escapeHtml(SUB_KIND_LABEL[s.kind])}</span>
+                <span class="team-detail__when">${escapeHtml(s.time.split(' – ')[0])} · Sân ${s.court}</span>
+              </div>
+              <div class="team-detail__pairline"><span class="team-detail__pair">${escapeHtml(own)}</span></div>
+              <div class="team-detail__pairline"><span class="team-detail__sep">VS</span><span class="team-detail__pair team-detail__pair--away">${escapeHtml(opp)}</span></div>
+            </div>`
+        })
+        .join('')
+      return `<div class="team-detail__match">
+          <div class="team-detail__match-head">
+            <div class="team-detail__match-top">
+              <span class="team-detail__round">Lượt ${m.round}</span>
+              <h4>${escapeHtml(teamLabel(team))} <span class="team-detail__vs">vs</span> ${escapeHtml(opponent.label)}</h4>
+            </div>
+            <div class="team-detail__meta">${escapeHtml(rt.ab.split(' – ')[0])}–${escapeHtml(rt.c.split(' – ')[1])} · Sân ${m.courts.join(' & ')}</div>
+          </div>
+          ${subsHTML}
+        </div>`
+    })
+    .join('')
+
+  return `
+    <div class="team-detail__head">
+      <div>
+        <span class="team-detail__eyebrow">LACA Team Championship · Season 4</span>
+        <h3>${teamLabel(team)} <em>· Bảng ${board}</em></h3>
+      </div>
+      <div class="team-detail__headright">Danh sách thi đấu <b>chính thức</b> · Vòng bảng</div>
+    </div>
+    <div class="team-detail__roster">${rosterHTML}</div>
+    <div class="team-detail__matches">${matchesHTML}</div>
+  `
+}
+
+function renderTeamDetail(team) {
+  const el = document.getElementById('teamDetail')
+  if (!el) return
+  el.innerHTML = teamDetailHTML(team)
+}
+
+// ===== Lịch thi đấu theo sân — gộp mọi trận con (vòng bảng + vòng loại trực
+// tiếp) đang diễn ra trên từng sân, sắp theo giờ, phục vụ trọng tài/BTC đứng
+// sân theo dõi cả ngày thay vì lật từng bảng. =====
+function buildCourtSchedule() {
+  const byCourt = {}
+  const push = it => {
+    ;(byCourt[it.court] = byCourt[it.court] || []).push(it)
+  }
+  BOARDS.forEach(board => {
+    buildBoardBigMatches(board).forEach(m => {
+      const vm = buildGroupMatchVM(m)
+      vm.subs.forEach(s => {
+        push({
+          court: s.court,
+          time: s.time,
+          label: `${vm.home.label} vs ${vm.away.label}`,
+          kind: SUB_KIND_LABEL[s.kind],
+          stage: `Vòng bảng · Bảng ${board} · Lượt ${m.round}`
+        })
+      })
+    })
+  })
+  Object.keys(KO_DEFS).forEach(id => {
+    const def = KO_DEFS[id]
+    const vm = buildKoMatchVM(id)
+    vm.subs.forEach(s => {
+      push({
+        court: s.court,
+        time: s.time,
+        label: `${vm.home.label} vs ${vm.away.label}`,
+        kind: SUB_KIND_LABEL[s.kind],
+        stage: def.label
+      })
+    })
+  })
+  const startTime = t => t.split(' – ')[0]
+  Object.values(byCourt).forEach(list =>
+    list.sort((a, b) => startTime(a.time).localeCompare(startTime(b.time)))
+  )
+  return byCourt
+}
+
+function renderCourtSchedule() {
+  const el = document.getElementById('courtSchedule')
+  if (!el) return
+  const byCourt = buildCourtSchedule()
+  const courts = Object.keys(byCourt)
+    .map(Number)
+    .sort((a, b) => a - b)
+  el.innerHTML = courts
+    .map(
+      c => `<div class="court-card">
+        <div class="court-card__head">Sân ${c}</div>
+        <div class="court-card__list">
+          ${byCourt[c]
+            .map(
+              it => `<div class="court-row">
+                <span class="court-row__time">${escapeHtml(it.time)}</span>
+                <span class="court-row__match">${escapeHtml(it.label)} <small>· ${escapeHtml(it.kind)}</small></span>
+                <span class="court-row__stage">${escapeHtml(it.stage)}</span>
+              </div>`
+            )
+            .join('')}
+        </div>
+      </div>`
+    )
+    .join('')
 }
 
 // ===== Persisted state (chỉ lưu tỷ số — không lưu đăng ký) =====
@@ -314,14 +564,14 @@ function buildGroupMatchVM(match) {
     label: s.label,
     time: s.time,
     court: s.court,
-    homePair: pairLabel(match.home, s.roles),
-    awayPair: pairLabel(match.away, s.roles)
+    homePair: pairLabel(match.home, s.homeRoles),
+    awayPair: pairLabel(match.away, s.awayRoles)
   }))
   return {
     id: match.id,
     code: `Lượt ${match.round} · Trận lớn ${match.pos + 1}`,
-    home: { code: match.home, label: `Đội ${match.home}` },
-    away: { code: match.away, label: `Đội ${match.away}` },
+    home: { code: match.home, label: teamLabel(match.home) },
+    away: { code: match.away, label: teamLabel(match.away) },
     subs,
     freeLineup: false
   }
@@ -470,7 +720,7 @@ function getBoardStandings(board) {
         rows[i].scored === rows[i + 1].scored &&
         !headToHeadWinner(rows[i].team, rows[i + 1].team)
       ) {
-        tieNote = `Đội ${rows[i].team} và Đội ${rows[i + 1].team} (Bảng ${board}) vẫn ngang nhau ở mọi chỉ số — Ban tổ chức sẽ quyết định theo hình thức bốc thăm (mục V.3).`
+        tieNote = `${teamLabel(rows[i].team)} và ${teamLabel(rows[i + 1].team)} (Bảng ${board}) vẫn ngang nhau ở mọi chỉ số — Ban tổ chức sẽ quyết định theo hình thức bốc thăm (mục V.3).`
         break
       }
     }
@@ -481,7 +731,7 @@ function getBoardStandings(board) {
 function resolveBoardRank(board, rank) {
   const { rows } = getBoardStandings(board)
   const row = rows[rank - 1]
-  if (row) return { code: row.team, label: `Đội ${row.team}` }
+  if (row) return { code: row.team, label: teamLabel(row.team) }
   return {
     code: null,
     label: rank === 1 ? `Nhất bảng ${board}` : `Nhì bảng ${board}`
@@ -775,7 +1025,10 @@ document.addEventListener('input', e => {
 
 // ===== Init =====
 renderTeamRoster()
+renderTeamSwitch()
+renderTeamDetail(activeTeam)
 renderBigMatchOverview()
 BOARDS.forEach(renderBoardSchedule)
+renderCourtSchedule()
 renderKnockout()
 refreshAllDerived()
