@@ -266,10 +266,10 @@ const ROSTER = {
   // Đội 4 — đổi người: M2 Quân Trần → Tuấn, W1 Diệp Ann → Beo (cần xác nhận
   // lại họ tên đầy đủ khi có).
   D: { M1: 'Huy Lưu', M2: 'Tuấn', M3: 'Mạnh Ngô', W1: 'Beo', W2: 'Mai Thu', W3: 'Lyxynk' },
-  // Đội 5 — đổi người so với danh sách gốc: W2 Phạm Thoa → Nana Phan, M3 Sơn
-  // Núi → Sơn Nguyễn, W3 "Thao Flyer" → "Thảo Flyer" (sửa chính tả), theo
-  // phiếu đăng ký đội thi đấu đã chốt.
-  E: { M1: 'Đình Tiến', M2: 'Thanh Mập', M3: 'Sơn Nguyễn', W1: 'Vạn Duyên', W2: 'Nana Phan', W3: 'Thảo Flyer' },
+  // Đội 5 — đổi người so với danh sách gốc: W2 Phạm Thoa → Nana Phan → Noa
+  // Múa, M3 Sơn Núi → Sơn Nguyễn, W3 "Thao Flyer" → "Thảo Flyer" (sửa chính
+  // tả), theo phiếu đăng ký đội thi đấu đã chốt.
+  E: { M1: 'Đình Tiến', M2: 'Thanh Mập', M3: 'Sơn Nguyễn', W1: 'Vạn Duyên', W2: 'Noa Múa', W3: 'Thảo Flyer' },
   // Đội 6 — đổi người: M2 Lukita → Đình Thông, W1 Diệu → Như Nguyễn.
   F: { M1: 'Quang Khánh', M2: 'Đình Thông', M3: 'Khắc Trà', W1: 'Như Nguyễn', W2: 'Minh Anh', W3: 'Trúc Quyên' },
   G: { M1: 'Minh Pandora', M2: 'Thuận Sovo', M3: 'Phương Nam', W1: 'Ánh Lê', W2: 'Ukly Hiền', W3: 'Khanh' },
