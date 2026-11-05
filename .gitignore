@@ -1,1 +1,7 @@
 *.xlsx
+
+node_modules/
+dist/
+.netlify/
+.env*
+.DS_Store

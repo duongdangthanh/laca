@@ -1,0 +1,32 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+  functions = "netlify/functions"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+[functions]
+  node_bundler = "esbuild"
+
+[[redirects]]
+  from = "/api/club/*"
+  to = "/.netlify/functions/club/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/pickleball"
+  to = "/pickleball/"
+  status = 301
+
+[[headers]]
+  for = "/pickleball/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+[[headers]]
+  for = "/api/club/*"
+  [headers.values]
+    Cache-Control = "no-store"
